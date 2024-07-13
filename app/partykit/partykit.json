@@ -1,0 +1,10 @@
+{
+  "$schema": "https://www.partykit.io/schema.json",
+  "name": "quest-board",
+  "main": "src/server.ts",
+  "compatibilityDate": "2024-07-13",
+  "serve": {
+    "path": "public",
+    "build": "src/client.ts"
+  }
+}
