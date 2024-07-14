@@ -34,10 +34,19 @@ pub struct Quest {
 
   /// The amount of governance token staked by the offeree. (1 + 8)
   pub offeree_staked: Option<u64>,
+
+  /// Votes for owner. (1 + 8)
+  pub owner_votes: Option<u64>,
+
+  /// Votes for offeree. (1 + 8)
+  pub offeree_votes: Option<u64>,
+
+  /// Votes for abstained (resulting to draw). (1 + 8)
+  pub abstained_votes: Option<u64>,
 }
 
 impl Quest {
   pub fn len() -> usize {
-    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + (1 + 32) + (1 + 8)
+    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8) + (1 + 8)
   }
 }
