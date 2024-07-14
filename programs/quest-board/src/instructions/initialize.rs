@@ -6,6 +6,7 @@ use crate::{program::QuestBoard, state::Config};
 pub struct InitializeParams {
   pub treasury: Pubkey,
   pub token: Pubkey,
+  pub base_fee: u64,
   pub decay_fee: u64,
 }
 
@@ -47,6 +48,7 @@ pub fn initialize_handler(ctx: Context<Initialize>, params: InitializeParams) ->
   config.authority = ctx.accounts.authority.key();
   config.treasury = params.treasury.key();
   config.token = params.token.key();
+  config.base_fee = params.base_fee;
   config.decay_fee = params.decay_fee;
 
   Ok(())

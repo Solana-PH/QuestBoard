@@ -5,7 +5,10 @@ pub struct Quest {
   /// Bump nonce of the PDA. (1)
   pub bump: u8,
 
-  /// unpublished: 0, open: 1, taken: 2, dispute: 3, complete: 4. (1)
+  /// unpublished: 0, open: 1, taken: 3, 
+  /// complete: 5 (101: owner signed), 6 (110: offeree signed), 7 (111: both signed),
+  /// dispute: 9 (1001: owner initiated), 10 (1010: offeree initiated), 11 (1011: both called),
+  /// dispute resolved: 13 (1101: owner won), 14 (1110: offeree won), 15 (1111: draw). (1)
   pub status: u8,
 
   /// The owner of the Quest. (32)
