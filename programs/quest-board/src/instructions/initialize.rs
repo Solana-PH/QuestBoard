@@ -8,6 +8,11 @@ pub struct InitializeParams {
   pub token: Pubkey,
   pub base_fee: u64,
   pub decay_fee: u64,
+  pub decay_start: u64,
+  pub vote_threshold: u64,
+  pub dispute_duration: u64,
+  pub staked_vote_power_start: u64,
+  pub unstaked_vote_unlock_interval: u64,
 }
 
 #[derive(Accounts)]
@@ -50,6 +55,11 @@ pub fn initialize_handler(ctx: Context<Initialize>, params: InitializeParams) ->
   config.token = params.token.key();
   config.base_fee = params.base_fee;
   config.decay_fee = params.decay_fee;
+  config.decay_start = params.decay_start;
+  config.vote_threshold = params.vote_threshold;
+  config.dispute_duration = params.dispute_duration;
+  config.staked_vote_power_start = params.staked_vote_power_start;
+  config.unstaked_vote_unlock_interval = params.unstaked_vote_unlock_interval;
 
   Ok(())
 }
