@@ -12,7 +12,7 @@ pub struct Config {
   pub treasury: Pubkey,
 
   /// Governance token to use. (32)
-  pub token: Pubkey,
+  pub token_mint: Pubkey,
 
   /// Amount of fee being collected when a Quest is created. (8)
   pub base_fee: u64,

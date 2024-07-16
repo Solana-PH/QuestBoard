@@ -29,6 +29,9 @@ pub struct Quest {
   /// SHA256 of the title and the description of the Quest. (32)
   pub details_hash: [u8; 32],
 
+  /// ID used to define the seed. (32)
+  pub id: Pubkey,
+
   /// The offeree of the Quest. (1 + 32)
   pub offeree: Option<Pubkey>,
 
@@ -47,6 +50,17 @@ pub struct Quest {
 
 impl Quest {
   pub fn len() -> usize {
-    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8) + (1 + 8)
+    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + 32 + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8) + (1 + 8)
   }
+}
+
+// MinStakeRequiredExceedsStaked
+
+#[error_code]
+pub enum QuestError {
+  #[msg("The minimum stake required exceeds the staked amount.")]
+  MinStakeRequiredExceedsStaked,
+
+  #[msg("The owner does not have enough governance tokens.")]
+  NotEnoughTokenBalance,
 }

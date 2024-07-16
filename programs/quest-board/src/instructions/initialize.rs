@@ -23,7 +23,7 @@ pub struct Initialize<'info> {
     init, 
     payer = authority, 
     seeds = [
-      "config".as_bytes(),
+      b"config",
     ], 
     bump, 
     space = Config::len()
@@ -52,7 +52,7 @@ pub fn initialize_handler(ctx: Context<Initialize>, params: InitializeParams) ->
   config.bump = ctx.bumps.config;
   config.authority = ctx.accounts.authority.key();
   config.treasury = params.treasury.key();
-  config.token = params.token.key();
+  config.token_mint = params.token.key();
   config.base_fee = params.base_fee;
   config.decay_fee = params.decay_fee;
   config.decay_start = params.decay_start;
