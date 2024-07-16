@@ -88,7 +88,7 @@ pub enum QuestError {
   #[msg("The Quest is not open.")]
   QuestNotOpen,
 
-  #[msg("The Quest cannot be closed")]
+  #[msg("The Quest cannot be closed.")]
   CloseNotAllowed,
 
   #[msg("Insufficient stake amount for the Quest.")]
@@ -96,4 +96,7 @@ pub enum QuestError {
 
   #[msg("The stake amount is too high for the Quest.")]
   StakeAmountTooHigh,
+
+  #[msg("The Quest cannot be completed.")]
+  CompleteNotAllowed,
 }

@@ -46,8 +46,13 @@ pub struct CloseQuest<'info> {
     ],
     bump = config.bump,
     has_one = token_mint,
+    has_one = treasury,
   )]
   pub config: Account<'info, Config>,
+
+  #[account(mut)]
+  /// CHECK: has_one in the config account
+  pub treasury: UncheckedAccount<'info>,
 
   pub owner: Signer<'info>,
 

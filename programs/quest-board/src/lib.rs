@@ -39,4 +39,8 @@ pub mod quest_board {
     accept_quest_handler(ctx, params)
   }
 
+  pub fn complete_quest(ctx: Context<CompleteQuest>) -> Result<()> {
+    complete_quest_handler(ctx)
+  }
+
 }
