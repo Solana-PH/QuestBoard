@@ -32,7 +32,7 @@ pub struct Quest {
   pub details_hash: [u8; 32],
 
   /// ID used to define the seed. (32)
-  pub id: Pubkey,
+  pub id: u64,
 
   /// The slot when the Quest was accepted. (1 + 8)
   pub accepted_timestamp: Option<u64>,
@@ -58,7 +58,7 @@ pub struct Quest {
 
 impl Quest {
   pub fn len() -> usize {
-    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + 32 + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8)
+    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + 8 + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8)
   }
 
   pub fn close_account(&self) -> Result<()> {
@@ -70,8 +70,6 @@ impl Quest {
   }
 
 }
-
-// MinStakeRequiredExceedsStaked
 
 #[error_code]
 pub enum QuestError {
@@ -92,4 +90,10 @@ pub enum QuestError {
 
   #[msg("The Quest cannot be closed")]
   CloseNotAllowed,
+
+  #[msg("Insufficient stake amount for the Quest.")]
+  StakeAmountTooLow,
+
+  #[msg("The stake amount is too high for the Quest.")]
+  StakeAmountTooHigh,
 }

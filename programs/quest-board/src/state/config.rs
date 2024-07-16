@@ -1,3 +1,5 @@
+// todo: separate config PDA from the counter PDA
+
 use anchor_lang::prelude::*;
 
 #[account]
@@ -35,27 +37,12 @@ pub struct Config {
   /// Interval in slots to unlock a portion of the staked votes until depletion. (8)
   pub unstaked_vote_unlock_interval: u64,
 
-  /// Number of posts (Quests) open / available. (8)
-  pub posts_open: u64,
-
-  /// Number of posts (Quests) taken. (8)
-  pub posts_taken: u64,
-
-  /// Number of posts (Quests) completed. Does not count resolved posts. (8)
-  pub posts_completed: u64,
-
-  /// Number of posts (Quests) in dispute. (8)
-  pub posts_in_dispute: u64,
-
-  /// Number of posts (Quests) resolved from dispute. (8)
-  pub posts_resolved: u64,
-
   /// Unused reserved byte space for future additive changes. (128)
   pub _reserved: [u8; 128],
 }
 
 impl Config {
   pub fn len() -> usize {
-    8 + 1 + 32 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 128
+    8 + 1 + 32 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 128
   }
 }

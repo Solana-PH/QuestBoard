@@ -15,7 +15,7 @@ pub struct UpdateQuest<'info> {
     mut, 
     seeds = [
       b"quest",
-      quest.id.as_ref(),
+      quest.id.to_le_bytes().as_ref(),
     ],
     bump = quest.bump,
     has_one = owner,

@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{program::QuestBoard, state::Config};
+use crate::{program::QuestBoard, state::Config, state::Counter};
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct InitializeParams {
@@ -28,7 +28,18 @@ pub struct Initialize<'info> {
     bump, 
     space = Config::len()
   )]
-  pub config: Account<'info, Config>,
+  pub config: Box<Account<'info, Config>>,
+
+  #[account(
+    init, 
+    payer = authority, 
+    seeds = [
+      b"counter",
+    ], 
+    bump, 
+    space = Counter::len()
+  )]
+  pub counter: Box<Account<'info, Counter>>,
 
   #[account(mut)]
   pub authority: Signer<'info>,
@@ -48,6 +59,7 @@ pub struct Initialize<'info> {
 
 pub fn initialize_handler(ctx: Context<Initialize>, params: InitializeParams) -> Result<()> {
   let config = &mut ctx.accounts.config;
+  let counter = &mut ctx.accounts.counter;
 
   config.bump = ctx.bumps.config;
   config.authority = ctx.accounts.authority.key();
@@ -60,6 +72,14 @@ pub fn initialize_handler(ctx: Context<Initialize>, params: InitializeParams) ->
   config.dispute_duration = params.dispute_duration;
   config.staked_vote_power_start = params.staked_vote_power_start;
   config.unstaked_vote_unlock_interval = params.unstaked_vote_unlock_interval;
+
+  counter.bump = ctx.bumps.counter;
+  counter.post_counter = 0;
+  counter.posts_open = 0;
+  counter.posts_taken = 0;
+  counter.posts_completed = 0;
+  counter.posts_in_dispute = 0;
+  counter.posts_resolved = 0;
 
   Ok(())
 }

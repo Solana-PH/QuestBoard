@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::{state::Config, state::Quest, state::QuestError};
+use crate::{state::Counter, state::Quest, state::QuestError};
 
 #[derive(Accounts)]
 pub struct UnpublishQuest<'info> {
@@ -8,7 +8,7 @@ pub struct UnpublishQuest<'info> {
     mut, 
     seeds = [
       b"quest",
-      quest.id.as_ref(),
+      quest.id.to_le_bytes().as_ref(),
     ],
     bump = quest.bump,
     has_one = owner,
@@ -19,11 +19,11 @@ pub struct UnpublishQuest<'info> {
   #[account(
     mut,
     seeds = [
-      b"config"
+      b"counter"
     ],
-    bump = config.bump,
+    bump = counter.bump,
   )]
-  pub config: Account<'info, Config>,
+  pub counter: Account<'info, Counter>,
 
   pub owner: Signer<'info>,
 
@@ -32,10 +32,10 @@ pub struct UnpublishQuest<'info> {
 
 pub fn unpublish_quest_handler(ctx: Context<UnpublishQuest>) -> Result<()> {
   let quest = &mut ctx.accounts.quest;
-  let config = &mut ctx.accounts.config;
+  let counter = &mut ctx.accounts.counter;
 
   quest.status = 0;
-  config.posts_open -= 1;
+  counter.posts_open -= 1;
 
   Ok(())
 }

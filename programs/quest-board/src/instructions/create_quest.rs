@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{Token, TokenAccount, Mint, Transfer, transfer};
 
-use crate::{state::Config, state::Quest, state::QuestError};
+use crate::{state::Config, state::Counter, state::Quest, state::QuestError};
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct CreateQuestParams {
@@ -21,14 +21,12 @@ pub struct CreateQuest<'info> {
     payer = owner, 
     seeds = [
       b"quest",
-      id.key().as_ref(),
+      counter.post_counter.to_le_bytes().as_ref(),
     ], 
     bump, 
     space = Quest::len()
   )]
   pub quest: Box<Account<'info, Quest>>,
-
-  pub id: Signer<'info>,
 
   #[account(
     init_if_needed,
@@ -56,11 +54,20 @@ pub struct CreateQuest<'info> {
     seeds = [
       b"config"
     ],
+    bump = config.bump,
     has_one = token_mint,
     has_one = treasury,
-    bump = config.bump,
   )]
   pub config: Account<'info, Config>,
+
+  #[account(
+    mut,
+    seeds = [
+      b"counter"
+    ],
+    bump = counter.bump,
+  )]
+  pub counter: Account<'info, Counter>,
 
   #[account(mut)]
   pub owner: Signer<'info>,
@@ -75,12 +82,13 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
 
   let quest = &mut ctx.accounts.quest;
   let owner = &mut ctx.accounts.owner;
+  let counter = &mut ctx.accounts.counter;
   let config = &ctx.accounts.config;
   let treasury = &ctx.accounts.treasury;
 
   quest.bump = ctx.bumps.quest;
   quest.status = 0;
-  quest.id = ctx.accounts.id.key();
+  quest.id = counter.post_counter;
   quest.owner = owner.key();
   quest.timestamp = Clock::get()?.slot;
   quest.staked = params.stake_amount;
@@ -140,6 +148,8 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
   let cpi_program = ctx.accounts.token_program.to_account_info();
   let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
   transfer(cpi_ctx, quest.staked)?;
+
+  counter.post_counter += 1;
 
   Ok(())
 }

@@ -35,4 +35,8 @@ pub mod quest_board {
     close_quest_handler(ctx)
   }
 
+  pub fn accept_quest(ctx: Context<AcceptQuest>, params: AcceptQuestParams) -> Result<()> {
+    accept_quest_handler(ctx, params)
+  }
+
 }
