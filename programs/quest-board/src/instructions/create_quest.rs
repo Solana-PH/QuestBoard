@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{Token, TokenAccount, Mint};
+use anchor_spl::token::{Token, TokenAccount, Mint, Transfer, transfer};
 
 use crate::{state::Config, state::Quest, state::QuestError};
 
@@ -26,7 +26,7 @@ pub struct CreateQuest<'info> {
     bump, 
     space = Quest::len()
   )]
-  pub quest: Account<'info, Quest>,
+  pub quest: Box<Account<'info, Quest>>,
 
   pub id: Signer<'info>,
 
@@ -89,6 +89,7 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
   quest.details_hash = params.details_hash;
   quest.offeree = None;
   quest.offeree_staked = None;
+  quest.offeree_proposal_hash = None;
   quest.owner_votes = None;
   quest.offeree_votes = None;
   quest.abstained_votes = None;
@@ -116,11 +117,29 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
   )?;
 
   // transfer SOL for placement fee
-  
+  let ix = anchor_lang::solana_program::system_instruction::transfer(
+    &owner.key(),
+    &quest.key(),
+    quest.placement_paid,
+  );
+
+  anchor_lang::solana_program::program::invoke(
+    &ix,
+    &[
+      owner.to_account_info(),
+      ctx.accounts.system_program.to_account_info(),
+    ],
+  )?;
 
   // transfer governance tokens
-
-
+  let cpi_accounts = Transfer {
+    from: ctx.accounts.owner_token_account.to_account_info(),
+    to: ctx.accounts.escrow_token_account.to_account_info(),
+    authority: ctx.accounts.owner.to_account_info(),
+  };
+  let cpi_program = ctx.accounts.token_program.to_account_info();
+  let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+  transfer(cpi_ctx, quest.staked)?;
 
   Ok(())
 }

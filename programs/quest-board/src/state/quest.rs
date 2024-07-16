@@ -38,6 +38,9 @@ pub struct Quest {
   /// The amount of governance token staked by the offeree. (1 + 8)
   pub offeree_staked: Option<u64>,
 
+  /// The hash of the proposal made by the offeree. (1 + 32)
+  pub offeree_proposal_hash: Option<[u8; 32]>,
+
   /// Votes for owner. (1 + 8)
   pub owner_votes: Option<u64>,
 
@@ -50,7 +53,7 @@ pub struct Quest {
 
 impl Quest {
   pub fn len() -> usize {
-    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + 32 + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8) + (1 + 8)
+    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + 32 + (1 + 32) + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8)
   }
 }
 
@@ -63,4 +66,13 @@ pub enum QuestError {
 
   #[msg("The owner does not have enough governance tokens.")]
   NotEnoughTokenBalance,
+
+  #[msg("The Quest is already published.")]
+  QuestAlreadyPublished,
+
+  #[msg("Cannot update an already published Quest.")]
+  UpdateNotAllowed,
+
+  #[msg("The Quest is not open.")]
+  QuestNotOpen,
 }

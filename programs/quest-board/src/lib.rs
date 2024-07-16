@@ -18,4 +18,17 @@ pub mod quest_board {
   pub fn create_quest(ctx: Context<CreateQuest>, params: CreateQuestParams) -> Result<()> {
     create_quest_handler(ctx, params)
   }
+
+  pub fn publish_quest(ctx: Context<PublishQuest>) -> Result<()> {
+    publish_quest_handler(ctx)
+  }
+
+  pub fn unpublish_quest(ctx: Context<UnpublishQuest>) -> Result<()> {
+    unpublish_quest_handler(ctx)
+  }
+
+  pub fn update_quest_hash(ctx: Context<UpdateQuestHash>, params: UpdateQuestHashParams) -> Result<()> {
+    update_quest_hash_handler(ctx, params)
+  }
+
 }
