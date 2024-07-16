@@ -36,7 +36,11 @@ pub fn update_quest_handler(ctx: Context<UpdateQuest>, params: UpdateQuestParams
   }
 
   if params.min_stake_required.is_some() {
-    quest.min_stake_required = params.min_stake_required.unwrap();
+    let min_stake_required = params.min_stake_required.unwrap();
+    if min_stake_required > quest.staked {
+      return Err(QuestError::MinStakeRequiredExceedsStaked.into());
+    }
+    quest.min_stake_required = min_stake_required;
   }
 
   Ok(())
