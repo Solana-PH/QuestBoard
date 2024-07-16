@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{program::QuestBoard, state::Config, state::Counter};
+use crate::{program::QuestBoard, state::Config, state::ConfigError, state::Counter};
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct InitializeParams {
@@ -45,12 +45,12 @@ pub struct Initialize<'info> {
   pub authority: Signer<'info>,
 
   #[account(
-    constraint = program.programdata_address()? == Some(program_data.key())
+    constraint = program.programdata_address()? == Some(program_data.key()) @ ConfigError::InvalidProgramData,
   )]
   pub program: Program<'info, QuestBoard>,
 
   #[account(
-    constraint = program_data.upgrade_authority_address == Some(authority.key())
+    constraint = program_data.upgrade_authority_address == Some(authority.key()) @ ConfigError::InvalidUpdateAuthority,
   )]
   pub program_data: Box<Account<'info, ProgramData>>,
 

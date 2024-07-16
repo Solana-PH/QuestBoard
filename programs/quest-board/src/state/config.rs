@@ -46,3 +46,13 @@ impl Config {
     8 + 1 + 32 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 128
   }
 }
+
+
+#[error_code]
+pub enum ConfigError {
+  #[msg("The program data did not match.")]
+  InvalidProgramData,
+
+  #[msg("The update authority provided is invalid.")]
+  InvalidUpdateAuthority,
+}
