@@ -27,8 +27,12 @@ pub mod quest_board {
     unpublish_quest_handler(ctx)
   }
 
-  pub fn update_quest_hash(ctx: Context<UpdateQuestHash>, params: UpdateQuestHashParams) -> Result<()> {
-    update_quest_hash_handler(ctx, params)
+  pub fn update_quest(ctx: Context<UpdateQuest>, params: UpdateQuestParams) -> Result<()> {
+    update_quest_handler(ctx, params)
+  }
+
+  pub fn close_quest(ctx: Context<CloseQuest>) -> Result<()> {
+    close_quest_handler(ctx)
   }
 
 }
