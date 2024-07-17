@@ -58,7 +58,7 @@ pub struct CreateQuest<'info> {
     has_one = token_mint,
     has_one = treasury,
   )]
-  pub config: Account<'info, Config>,
+  pub config: Box<Account<'info, Config>>,
 
   #[account(
     mut,
@@ -67,7 +67,7 @@ pub struct CreateQuest<'info> {
     ],
     bump = counter.bump,
   )]
-  pub counter: Account<'info, Counter>,
+  pub counter: Box<Account<'info, Counter>>,
 
   #[account(mut)]
   pub owner: Signer<'info>,

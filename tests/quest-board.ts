@@ -23,6 +23,7 @@ import {
 import { readFileSync } from 'fs'
 import { homedir } from 'os'
 import { resolve } from 'path'
+import { expect } from 'chai'
 
 function loadKeypair(filePath: string): Keypair {
   const resolvedPath = filePath.startsWith('~')
@@ -45,7 +46,6 @@ describe('quest-board', () => {
 
   let config: IdlAccounts<QuestBoard>['config']
   let counter: IdlAccounts<QuestBoard>['counter']
-  let questPDA: PublicKey
   let tokenMint: PublicKey
   let ownerAta: PublicKey
   let offereeAta: PublicKey
@@ -65,39 +65,12 @@ describe('quest-board', () => {
     program.programId
   )
 
+  const [questPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from('quest'), Uint8Array.of(0)],
+    program.programId
+  )
+
   before(async () => {
-    const accountInfo = await program.provider.connection.getAccountInfo(
-      programDataPda
-    )
-
-    if (accountInfo === null) {
-      console.log('No account found at the given PDA.')
-      return
-    }
-
-    // Extract the upgrade_authority_address
-    // The program data account layout:
-    // Offset 0-4: Account data length
-    // Offset 4-36: Slot (u64)
-    // Offset 36-68: Program owner (Pubkey)
-    // Offset 68-100: Upgrade authority (Pubkey)
-
-    const UPGRADE_AUTHORITY_OFFSET = 68
-    const UPGRADE_AUTHORITY_LENGTH = 32
-
-    const upgradeAuthorityBytes = accountInfo.data.slice(
-      UPGRADE_AUTHORITY_OFFSET,
-      UPGRADE_AUTHORITY_OFFSET + UPGRADE_AUTHORITY_LENGTH
-    )
-    const upgradeAuthorityAddress = new PublicKey(upgradeAuthorityBytes)
-
-    console.log(
-      'Upgrade Authority Address:',
-      upgradeAuthorityAddress.toBase58()
-    )
-
-    console.log('Payer Address:', program.provider.publicKey.toBase58())
-
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: authority.publicKey,
@@ -154,7 +127,7 @@ describe('quest-board', () => {
     ])
   })
 
-  xit('Is initialized!', async () => {
+  it('Is initialized!', async () => {
     config = await program.account.config.fetchNullable(configPda)
 
     if (!config) {
@@ -172,17 +145,32 @@ describe('quest-board', () => {
         })
         .accounts({
           authority: authority.publicKey,
-          programData: programDataPda,
+          // programData: programDataPda,
         })
         .rpc()
 
       config = await program.account.config.fetch(configPda)
     }
 
-    console.log(config)
+    expect(config.authority.equals(program.provider.publicKey)).to.be.true
   })
 
-  it('Can create a new quest', async () => {})
+  it('Can create a new quest', async () => {
+    await program.methods
+      .createQuest({
+        detailsHash: Array.from(Keypair.generate().publicKey.toBytes()),
+        minStakeRequired: new BN(100 * 10 ** 9),
+        placementPaid: new BN(0),
+        stakeAmount: new BN(100 * 10 ** 9),
+      })
+      .accounts({
+        owner: authority.publicKey,
+      })
+      .rpc()
+
+    const quest = await program.account.quest.fetch(questPda)
+    console.log(quest)
+  })
 
   it('Can update the quest', async () => {})
 
