@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{Token, TokenAccount, Mint, Transfer, transfer};
 
-use crate::{state::Config, state::Counter, state::Quest, state::QuestError};
+use crate::{state::Config, state::Quest, state::QuestError};
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct CreateQuestParams {
@@ -21,7 +21,7 @@ pub struct CreateQuest<'info> {
     payer = owner, 
     seeds = [
       b"quest",
-      counter.post_counter.to_le_bytes().as_ref(),
+      id.key().as_ref(),
     ], 
     bump, 
     space = Quest::len()
@@ -60,17 +60,11 @@ pub struct CreateQuest<'info> {
   )]
   pub config: Box<Account<'info, Config>>,
 
-  #[account(
-    mut,
-    seeds = [
-      b"counter"
-    ],
-    bump = counter.bump,
-  )]
-  pub counter: Box<Account<'info, Counter>>,
 
   #[account(mut)]
   pub owner: Signer<'info>,
+
+  pub id: Signer<'info>,
 
   pub system_program: Program<'info, System>,
   pub associated_token_program: Program<'info, AssociatedToken>,
@@ -82,13 +76,12 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
 
   let quest = &mut ctx.accounts.quest;
   let owner = &mut ctx.accounts.owner;
-  let counter = &mut ctx.accounts.counter;
   let config = &ctx.accounts.config;
   let treasury = &ctx.accounts.treasury;
 
   quest.bump = ctx.bumps.quest;
   quest.status = 0;
-  quest.id = counter.post_counter;
+  quest.id = ctx.accounts.id.key();
   quest.owner = owner.key();
   quest.timestamp = Clock::get()?.slot;
   quest.staked = params.stake_amount;
@@ -109,17 +102,21 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
 
   // pay base_fee to treasury
   let base_fee = config.base_fee;
-  
+
   let ix = anchor_lang::solana_program::system_instruction::transfer(
     &owner.key(),
     &treasury.key(),
+    // WARNING:
+    // to save you some headache, treasury should have enough
+    // rent exempt balance or you will encounter
+    // "Transaction results in an account (1) with insufficient funds for rent.""
     base_fee,
   );
-
   anchor_lang::solana_program::program::invoke(
     &ix,
     &[
       owner.to_account_info(),
+      ctx.accounts.treasury.to_account_info(),
       ctx.accounts.system_program.to_account_info(),
     ],
   )?;
@@ -148,8 +145,6 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
   let cpi_program = ctx.accounts.token_program.to_account_info();
   let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
   transfer(cpi_ctx, quest.staked)?;
-
-  counter.post_counter += 1;
 
   Ok(())
 }

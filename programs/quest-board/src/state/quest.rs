@@ -32,7 +32,7 @@ pub struct Quest {
   pub details_hash: [u8; 32],
 
   /// ID used to define the seed. (32)
-  pub id: u64,
+  pub id: Pubkey,
 
   /// The slot when the Quest was accepted. (1 + 8)
   pub accepted_timestamp: Option<u64>,
@@ -58,7 +58,7 @@ pub struct Quest {
 
 impl Quest {
   pub fn len() -> usize {
-    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + 8 + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8)
+    8 + 1 + 1 + 32 + 8 + 8 + 8 + 8 + 32 + 32 + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 32) + (1 + 8) + (1 + 8) + (1 + 8)
   }
 
   pub fn close_account(&self) -> Result<()> {

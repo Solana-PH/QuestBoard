@@ -11,6 +11,7 @@ import {
   Keypair,
   LAMPORTS_PER_SOL,
   PublicKey,
+  SendTransactionError,
   SystemProgram,
   Transaction,
 } from '@solana/web3.js'
@@ -43,6 +44,7 @@ describe('quest-board', () => {
   const authority = loadKeypair('~/.config/solana/id.json')
   const treasuryKeypair = Keypair.generate()
   const offereeKeypair = Keypair.generate()
+  const questId = Keypair.generate()
 
   let config: IdlAccounts<QuestBoard>['config']
   let counter: IdlAccounts<QuestBoard>['counter']
@@ -66,12 +68,12 @@ describe('quest-board', () => {
   )
 
   const [questPda] = PublicKey.findProgramAddressSync(
-    [Buffer.from('quest'), Uint8Array.of(0)],
+    [Buffer.from('quest'), questId.publicKey.toBytes()],
     program.programId
   )
 
   before(async () => {
-    const transaction = new Transaction().add(
+    const transaction1 = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: authority.publicKey,
         toPubkey: offereeKeypair.publicKey,
@@ -79,7 +81,19 @@ describe('quest-board', () => {
       })
     )
 
-    await program.provider.sendAndConfirm(transaction)
+    await program.provider.sendAndConfirm(transaction1)
+
+    // IMPORTANT
+    // treasury should have a sufficient rent exempt balance else the quest creation will fail
+    const transaction2 = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: authority.publicKey,
+        toPubkey: treasuryKeypair.publicKey,
+        lamports: 2 * LAMPORTS_PER_SOL,
+      })
+    )
+
+    await program.provider.sendAndConfirm(transaction2)
 
     tokenMint = await createMint(
       program.provider.connection,
@@ -145,12 +159,13 @@ describe('quest-board', () => {
         })
         .accounts({
           authority: authority.publicKey,
-          // programData: programDataPda,
         })
         .rpc()
 
       config = await program.account.config.fetch(configPda)
     }
+
+    counter = await program.account.counter.fetchNullable(counterPda)
 
     expect(config.authority.equals(program.provider.publicKey)).to.be.true
   })
@@ -165,11 +180,13 @@ describe('quest-board', () => {
       })
       .accounts({
         owner: authority.publicKey,
+        id: questId.publicKey,
       })
+      .signers([questId])
       .rpc()
 
     const quest = await program.account.quest.fetch(questPda)
-    console.log(quest)
+    expect(quest.owner.equals(authority.publicKey)).to.be.true
   })
 
   it('Can update the quest', async () => {})

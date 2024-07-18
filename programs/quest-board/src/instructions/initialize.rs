@@ -74,7 +74,6 @@ pub fn initialize_handler(ctx: Context<Initialize>, params: InitializeParams) ->
   config.unstaked_vote_unlock_interval = params.unstaked_vote_unlock_interval;
 
   counter.bump = ctx.bumps.counter;
-  counter.post_counter = 0;
   counter.posts_open = 0;
   counter.posts_taken = 0;
   counter.posts_completed = 0;

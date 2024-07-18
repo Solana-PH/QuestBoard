@@ -5,9 +5,6 @@ pub struct Counter {
   /// Bump nonce of the PDA. (1)
   pub bump: u8,
 
-  /// Incremental counter used as an ID (seed) for the Quests. (8)
-  pub post_counter: u64,
-
   /// Number of posts (Quests) open / available. (8)
   pub posts_open: u64,
 
@@ -29,6 +26,6 @@ pub struct Counter {
 
 impl Counter {
   pub fn len() -> usize {
-    8 + 1 + 8 + 8 + 8 + 8 + 8 + 8 + 128
+    8 + 1 + 8 + 8 + 8 + 8 + 8 + 128
   }
 }
