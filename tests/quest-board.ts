@@ -178,11 +178,16 @@ describe('quest-board', () => {
   })
 
   it('Can create a new quest', async () => {
+    const preBalanceInLamports = await program.provider.connection.getBalance(
+      authority.publicKey
+    )
+    console.log('Balance before creation', preBalanceInLamports)
+
     await program.methods
       .createQuest({
         detailsHash: Array.from(Keypair.generate().publicKey.toBytes()),
         minStakeRequired: new BN(100 * 10 ** 9),
-        placementPaid: new BN(0),
+        placementPaid: new BN(0), //new BN(0.1 * LAMPORTS_PER_SOL),
         stakeAmount: new BN(100 * 10 ** 9),
       })
       .accounts({
@@ -207,6 +212,16 @@ describe('quest-board', () => {
 
     const balance = tokenAccountInfo.amount
     expect(Number(balance) / 10 ** 9).to.be.equal(900)
+
+    const postBalanceInLamports = await program.provider.connection.getBalance(
+      authority.publicKey
+    )
+    console.log('Balance after creation', postBalanceInLamports)
+
+    console.log(
+      'Balance diff',
+      (postBalanceInLamports - preBalanceInLamports) / LAMPORTS_PER_SOL
+    )
   })
 
   it('Can update the quest', async () => {
@@ -261,6 +276,11 @@ describe('quest-board', () => {
   })
 
   it('Can close the quest', async () => {
+    const preBalanceInLamports = await program.provider.connection.getBalance(
+      authority.publicKey
+    )
+    console.log('Balance before closing', preBalanceInLamports)
+
     await program.methods
       .closeQuest()
       .accounts({
@@ -272,7 +292,30 @@ describe('quest-board', () => {
       .rpc()
 
     const quest = await program.account.quest.fetchNullable(questPda1)
-    console.log(quest)
+    expect(quest).to.be.equal(null)
+
+    const associatedTokenAccount = await getAssociatedTokenAddress(
+      tokenMint,
+      authority.publicKey
+    )
+
+    const tokenAccountInfo = await getAccount(
+      program.provider.connection,
+      associatedTokenAccount
+    )
+
+    const balance = tokenAccountInfo.amount
+    expect(Number(balance) / 10 ** 9).to.be.equal(1000) // should be able to retrieve back the DAO tokens
+
+    const postBalanceInLamports = await program.provider.connection.getBalance(
+      authority.publicKey
+    )
+    console.log('Balance after closing', postBalanceInLamports)
+
+    console.log(
+      'Balance diff',
+      (postBalanceInLamports - preBalanceInLamports) / LAMPORTS_PER_SOL
+    )
   })
 
   it('Can accept the quest', async () => {})

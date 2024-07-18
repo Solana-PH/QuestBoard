@@ -23,7 +23,6 @@ pub struct CompleteQuest<'info> {
     ],
     bump = quest.bump,
     has_one = owner,
-    close = owner,
     constraint = quest.status == 3 @ QuestError::CompleteNotAllowed,
   )]
   pub quest: Box<Account<'info, Quest>>,
@@ -32,7 +31,6 @@ pub struct CompleteQuest<'info> {
     mut,
     associated_token::mint = token_mint,
     associated_token::authority = quest,
-    close = owner,
   )]
   pub escrow_token_account: Account<'info, TokenAccount>,
 
