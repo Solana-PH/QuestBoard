@@ -5,13 +5,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-quest_board = "E69Kac8iuarujp7bTZtkEGjCsXWyx3MvXpQ1gv5Q6Mdz"
+quest_board = "6XyqAAGfZ7JfmvBNYf1T77zpnfvjonjG2V7RTnwihg9u"
+
+[programs.devnet]
+quest_board = "6XyqAAGfZ7JfmvBNYf1T77zpnfvjonjG2V7RTnwihg9u"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
