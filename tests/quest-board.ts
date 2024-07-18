@@ -11,7 +11,6 @@ import {
   Keypair,
   LAMPORTS_PER_SOL,
   PublicKey,
-  SendTransactionError,
   SystemProgram,
   Transaction,
 } from '@solana/web3.js'
@@ -46,7 +45,8 @@ describe('quest-board', () => {
   const authority = loadKeypair('~/.config/solana/id.json')
   const treasuryKeypair = Keypair.generate()
   const offereeKeypair = Keypair.generate()
-  const questId = Keypair.generate()
+  const questId1 = Keypair.generate()
+  const questId2 = Keypair.generate()
 
   let config: IdlAccounts<QuestBoard>['config']
   let counter: IdlAccounts<QuestBoard>['counter']
@@ -54,10 +54,10 @@ describe('quest-board', () => {
   let ownerAta: PublicKey
   let offereeAta: PublicKey
 
-  const [programDataPda] = PublicKey.findProgramAddressSync(
-    [program.programId.toBytes()],
-    new PublicKey('BPFLoaderUpgradeab1e11111111111111111111111')
-  )
+  // const [programDataPda] = PublicKey.findProgramAddressSync(
+  //   [program.programId.toBytes()],
+  //   new PublicKey('BPFLoaderUpgradeab1e11111111111111111111111')
+  // )
 
   const [configPda] = PublicKey.findProgramAddressSync(
     [Buffer.from('config')],
@@ -69,8 +69,13 @@ describe('quest-board', () => {
     program.programId
   )
 
-  const [questPda] = PublicKey.findProgramAddressSync(
-    [Buffer.from('quest'), questId.publicKey.toBytes()],
+  const [questPda1] = PublicKey.findProgramAddressSync(
+    [Buffer.from('quest'), questId1.publicKey.toBytes()],
+    program.programId
+  )
+
+  const [questPda2] = PublicKey.findProgramAddressSync(
+    [Buffer.from('quest'), questId2.publicKey.toBytes()],
     program.programId
   )
 
@@ -182,12 +187,12 @@ describe('quest-board', () => {
       })
       .accounts({
         owner: authority.publicKey,
-        id: questId.publicKey,
+        id: questId1.publicKey,
       })
-      .signers([questId])
+      .signers([questId1])
       .rpc()
 
-    const quest = await program.account.quest.fetch(questPda)
+    const quest = await program.account.quest.fetch(questPda1)
     expect(quest.owner.equals(authority.publicKey)).to.be.true
 
     const associatedTokenAccount = await getAssociatedTokenAddress(
@@ -204,13 +209,71 @@ describe('quest-board', () => {
     expect(Number(balance) / 10 ** 9).to.be.equal(900)
   })
 
-  it('Can update the quest', async () => {})
+  it('Can update the quest', async () => {
+    const randomBytes = Array.from(Keypair.generate().publicKey.toBytes())
 
-  it('Can publish the quest', async () => {})
+    await program.methods
+      .updateQuest({
+        detailsHash: randomBytes,
+        minStakeRequired: new BN(50 * 10 ** 9),
+      })
+      .accounts({
+        owner: authority.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda1,
+      })
+      .rpc()
 
-  it('Can unpublish the quest', async () => {})
+    const quest = await program.account.quest.fetch(questPda1)
+    expect(quest.detailsHash).to.be.deep.equal(randomBytes)
+    expect(quest.minStakeRequired.toNumber()).to.be.equal(50 * 10 ** 9)
+  })
 
-  it('Can close the quest', async () => {})
+  it('Can publish the quest', async () => {
+    await program.methods
+      .publishQuest()
+      .accounts({
+        owner: authority.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda1,
+      })
+      .rpc()
+
+    const quest = await program.account.quest.fetch(questPda1)
+    expect(quest.status).to.be.equal(1)
+  })
+
+  it('Can unpublish the quest', async () => {
+    await program.methods
+      .unpublishQuest()
+      .accounts({
+        owner: authority.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda1,
+      })
+      .rpc()
+
+    const quest = await program.account.quest.fetch(questPda1)
+    expect(quest.status).to.be.equal(0)
+  })
+
+  it('Can close the quest', async () => {
+    await program.methods
+      .closeQuest()
+      .accounts({
+        owner: authority.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda1,
+      })
+      .rpc()
+
+    const quest = await program.account.quest.fetchNullable(questPda1)
+    console.log(quest)
+  })
 
   it('Can accept the quest', async () => {})
 
