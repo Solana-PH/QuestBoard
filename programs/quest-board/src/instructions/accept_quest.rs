@@ -31,6 +31,7 @@ pub struct AcceptQuest<'info> {
     bump = quest.bump,
     has_one = owner,
     constraint = quest.status == 1 @ QuestError::QuestNotOpen,
+    constraint = offeree.key() != owner.key() @ QuestError::OwnerCannotAcceptOwnQuest,
   )]
   pub quest: Box<Account<'info, Quest>>,
 

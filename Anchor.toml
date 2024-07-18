@@ -14,7 +14,7 @@ quest_board = "6e1FHc8ddq7yG5MWRiL141SDXWX6jjn327efN5WZBrUD"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

@@ -91,6 +91,9 @@ pub enum QuestError {
   #[msg("The Quest cannot be closed.")]
   CloseNotAllowed,
 
+  #[msg("The owner cannot accept their own Quest.")]
+  OwnerCannotAcceptOwnQuest,
+
   #[msg("Insufficient stake amount for the Quest.")]
   StakeAmountTooLow,
 
