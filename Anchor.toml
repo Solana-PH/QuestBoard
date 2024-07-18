@@ -5,10 +5,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-quest_board = "6XyqAAGfZ7JfmvBNYf1T77zpnfvjonjG2V7RTnwihg9u"
+quest_board = "6e1FHc8ddq7yG5MWRiL141SDXWX6jjn327efN5WZBrUD"
 
 [programs.devnet]
-quest_board = "6XyqAAGfZ7JfmvBNYf1T77zpnfvjonjG2V7RTnwihg9u"
+quest_board = "6e1FHc8ddq7yG5MWRiL141SDXWX6jjn327efN5WZBrUD"
 
 [registry]
 url = "https://api.apr.dev"
@@ -19,3 +19,5 @@ wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+init = "yarn run ts-node --project ./tsconfig.json scripts/init.ts"
+mint-token = "yarn run ts-node --project ./tsconfig.json scripts/mint-token.ts"

@@ -5,7 +5,7 @@ pub mod state;
 
 pub use instructions::*;
 
-declare_id!("6XyqAAGfZ7JfmvBNYf1T77zpnfvjonjG2V7RTnwihg9u");
+declare_id!("6e1FHc8ddq7yG5MWRiL141SDXWX6jjn327efN5WZBrUD");
 
 #[program]
 pub mod quest_board {
