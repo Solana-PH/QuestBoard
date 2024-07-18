@@ -7,14 +7,13 @@ import {
 import { QuestBoard } from '../target/types/quest_board'
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { BN } from 'bn.js'
-import { loadKeypair } from './utils'
+import { loadKeypair, tokenMint } from './utils'
 
 const init = async () => {
   setProvider(AnchorProvider.env())
 
   const program = workspace.QuestBoard as Program<QuestBoard>
   const authority = loadKeypair('~/.config/solana/id.json')
-  const tokenMint = new PublicKey('iJ5yihahjESi2Tg51YHMb7uXkJF4ELx72bVHXJgBkzZ')
   const [configPda] = PublicKey.findProgramAddressSync(
     [Buffer.from('config')],
     program.programId
@@ -56,6 +55,7 @@ const init = async () => {
   }
 
   console.log('Config account:', configPda.toBase58())
+  console.log('Token mint:', config.tokenMint.toBase58())
 }
 
 init()

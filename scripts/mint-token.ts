@@ -22,7 +22,7 @@ const mintToken = async () => {
     9
   )
 
-  console.log('Token mint:', tokenMint.toBase58())
+  console.log('Token mint:', tokenMint.toBase58()) // iJ5yihahjESi2Tg51YHMb7uXkJF4ELx72bVHXJgBkzZ
 }
 
 mintToken()
