@@ -318,7 +318,64 @@ describe('quest-board', () => {
     )
   })
 
-  it('Can accept the quest', async () => {})
+  it('Can accept the quest', async () => {
+    // create a new quest
+    await program.methods
+      .createQuest({
+        detailsHash: Array.from(Keypair.generate().publicKey.toBytes()),
+        minStakeRequired: new BN(100 * 10 ** 9),
+        placementPaid: new BN(0), //new BN(0.1 * LAMPORTS_PER_SOL),
+        stakeAmount: new BN(100 * 10 ** 9),
+      })
+      .accounts({
+        owner: authority.publicKey,
+        id: questId2.publicKey,
+      })
+      .signers([questId2])
+      .rpc()
+
+    // publish the quest
+    await program.methods
+      .publishQuest()
+      .accounts({
+        owner: authority.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda2,
+      })
+      .rpc()
+
+    // accept the quest
+    await program.methods
+      .acceptQuest({
+        stakeAmount: new BN(100 * 10 ** 9),
+        offereeProposalHash: Array.from(Keypair.generate().publicKey.toBytes()),
+      })
+      .accounts({
+        offeree: offereeKeypair.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda2,
+      })
+      .signers([offereeKeypair])
+      .rpc()
+
+    const counter = await program.account.counter.fetch(counterPda)
+    expect(counter.postsTaken.toNumber()).to.be.equal(1)
+
+    const associatedTokenAccount = await getAssociatedTokenAddress(
+      tokenMint,
+      offereeKeypair.publicKey
+    )
+
+    const tokenAccountInfo = await getAccount(
+      program.provider.connection,
+      associatedTokenAccount
+    )
+
+    const balance = tokenAccountInfo.amount
+    expect(Number(balance) / 10 ** 9).to.be.equal(900)
+  })
 
   it('Can complete the quest', async () => {})
 })

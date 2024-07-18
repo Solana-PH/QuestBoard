@@ -137,7 +137,7 @@ pub fn create_quest_handler(ctx: Context<CreateQuest>, params: CreateQuestParams
     ],
   )?;
 
-  // // transfer governance tokens
+  // transfer governance tokens
   let cpi_accounts = Transfer {
     from: ctx.accounts.owner_token_account.to_account_info(),
     to: ctx.accounts.escrow_token_account.to_account_info(),
