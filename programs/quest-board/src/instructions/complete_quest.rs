@@ -37,13 +37,6 @@ pub struct CompleteQuest<'info> {
   #[account(
     mut,
     associated_token::mint = token_mint,
-    associated_token::authority = owner,
-  )]
-  pub owner_token_account: Account<'info, TokenAccount>,
-
-  #[account(
-    mut,
-    associated_token::mint = token_mint,
     associated_token::authority = offeree,
   )]
   pub offeree_token_account: Account<'info, TokenAccount>,
@@ -86,39 +79,29 @@ pub struct CompleteQuest<'info> {
 pub fn complete_quest_handler(ctx: Context<CompleteQuest>) -> Result<()> {
 
   let quest = &mut ctx.accounts.quest;
+  let id = quest.id.key();
+  let quest_bump = quest.bump.to_le_bytes();
   let counter = &mut ctx.accounts.counter;
-  let config = &ctx.accounts.config;
 
-  // get difference between offeree's staked token and the total amount escrowed
   let offeree_staked = quest.offeree_staked.unwrap();
-  let escrowed = ctx.accounts.escrow_token_account.amount;
-  let owner_staked = offeree_staked - escrowed;
 
-  let seeds = &[b"config".as_ref(), &[config.bump]];
-  let signer = &[&seeds[..]];
+  let seeds = vec![
+    b"quest".as_ref(), 
+    id.as_ref(),
+    quest_bump.as_ref()
+  ];
+  let signer = vec![seeds.as_slice()];
 
-  let cpi_accounts = Transfer {
-    from: ctx.accounts.escrow_token_account.to_account_info(),
-    to: ctx.accounts.owner_token_account.to_account_info(),
-    authority: ctx.accounts.config.to_account_info(),
-  };
-  let cpi_program = ctx.accounts.token_program.to_account_info();
-  let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
-  transfer(cpi_ctx, owner_staked)?;
-
-  let cpi_accounts = Transfer {
+  let transfer_ix = Transfer {
     from: ctx.accounts.escrow_token_account.to_account_info(),
     to: ctx.accounts.offeree_token_account.to_account_info(),
-    authority: ctx.accounts.config.to_account_info(),
+    authority: quest.to_account_info(),
   };
   let cpi_program = ctx.accounts.token_program.to_account_info();
-  let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
+  let cpi_ctx = CpiContext::new_with_signer(cpi_program, transfer_ix, signer.as_slice());
   transfer(cpi_ctx, offeree_staked)?;
 
-  // compute necessary decay fee, if any
-  quest.close_account()?;
-
-  quest.status = 7; // not that it matters, quest PDA will be closed anyway
+  quest.status = 7; 
   counter.posts_taken -= 1;
   counter.posts_completed += 1;
 

@@ -377,5 +377,48 @@ describe('quest-board', () => {
     expect(Number(balance) / 10 ** 9).to.be.equal(900)
   })
 
-  it('Can complete the quest', async () => {})
+  it('Can complete the quest', async () => {
+    await program.methods
+      .completeQuest()
+      .accounts({
+        offeree: offereeKeypair.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda2,
+      })
+      .signers([offereeKeypair])
+      .rpc()
+
+    const associatedTokenAccount = await getAssociatedTokenAddress(
+      tokenMint,
+      offereeKeypair.publicKey
+    )
+
+    const tokenAccountInfo = await getAccount(
+      program.provider.connection,
+      associatedTokenAccount
+    )
+
+    const balance = tokenAccountInfo.amount
+    expect(Number(balance) / 10 ** 9).to.be.equal(1000)
+
+    const counter = await program.account.counter.fetch(counterPda)
+    expect(counter.postsTaken.toNumber()).to.be.equal(0)
+    expect(counter.postsCompleted.toNumber()).to.be.equal(1)
+  })
+
+  it('Can close a completed quest', async () => {
+    await program.methods
+      .closeQuest()
+      .accounts({
+        owner: authority.publicKey,
+      })
+      .accountsPartial({
+        quest: questPda2,
+      })
+      .rpc()
+
+    const quest = await program.account.quest.fetchNullable(questPda2)
+    expect(quest).to.be.equal(null)
+  })
 })
