@@ -17,6 +17,8 @@ import {
 } from '@solana/web3.js'
 import {
   createMint,
+  getAccount,
+  getAssociatedTokenAddress,
   getOrCreateAssociatedTokenAccount,
   mintTo,
 } from '@solana/spl-token'
@@ -187,6 +189,19 @@ describe('quest-board', () => {
 
     const quest = await program.account.quest.fetch(questPda)
     expect(quest.owner.equals(authority.publicKey)).to.be.true
+
+    const associatedTokenAccount = await getAssociatedTokenAddress(
+      tokenMint,
+      authority.publicKey
+    )
+
+    const tokenAccountInfo = await getAccount(
+      program.provider.connection,
+      associatedTokenAccount
+    )
+
+    const balance = tokenAccountInfo.amount
+    expect(Number(balance) / 10 ** 9).to.be.equal(900)
   })
 
   it('Can update the quest', async () => {})
