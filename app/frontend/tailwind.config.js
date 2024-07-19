@@ -7,6 +7,22 @@ export default {
         cursive: ['IM Fell English', 'cursive'],
         serif: ['IM Fell English', 'serif'],
       },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '50%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+        fadeOut: {
+          '0%': { opacity: 1 },
+          '50%': { opacity: 1 },
+          '100%': { opacity: 0 },
+        },
+      },
+      animation: {
+        fadeIn: 'fadeIn 500ms forwards',
+        fadeOut: 'fadeOut 500ms forwards',
+      },
     },
   },
   plugins: [],

@@ -1,7 +1,12 @@
-import { Splash } from './components/Splash'
+import { ActionBar } from './components/ActionBar'
 
 function App() {
-  return <Splash />
+  return (
+    <div className='h-screen w-full flex flex-col'>
+      <div className='flex flex-auto'></div>
+      <ActionBar />
+    </div>
+  )
 }
 
 export default App

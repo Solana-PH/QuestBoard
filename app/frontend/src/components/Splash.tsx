@@ -1,20 +1,27 @@
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { FC } from 'react'
 
 export const Splash: FC = () => {
+  const { connecting } = useWallet()
+  const { setVisible } = useWalletModal()
+
+  if (connecting) return null
+
   return (
-    <div className='flex flex-col'>
+    <div className='flex flex-col animate-fadeIn'>
       <div className='h-screen w-full flex flex-col gap-10 items-center justify-center'>
         <div className='flex flex-col gap-5 items-center justify-center'>
           <img
             src='/QuestBoardLogo.svg'
             alt='QuestBoard'
-            className='aspect-square object-contain w-64'
+            className='aspect-square object-contain w-32 xl:w-64'
           />
           <p className='font-cursive text-2xl italic'>
             Connecting needs with deeds
           </p>
         </div>
-        <button>Connect</button>
+        <button onClick={() => setVisible(true)}>Connect</button>
       </div>
     </div>
   )
