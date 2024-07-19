@@ -1,5 +1,7 @@
+import { Splash } from './components/Splash'
+
 function App() {
-  return null
+  return <Splash />
 }
 
 export default App
