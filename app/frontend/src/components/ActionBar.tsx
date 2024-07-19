@@ -1,13 +1,24 @@
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Wallet, Note } from '@phosphor-icons/react'
 import { FC } from 'react'
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  MenuSeparator,
+} from '@headlessui/react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { trimAddress } from '../utils/trimAddress'
+import { useAtomValue } from 'jotai'
+import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
+import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
 
 export const ActionBar: FC = () => {
   const { disconnect, publicKey } = useWallet()
   const { setVisible } = useWalletModal()
+  const solBalance = useAtomValue(solBalanceFormattedAtom)
+  const daoBalance = useAtomValue(daoBalanceFormattedAtom)
 
   return (
     <div className='animate-fadeIn flex flex-none px-2 h-16 bg-black/50 items-center justify-between gap-5'>
@@ -39,6 +50,25 @@ export const ActionBar: FC = () => {
             anchor='bottom'
             className='w-52 flex flex-col p-1 bg-amber-300/5 backdrop-blur'
           >
+            <div className='flex flex-col gap-2 py-2'>
+              <p className='px-3 text-xs flex items-center justify-between'>
+                <span className='opacity-50 font-bold'>SOL</span>
+                {solBalance ? (
+                  <span className='tabular-nums'>{solBalance}</span>
+                ) : (
+                  <span className='rounded h-4 w-20 animate-pulse bg-white/20'></span>
+                )}
+              </p>
+              <p className='px-3 text-xs flex items-center justify-between'>
+                <span className='opacity-50 font-bold'>DAO</span>
+                {daoBalance ? (
+                  <span className='tabular-nums'>{daoBalance}</span>
+                ) : (
+                  <span className='rounded h-4 w-32 animate-pulse bg-white/20'></span>
+                )}
+              </p>
+            </div>
+            <MenuSeparator className='my-1' />
             <MenuItem>
               <button
                 onClick={() => setVisible(true)}

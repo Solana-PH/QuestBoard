@@ -42,10 +42,12 @@ export class KeypairWallet implements AnchorWallet {
 
 export const anchorProviderAtom = atom((get) => {
   const wallet = get(anchorWalletAtom)
+
+  if (!wallet) return null
+
   const connection = get(connectionAtom)
-  const dummyWallet = new KeypairWallet(Keypair.generate())
   const commitment = get(connectionCommitmentAtom)
-  const provider = new AnchorProvider(connection, wallet ?? dummyWallet, {
+  const provider = new AnchorProvider(connection, wallet, {
     skipPreflight: true,
     commitment,
   })
