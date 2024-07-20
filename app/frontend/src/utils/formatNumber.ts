@@ -1,4 +1,5 @@
 export const parseNumber = (num: string, fallback?: number) => {
+  num = num ?? ''
   let cleanNum = num.replace(/[^0-9.,]/g, '')
 
   cleanNum = cleanNum.replace(/,/g, '.')

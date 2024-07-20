@@ -8,12 +8,24 @@ import { ScrollableContent } from './ScrollableContent'
 import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
 import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
 import { NumberInput } from './NumberInput'
+import { formatNumber, parseNumber } from '../utils/formatNumber'
 
 export const CreateQuestDialog: FC = () => {
   const [showDialog, setShowDialog] = useAtom(showDialogAtom)
   const solBalance = useAtomValue(solBalanceFormattedAtom)
   const daoBalance = useAtomValue(daoBalanceFormattedAtom)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [reward, setReward] = useState('')
   const [stake, setStake] = useState('')
+  const [minStake, setMinStake] = useState('')
+  const [placement, setPlacement] = useState('')
+
+  const onPostQuest = () => {
+    // generate ID for the quest
+    // get the PDA of the quest based on ID
+    // reach out partykit to store title, description & reward
+  }
 
   return (
     <Dialog
@@ -46,6 +58,8 @@ export const CreateQuestDialog: FC = () => {
               id='title'
               placeholder='LF> A friend to join me on my birthday :('
               className='w-full bg-black/10 px-3 py-2'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -59,6 +73,8 @@ export const CreateQuestDialog: FC = () => {
               id='description'
               placeholder='Provide a meaningful description of your expectations for this quest.'
               className='w-full bg-black/10 px-3 py-2'
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -73,6 +89,8 @@ export const CreateQuestDialog: FC = () => {
               id='reward'
               placeholder='A birthday cake and a hug.'
               className='w-full bg-black/10 px-3 py-2'
+              value={reward}
+              onChange={(e) => setReward(e.target.value)}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -92,8 +110,18 @@ export const CreateQuestDialog: FC = () => {
               id='stake'
               placeholder='How much are you willing to stake for this quest?'
               className='w-full bg-black/10 px-3 py-2'
+              max={parseNumber(daoBalance, 0)}
               value={stake}
               onChange={setStake}
+              onBlur={(val) => {
+                if (minStake !== '') {
+                  const stakeNum = parseNumber(val, 0)
+                  const minStakeNum = parseNumber(minStake, 0)
+                  setMinStake(
+                    formatNumber(Math.min(stakeNum, minStakeNum) + '')
+                  )
+                }
+              }}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -103,11 +131,22 @@ export const CreateQuestDialog: FC = () => {
             >
               Minimum Stake Requirement (Optional)
             </label>
-            <input
+            <NumberInput
               type='text'
               id='minstake'
               placeholder='How much you require the taker to stake for this.'
               className='w-full bg-black/10 px-3 py-2'
+              value={minStake}
+              onChange={setMinStake}
+              onBlur={(minStake) => {
+                if (minStake !== '') {
+                  const stakeNum = parseNumber(stake, 0)
+                  const minStakeNum = parseNumber(minStake, 0)
+                  setMinStake(
+                    formatNumber(Math.min(stakeNum, minStakeNum) + '')
+                  )
+                }
+              }}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -117,11 +156,13 @@ export const CreateQuestDialog: FC = () => {
             >
               Placement Boost (Optional)
             </label>
-            <input
+            <NumberInput
               type='text'
               id='placement'
               placeholder='Boost visibility of your post.'
               className='w-full bg-black/10 px-3 py-2'
+              value={placement}
+              onChange={setPlacement}
             />
           </div>
           <div className='bg-black/50 text-white'>

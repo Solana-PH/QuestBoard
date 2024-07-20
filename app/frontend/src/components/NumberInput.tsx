@@ -1,15 +1,24 @@
 import React, { useState, useEffect, InputHTMLAttributes } from 'react'
-import { formatNumber } from '../utils/formatNumber'
+import { formatNumber, parseNumber } from '../utils/formatNumber'
 
 interface NumberInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {
+  extends Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    'value' | 'onChange',
+    'onBlur',
+    'max'
+  > {
   value: string
   onChange: (value: string) => void
+  onBlur?: (value: string) => void
+  max?: number
 }
 
 export const NumberInput: React.FC<NumberInputProps> = ({
   value,
   onChange,
+  onBlur,
+  max,
   ...props
 }) => {
   const [displayValue, setDisplayValue] = useState<string>(value)
@@ -19,9 +28,17 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   }, [value])
 
   const handleBlur = () => {
-    const formattedValue = formatNumber(value)
+    let num = parseNumber(value, 0)
+
+    if (typeof max === 'number') {
+      num = Math.min(num, max)
+    }
+
+    const formattedValue = formatNumber(num + '')
     setDisplayValue(formattedValue)
     onChange(formattedValue)
+
+    onBlur?.(formattedValue)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +53,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
       value={displayValue}
       onChange={handleChange}
       onBlur={handleBlur}
+      onFocus={(e) => e.target.select()}
       {...props}
     />
   )
