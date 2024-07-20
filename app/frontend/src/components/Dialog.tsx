@@ -45,7 +45,7 @@ export default function Dialog({ show, children, onClose }: DialogProps) {
               <div className='w-full mx-auto overflow-hidden'>
                 <div
                   className={
-                    'p-3 w-full h-full flex flex-col items-center justify-center'
+                    'w-full h-full flex flex-col items-center justify-center'
                   }
                 >
                   {children}

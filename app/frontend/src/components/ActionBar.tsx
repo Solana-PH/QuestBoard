@@ -10,15 +10,17 @@ import {
 } from '@headlessui/react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { trimAddress } from '../utils/trimAddress'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
 import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
+import { Dialogs, showDialogAtom } from '../atoms/showDialogAtom'
 
 export const ActionBar: FC = () => {
   const { disconnect, publicKey } = useWallet()
   const { setVisible } = useWalletModal()
   const solBalance = useAtomValue(solBalanceFormattedAtom)
   const daoBalance = useAtomValue(daoBalanceFormattedAtom)
+  const setShowDialog = useSetAtom(showDialogAtom)
 
   return (
     <div className='animate-fadeIn flex flex-none px-2 h-16 bg-black/50 items-center justify-between gap-5'>
@@ -32,7 +34,7 @@ export const ActionBar: FC = () => {
           <input
             type='text'
             placeholder='Search Quests'
-            className='bg-transparent border-b border-white/50 text-white px-3 py-2 w-full'
+            className='bg-transparent px-3 py-2 w-full'
           />
         </div>
       </div>
@@ -87,7 +89,10 @@ export const ActionBar: FC = () => {
             </MenuItem>
           </MenuItems>
         </Menu>
-        <button className='px-3 py-2 flex items-center gap-3 bg-amber-300/10 hover:bg-amber-300/30 transition-colors'>
+        <button
+          onClick={() => setShowDialog(Dialogs.CREATE_QUEST)}
+          className='px-3 py-2 flex items-center gap-3 bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+        >
           <Note size={32} />
           <span className='hidden xl:inline'>Post a Quest</span>
         </button>
