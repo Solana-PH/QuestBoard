@@ -87,6 +87,8 @@ export default class QuestInfo implements ServerCommon {
     }
 
     // todo: PATCH method, which will update the details of the quest
+    // requires consulting the blockchain and checking the owner of the quest
+    // requires signature of the owner as well
 
     return new Response('Access denied', { status: 403 })
   }

@@ -1,43 +1,43 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { FC, useEffect } from 'react'
 import { PROGRAM_ID, programAtom } from '../atoms/programAtom'
-import { configAtom } from '../atoms/configAtom'
+import { counterAtom } from '../atoms/counterAtom'
 import { useUserWallet } from '../atoms/userWalletAtom'
 import { PublicKey } from '@solana/web3.js'
 
-export const [configPda] = PublicKey.findProgramAddressSync(
-  [Buffer.from('config')],
+export const [counterPda] = PublicKey.findProgramAddressSync(
+  [Buffer.from('counter')],
   PROGRAM_ID
 )
 
-export const ConfigListener: FC = () => {
+export const CounterListener: FC = () => {
   const wallet = useUserWallet()
   const program = useAtomValue(programAtom)
-  const setConfig = useSetAtom(configAtom)
+  const setCounter = useSetAtom(counterAtom)
 
   useEffect(() => {
     if (!program) return
 
-    program.account.config.fetchNullable(configPda).then((configAccount) => {
-      setConfig(configAccount)
+    program.account.counter.fetchNullable(counterPda).then((counterAccount) => {
+      setCounter(counterAccount)
     })
 
     const subscriptionId = program.provider.connection.onAccountChange(
-      configPda,
+      counterPda,
       (accountInfo) => {
-        const configAccount = program.account.config.coder.accounts.decode(
-          'config',
+        const counterAccount = program.account.counter.coder.accounts.decode(
+          'counter',
           accountInfo.data
         )
 
-        setConfig(configAccount)
+        setCounter(counterAccount)
       }
     )
 
     return () => {
       program.provider.connection.removeAccountChangeListener(subscriptionId)
     }
-  }, [wallet, program, setConfig])
+  }, [wallet, program, setCounter])
 
   return null
 }

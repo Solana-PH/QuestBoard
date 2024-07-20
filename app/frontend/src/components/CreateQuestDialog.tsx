@@ -9,9 +9,16 @@ import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
 import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
 import { NumberInput } from './NumberInput'
 import { formatNumber, parseNumber } from '../utils/formatNumber'
-import { Keypair } from '@solana/web3.js'
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+} from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
+import { PROGRAM_ID, programAtom } from '../atoms/programAtom'
+import { BN } from '@coral-xyz/anchor'
 
 export const CreateQuestDialog: FC = () => {
   const [showDialog, setShowDialog] = useAtom(showDialogAtom)
@@ -23,40 +30,105 @@ export const CreateQuestDialog: FC = () => {
   const [stake, setStake] = useState('')
   const [minStake, setMinStake] = useState('')
   const [placement, setPlacement] = useState('')
+  const program = useAtomValue(programAtom)
+  const [busy, setBusy] = useState(false)
 
   const onPostQuest = async () => {
-    // generate ID for the quest
-    // get the PDA of the quest based on ID
-    // reach out partykit to store title, description & reward
-    // partykit will return hash of ID + title + description + reward
-    const idKeypair = Keypair.generate()
-    const id = idKeypair.publicKey.toBase58()
+    if (!program) return
+    setBusy(true)
+    try {
+      const idKeypair = Keypair.generate()
+      const id = idKeypair.publicKey.toBase58()
 
-    const details = [id, title.trim(), description.trim(), reward.trim()].join(
-      ''
-    )
-    const signature = sign.detached(Buffer.from(details), idKeypair.secretKey)
+      const details = [
+        id,
+        title.trim(),
+        description.trim(),
+        reward.trim(),
+      ].join('')
+      const signature = sign.detached(Buffer.from(details), idKeypair.secretKey)
 
-    const payload = {
-      id,
-      title,
-      description,
-      reward,
-      signature: bs58.encode(signature),
-    }
-
-    const hash = await fetch(
-      `http://192.168.1.32:1999/parties/main/questinfo_${id}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+      const payload = {
+        id,
+        title,
+        description,
+        reward,
+        signature: bs58.encode(signature),
       }
-    )
 
-    console.log(hash)
+      const response = await fetch(
+        `http://192.168.1.32:1999/parties/main/questinfo_${id}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to create quest details')
+      }
+
+      const hashStr = await response.text()
+      const hash = bs58.decode(hashStr)
+
+      const [questPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from('quest'), idKeypair.publicKey.toBytes()],
+        PROGRAM_ID
+      )
+
+      const createIx = await program.methods
+        .createQuest({
+          detailsHash: Array.from(hash),
+          minStakeRequired: new BN(parseNumber(minStake, 0) * 10 ** 9),
+          placementPaid: new BN(parseNumber(placement, 0) * LAMPORTS_PER_SOL),
+          stakeAmount: new BN(parseNumber(stake, 0) * 10 ** 9),
+        })
+        .accounts({
+          owner: program.provider.publicKey,
+          id: idKeypair.publicKey,
+        })
+        .signers([idKeypair])
+        .instruction()
+
+      const publishIx = await program.methods
+        .publishQuest()
+        .accounts({
+          owner: program.provider.publicKey,
+        })
+        .accountsPartial({
+          quest: questPda,
+        })
+        .instruction()
+
+      const tx = new Transaction().add(createIx, publishIx)
+
+      const txSignature = await program.provider.sendAndConfirm(
+        tx,
+        [idKeypair],
+        {
+          commitment: 'confirmed',
+        }
+      )
+
+      console.log('Transaction submitted:', txSignature)
+
+      // clear all fields
+      setShowDialog(Dialogs.NONE)
+      setTitle('')
+      setDescription('')
+      setReward('')
+      setStake('')
+      setMinStake('')
+      setPlacement('')
+
+      setBusy(false)
+    } catch (error) {
+      setBusy(false)
+      throw error
+    }
   }
 
   return (
@@ -68,6 +140,7 @@ export const CreateQuestDialog: FC = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault()
+            if (busy) return
             onPostQuest()
           }}
           className={cn(
@@ -205,6 +278,7 @@ export const CreateQuestDialog: FC = () => {
           <div className='bg-black/50 text-white'>
             <button
               type='submit'
+              disabled={busy}
               className='w-full px-3 py-2 flex items-center justify-center gap-3 bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
             >
               <Note size={32} />

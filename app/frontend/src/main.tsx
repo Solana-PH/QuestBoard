@@ -9,6 +9,7 @@ import './index.css'
 import { AtomsInitializer } from './atoms/AtomsInitializer.tsx'
 import { BalanceListener } from './components/BalanceListener.tsx'
 import { ConfigListener } from './components/ConfigListener.tsx'
+import { CounterListener } from './components/CounterListener.tsx'
 
 const SplashScreen = () => {
   const { connected } = useWallet()
@@ -32,6 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <AtomsInitializer>
         <BalanceListener />
         <ConfigListener />
+        <CounterListener />
         <SplashScreen />
       </AtomsInitializer>
     </WalletAdapter>
