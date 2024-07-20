@@ -3,18 +3,24 @@ import Chat from './servers/Chat'
 import Core from './servers/Core'
 import Default from './servers/Default'
 import type { ServerCommon } from './servers/ServerCommon'
+import QuestInfo from './servers/QuestInfo'
+import { commonHeaders } from './commonHeaders'
 
 export default class Server implements Party.Server {
   readonly server: ServerCommon
 
   constructor(readonly room: Party.Room) {
-    const [role, id] = room.id.toLowerCase().trim().split('/')
+    const [role] = room.id.toLowerCase().trim().split('_')
+
     switch (role) {
       case 'core':
         this.server = new Core(room)
         break
       case 'chat':
-        this.server = new Chat(room, id)
+        this.server = new Chat(room)
+        break
+      case 'questinfo':
+        this.server = new QuestInfo(room)
         break
       default:
         this.server = new Default(room)
@@ -46,6 +52,13 @@ export default class Server implements Party.Server {
   }
 
   async onRequest(req: Party.Request) {
+    if (req.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: commonHeaders,
+      })
+    }
+
     return (
       this.server.onRequest?.(req) ??
       new Response('Access denied', { status: 403 })
@@ -61,12 +74,14 @@ export default class Server implements Party.Server {
     lobby: Party.Lobby,
     ctx: Party.ExecutionContext
   ) {
-    const [role] = lobby.id.toLowerCase().trim().split('/')
+    const [role] = lobby.id.toLowerCase().trim().split('_')
     switch (role) {
       case 'core':
         return Core.onBeforeRequest(req, lobby, ctx)
       case 'chat':
         return Chat.onBeforeRequest(req, lobby, ctx)
+      case 'questinfo':
+        return QuestInfo.onBeforeRequest(req, lobby, ctx)
       default:
         return Default.onBeforeRequest(req, lobby, ctx)
     }
@@ -77,12 +92,14 @@ export default class Server implements Party.Server {
     lobby: Party.Lobby,
     ctx: Party.ExecutionContext
   ) {
-    const [role] = lobby.id.toLowerCase().trim().split('/')
+    const [role] = lobby.id.toLowerCase().trim().split('_')
     switch (role) {
       case 'core':
         return Core.onBeforeConnect(req, lobby, ctx)
       case 'chat':
         return Chat.onBeforeConnect(req, lobby, ctx)
+      case 'questinfo':
+        return QuestInfo.onBeforeConnect(req, lobby, ctx)
       default:
         return Default.onBeforeConnect(req, lobby, ctx)
     }

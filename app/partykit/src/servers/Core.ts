@@ -2,6 +2,8 @@ import type * as Party from 'partykit/server'
 import type { ServerCommon } from './ServerCommon'
 
 export default class Core implements ServerCommon {
+  name = 'core'
+
   constructor(readonly room: Party.Room) {}
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {

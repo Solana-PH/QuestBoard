@@ -9,6 +9,8 @@ import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
 import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
 import { NumberInput } from './NumberInput'
 import { formatNumber, parseNumber } from '../utils/formatNumber'
+import { Keypair } from '@solana/web3.js'
+import { sign } from 'tweetnacl'
 
 export const CreateQuestDialog: FC = () => {
   const [showDialog, setShowDialog] = useAtom(showDialogAtom)
@@ -21,10 +23,41 @@ export const CreateQuestDialog: FC = () => {
   const [minStake, setMinStake] = useState('')
   const [placement, setPlacement] = useState('')
 
-  const onPostQuest = () => {
+  const onPostQuest = async () => {
     // generate ID for the quest
     // get the PDA of the quest based on ID
     // reach out partykit to store title, description & reward
+    // partykit will return hash of ID + title + description + reward
+    const idKeypair = Keypair.generate()
+    const id = idKeypair.publicKey.toBase58()
+
+    const details = [id, title.trim(), description.trim(), reward.trim()].join(
+      ''
+    )
+    const signature = sign.detached(Buffer.from(details), idKeypair.secretKey)
+
+    const payload = {
+      id,
+      title,
+      description,
+      reward,
+      signature: Buffer.from(signature).toString('hex'),
+    }
+
+    // await fetch(`http://192.168.1.32:1999/questinfo/${id}`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(payload),
+    // })
+    await fetch(`http://192.168.1.32:1999/parties/main/questinfo_${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
   }
 
   return (
@@ -33,7 +66,11 @@ export const CreateQuestDialog: FC = () => {
       onClose={() => setShowDialog(Dialogs.NONE)}
     >
       <ScrollableContent>
-        <div
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onPostQuest()
+          }}
           className={cn(
             'flex flex-col gap-5',
             'mx-auto max-w-md w-full bg-amber-100 text-amber-950 px-5 pb-5 pt-4'
@@ -41,7 +78,7 @@ export const CreateQuestDialog: FC = () => {
         >
           <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-amber-100 z-10'>
             <span>Create a Quest</span>
-            <button onClick={() => setShowDialog(Dialogs.NONE)}>
+            <button type='button' onClick={() => setShowDialog(Dialogs.NONE)}>
               <X size={24} />
             </button>
           </h2>
@@ -82,7 +119,7 @@ export const CreateQuestDialog: FC = () => {
               htmlFor='reward'
               className='text-xs uppercase tracking-wider font-bold opacity-50'
             >
-              Reward (Optional)
+              Reward
             </label>
             <input
               type='text'
@@ -100,6 +137,7 @@ export const CreateQuestDialog: FC = () => {
             >
               <span className='opacity-50'>Stake (Optional)</span>
               <button
+                type='button'
                 onClick={() => setStake(daoBalance)}
                 className='uppercase tabular-nums'
               >
@@ -166,12 +204,15 @@ export const CreateQuestDialog: FC = () => {
             />
           </div>
           <div className='bg-black/50 text-white'>
-            <button className='w-full px-3 py-2 flex items-center justify-center gap-3 bg-amber-300/10 hover:bg-amber-300/30 transition-colors'>
+            <button
+              type='submit'
+              className='w-full px-3 py-2 flex items-center justify-center gap-3 bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+            >
               <Note size={32} />
               <span>Post a Quest</span>
             </button>
           </div>
-        </div>
+        </form>
       </ScrollableContent>
     </Dialog>
   )

@@ -1,3 +1,5 @@
 import type * as Party from 'partykit/server'
 
-export type ServerCommon = Party.Server & {}
+export type ServerCommon = Party.Server & {
+  name: string
+}
