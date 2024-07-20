@@ -7,7 +7,7 @@ function App() {
   return (
     <div className='h-screen w-full flex flex-col'>
       <ScrollableContent className='flex flex-col'>
-        <div className='show-next-when-empty'>
+        <div className='show-next-when-empty grid grid-cols-12 gap-5 p-5'>
           <QuestList />
         </div>
         <div className='w-full h-full flex items-center justify-center'>

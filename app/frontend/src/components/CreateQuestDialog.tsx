@@ -35,17 +35,20 @@ export const CreateQuestDialog: FC = () => {
 
   const onPostQuest = async () => {
     if (!program) return
+    const title = title.trim()
+    const description = description.trim()
+    const reward = reward.trim()
+
+    if (title === '' || title.length > 120) return
+    if (description === '' || description.length > 320) return
+    if (reward === '' || reward.length > 120) return
+
     setBusy(true)
     try {
       const idKeypair = Keypair.generate()
       const id = idKeypair.publicKey.toBase58()
 
-      const details = [
-        id,
-        title.trim(),
-        description.trim(),
-        reward.trim(),
-      ].join('')
+      const details = [id, title, description, reward].join('')
       const signature = sign.detached(Buffer.from(details), idKeypair.secretKey)
 
       const payload = {
@@ -149,7 +152,7 @@ export const CreateQuestDialog: FC = () => {
           )}
         >
           <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-amber-100 z-10'>
-            <span>Create a Quest</span>
+            <span className='font-bold'>Create a Quest</span>
             <button type='button' onClick={() => setShowDialog(Dialogs.NONE)}>
               <X size={24} />
             </button>
@@ -168,7 +171,7 @@ export const CreateQuestDialog: FC = () => {
               placeholder='LF> A friend to join me on my birthday :('
               className='w-full bg-black/10 px-3 py-2'
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value.substring(0, 120))}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -183,7 +186,7 @@ export const CreateQuestDialog: FC = () => {
               placeholder='Provide a meaningful description of your expectations for this quest.'
               className='w-full bg-black/10 px-3 py-2'
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value.substring(0, 320))}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -199,7 +202,7 @@ export const CreateQuestDialog: FC = () => {
               placeholder='A birthday cake and a hug.'
               className='w-full bg-black/10 px-3 py-2'
               value={reward}
-              onChange={(e) => setReward(e.target.value)}
+              onChange={(e) => setReward(e.target.value.substring(0, 120))}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -279,10 +282,16 @@ export const CreateQuestDialog: FC = () => {
             <button
               type='submit'
               disabled={busy}
-              className='w-full px-3 py-2 flex items-center justify-center gap-3 bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+              className={cn(
+                busy
+                  ? 'opacity-50 pointer-events-none cursor-wait'
+                  : 'cursor-pointer',
+                'w-full px-3 py-2 flex items-center justify-center gap-3',
+                'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+              )}
             >
               <Note size={32} />
-              <span>Post a Quest</span>
+              <span>{busy ? 'Please Wait' : 'Post a Quest'}</span>
             </button>
           </div>
         </form>
