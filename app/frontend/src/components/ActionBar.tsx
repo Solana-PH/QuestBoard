@@ -50,7 +50,7 @@ export const ActionBar: FC = () => {
           </MenuButton>
           <MenuItems
             anchor='bottom'
-            className='w-52 flex flex-col p-1 bg-amber-300/5 backdrop-blur'
+            className='w-52 flex flex-col p-1 bg-black/80 backdrop-blur'
           >
             <div className='flex flex-col gap-2 py-2'>
               <p className='px-3 text-xs flex items-center justify-between'>

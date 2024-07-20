@@ -6,6 +6,7 @@ import { useAtomValue } from 'jotai'
 import { questDetailsAtom } from '../atoms/questDetailsAtom'
 import { trimAddress } from '../utils/trimAddress'
 import { formatNumber } from '../utils/formatNumber'
+import cn from 'classnames'
 
 export const QuestCard: FC<
   ProgramAccount<IdlAccounts<QuestBoard>['quest']>
@@ -15,7 +16,13 @@ export const QuestCard: FC<
   const details = useAtomValue(questDetailsAtom(id + '_' + hash))
 
   return (
-    <div className='col-span-3 bg-amber-100 text-amber-950 p-5 flex flex-col gap-5'>
+    <div
+      className={cn(
+        'col-span-12 portrait:md:col-span-6 landscape:md:col-span-4',
+        'portrait:xl:col-span-4 landscape:xl:col-span-3',
+        'bg-amber-100 text-amber-950 p-5 flex flex-col gap-5'
+      )}
+    >
       <div className='flex flex-col gap-2'>
         {details ? (
           <h2 className='text-2xl font-cursive font-bold'>{details.title}</h2>
