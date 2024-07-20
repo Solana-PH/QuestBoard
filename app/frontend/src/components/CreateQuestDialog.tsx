@@ -11,6 +11,7 @@ import { NumberInput } from './NumberInput'
 import { formatNumber, parseNumber } from '../utils/formatNumber'
 import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
+import bs58 from 'bs58'
 
 export const CreateQuestDialog: FC = () => {
   const [showDialog, setShowDialog] = useAtom(showDialogAtom)
@@ -41,23 +42,21 @@ export const CreateQuestDialog: FC = () => {
       title,
       description,
       reward,
-      signature: Buffer.from(signature).toString('hex'),
+      signature: bs58.encode(signature),
     }
 
-    // await fetch(`http://192.168.1.32:1999/questinfo/${id}`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(payload),
-    // })
-    await fetch(`http://192.168.1.32:1999/parties/main/questinfo_${id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
+    const hash = await fetch(
+      `http://192.168.1.32:1999/parties/main/questinfo_${id}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    )
+
+    console.log(hash)
   }
 
   return (
