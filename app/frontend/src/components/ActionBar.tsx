@@ -14,6 +14,11 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
 import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
 import { Dialogs, showDialogAtom } from '../atoms/showDialogAtom'
+import {
+  ConnectionStatus,
+  connectionStatusAtom,
+} from '../atoms/connectionStatusAtom'
+import cn from 'classnames'
 
 export const ActionBar: FC = () => {
   const { disconnect, publicKey } = useWallet()
@@ -21,6 +26,7 @@ export const ActionBar: FC = () => {
   const solBalance = useAtomValue(solBalanceFormattedAtom)
   const daoBalance = useAtomValue(daoBalanceFormattedAtom)
   const setShowDialog = useSetAtom(showDialogAtom)
+  const connectionStatus = useAtomValue(connectionStatusAtom)
 
   return (
     <div className='animate-fadeIn flex flex-none px-2 h-16 bg-black/50 items-center justify-between gap-5'>
@@ -40,11 +46,22 @@ export const ActionBar: FC = () => {
       </div>
       <div className='flex-none flex items-center gap-5'>
         <Menu>
-          <MenuButton className='px-3 py-2 flex items-center gap-3'>
+          <MenuButton className='px-3 py-2 flex items-center gap-2'>
             <Wallet size={32} />
             {publicKey && (
-              <span className='hidden xl:inline'>
-                {trimAddress(publicKey.toBase58())}
+              <span className='flex items-center gap-2'>
+                <span className='hidden xl:inline'>
+                  {trimAddress(publicKey.toBase58())}
+                </span>
+                <span
+                  className={cn(
+                    'rounded-full w-2 h-2 flex-none',
+                    ConnectionStatus.CONNECTED === connectionStatus &&
+                      'bg-green-500',
+                    ConnectionStatus.CONNECTING === connectionStatus &&
+                      'bg-amber-500 animate-pulse'
+                  )}
+                />
               </span>
             )}
           </MenuButton>

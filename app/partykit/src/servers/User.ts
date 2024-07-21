@@ -13,11 +13,31 @@ interface UserDetails {
 
 export default class User implements ServerCommon {
   name = 'user'
+  connected = false
 
   constructor(readonly room: Party.Room) {}
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-    // conn.close()
+    this.connected = true
+  }
+
+  async onClose(conn: Party.Connection) {
+    this.connected = false
+  }
+
+  async onRequest(req: Party.Request) {
+    if (req.method === 'GET') {
+      return new Response(
+        JSON.stringify({
+          online: this.connected,
+        }),
+        { status: 200, headers: commonHeaders }
+      )
+    }
+    return new Response('Access denied', {
+      status: 403,
+      headers: commonHeaders,
+    })
   }
 
   async onMessage(

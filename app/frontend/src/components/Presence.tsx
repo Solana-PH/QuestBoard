@@ -1,4 +1,4 @@
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import usePartySocket from 'partysocket/react'
 import { FC } from 'react'
 import { myDetailsAtom, UserDetails } from '../atoms/userDetailsAtom'
@@ -7,6 +7,10 @@ import { WalletContextState } from '@solana/wallet-adapter-react'
 import { Keypair } from '@solana/web3.js'
 import bs58 from 'bs58'
 import { sign } from 'tweetnacl'
+import {
+  ConnectionStatus,
+  connectionStatusAtom,
+} from '../atoms/connectionStatusAtom'
 
 const PresenceInner: FC<{
   details: UserDetails
@@ -16,6 +20,7 @@ const PresenceInner: FC<{
   // consults own room
   // own room do POST request presence server
   const address = wallet.publicKey.toBase58()
+  const setConnectionStatus = useSetAtom(connectionStatusAtom)
 
   const ws = usePartySocket({
     host: 'http://192.168.1.32:1999',
@@ -40,16 +45,18 @@ const PresenceInner: FC<{
     },
 
     onOpen() {
-      console.log('connected')
+      console.log('ws connected')
+      setConnectionStatus(ConnectionStatus.CONNECTED)
     },
     onMessage(e) {
-      console.log('message', e.data)
+      console.log('ws message', e.data)
     },
     onClose() {
-      console.log('closed')
+      console.log('ws closed')
+      setConnectionStatus(ConnectionStatus.CONNECTING)
     },
     onError(e) {
-      console.log('error')
+      console.log('ws error')
     },
   })
 
