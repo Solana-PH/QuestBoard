@@ -1,10 +1,11 @@
 import type * as Party from 'partykit/server'
+import type { ServerCommon } from './servers/ServerCommon'
+import { commonHeaders } from './commonHeaders'
 import Chat from './servers/Chat'
 import Core from './servers/Core'
 import Default from './servers/Default'
-import type { ServerCommon } from './servers/ServerCommon'
 import QuestInfo from './servers/QuestInfo'
-import { commonHeaders } from './commonHeaders'
+import UserInfo from './servers/UserInfo'
 
 export default class Server implements Party.Server {
   readonly server: ServerCommon
@@ -21,6 +22,9 @@ export default class Server implements Party.Server {
         break
       case 'questinfo':
         this.server = new QuestInfo(room)
+        break
+      case 'userinfo':
+        this.server = new UserInfo(room)
         break
       default:
         this.server = new Default(room)
@@ -82,6 +86,8 @@ export default class Server implements Party.Server {
         return Chat.onBeforeRequest(req, lobby, ctx)
       case 'questinfo':
         return QuestInfo.onBeforeRequest(req, lobby, ctx)
+      case 'userinfo':
+        return UserInfo.onBeforeRequest(req, lobby, ctx)
       default:
         return Default.onBeforeRequest(req, lobby, ctx)
     }
@@ -100,6 +106,8 @@ export default class Server implements Party.Server {
         return Chat.onBeforeConnect(req, lobby, ctx)
       case 'questinfo':
         return QuestInfo.onBeforeConnect(req, lobby, ctx)
+      case 'userinfo':
+        return UserInfo.onBeforeConnect(req, lobby, ctx)
       default:
         return Default.onBeforeConnect(req, lobby, ctx)
     }

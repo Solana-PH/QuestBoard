@@ -14,7 +14,7 @@ export interface DialogProps {
 export default function Dialog({ show, children, onClose }: DialogProps) {
   return (
     <Transition show={show} as={Fragment}>
-      <UiDialog onClose={onClose} className='relative z-50'>
+      <UiDialog onClose={onClose ?? (() => {})} className='relative z-50'>
         <TransitionChild
           as={Fragment}
           enter='ease-linear duration-300'

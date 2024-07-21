@@ -2,6 +2,7 @@ import { ActionBar } from './components/ActionBar'
 import { CreateQuestDialog } from './components/CreateQuestDialog'
 import { QuestList } from './components/QuestList'
 import { ScrollableContent } from './components/ScrollableContent'
+import { WelcomeModal } from './components/WelcomeModal'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       </ScrollableContent>
       <ActionBar />
       <CreateQuestDialog />
+      <WelcomeModal />
     </div>
   )
 }
