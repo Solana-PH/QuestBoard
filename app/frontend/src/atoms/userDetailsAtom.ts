@@ -3,6 +3,7 @@ import { atomFamily } from 'jotai/utils'
 import bs58 from 'bs58'
 import { Keypair } from '@solana/web3.js'
 import { userWalletAtom } from './userWalletAtom'
+import { partykitAddress } from '../constants/partykitAddress'
 
 export interface UserDetails {
   sessionAddress: string
@@ -19,7 +20,7 @@ export const userDetailsAtom = atomFamily((address: string) =>
       get(refresherAtom(address))
       try {
         const response = await fetch(
-          `http://192.168.1.32:1999/parties/main/userinfo_${address}`,
+          `${partykitAddress}/parties/main/userinfo_${address}`,
           {
             method: 'GET',
             headers: {

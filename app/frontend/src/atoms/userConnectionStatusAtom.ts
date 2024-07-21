@@ -1,5 +1,6 @@
 import { atom } from 'jotai'
 import { atomFamily } from 'jotai/utils'
+import { partykitAddress } from '../constants/partykitAddress'
 
 const refresherAtom = atomFamily((address: string) => atom(Date.now()))
 
@@ -11,7 +12,7 @@ export const userConnectionStatusAtom = atomFamily((address: string) =>
 
       get(refresherAtom(address))
       const response = await fetch(
-        `http://192.168.1.32:1999/parties/main/user_${address}`,
+        `${partykitAddress}/parties/main/user_${address}`,
         {
           method: 'GET',
           headers: {

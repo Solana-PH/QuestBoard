@@ -19,6 +19,7 @@ import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 import { PROGRAM_ID, programAtom } from '../atoms/programAtom'
 import { BN } from '@coral-xyz/anchor'
+import { partykitAddress } from '../constants/partykitAddress'
 
 export const CreateQuestDialog: FC = () => {
   const [showDialog, setShowDialog] = useAtom(showDialogAtom)
@@ -65,7 +66,7 @@ export const CreateQuestDialog: FC = () => {
       }
 
       const response = await fetch(
-        `http://192.168.1.32:1999/parties/main/questinfo_${id}`,
+        `${partykitAddress}/parties/main/questinfo_${id}`,
         {
           method: 'POST',
           headers: {

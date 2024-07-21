@@ -3,6 +3,7 @@ import type { ServerCommon } from './ServerCommon'
 import { commonHeaders } from '../commonHeaders'
 import bs58 from 'bs58'
 import { sign } from 'tweetnacl'
+import { partykitAddress } from '../partykitAddress'
 
 interface UserDetails {
   sessionAddress: string
@@ -81,7 +82,7 @@ export default class User implements ServerCommon {
       const [message, signature] = token.split('.')
 
       const remote = await fetch(
-        `http://192.168.1.32:1999/parties/main/userinfo_${address}`,
+        `${partykitAddress}/parties/main/userinfo_${address}`,
         {
           method: 'GET',
           headers: {

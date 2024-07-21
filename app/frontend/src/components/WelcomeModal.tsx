@@ -9,6 +9,7 @@ import TimeInput from './TimeInput'
 import { Keypair } from '@solana/web3.js'
 import { Pen, X } from '@phosphor-icons/react'
 import bs58 from 'bs58'
+import { partykitAddress } from '../constants/partykitAddress'
 
 export const WelcomeModal: FC = () => {
   const wallet = useUserWallet()
@@ -34,7 +35,7 @@ export const WelcomeModal: FC = () => {
       }
 
       const response = await fetch(
-        `http://192.168.1.32:1999/parties/main/userinfo_${walletAddress}`,
+        `${partykitAddress}/parties/main/userinfo_${walletAddress}`,
         {
           method: 'POST',
           headers: {

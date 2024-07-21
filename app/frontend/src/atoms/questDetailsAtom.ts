@@ -1,5 +1,6 @@
 import { atom } from 'jotai'
 import { atomFamily } from 'jotai/utils'
+import { partykitAddress } from '../constants/partykitAddress'
 
 export interface QuestDetails {
   id: string
@@ -14,7 +15,7 @@ export const questDetailsAtom = atomFamily((id_hash: string) =>
     const [id, hash] = id_hash.split('_')
 
     const response = await fetch(
-      `http://192.168.1.32:1999/parties/main/questinfo_${id}?hash=${hash}`,
+      `${partykitAddress}/parties/main/questinfo_${id}?hash=${hash}`,
       {
         method: 'GET',
         headers: {

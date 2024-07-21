@@ -11,6 +11,7 @@ import {
   ConnectionStatus,
   connectionStatusAtom,
 } from '../atoms/connectionStatusAtom'
+import { partykitAddress } from '../constants/partykitAddress'
 
 const PresenceInner: FC<{
   details: UserDetails
@@ -23,7 +24,7 @@ const PresenceInner: FC<{
   const setConnectionStatus = useSetAtom(connectionStatusAtom)
 
   const ws = usePartySocket({
-    host: 'http://192.168.1.32:1999',
+    host: partykitAddress,
     room: `user_${address}`,
 
     query: async () => {
