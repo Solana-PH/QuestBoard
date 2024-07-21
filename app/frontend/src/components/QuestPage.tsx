@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { ScrollableContent } from './ScrollableContent'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Trash, X } from '@phosphor-icons/react'
+import { HandPalm, Trash, X } from '@phosphor-icons/react'
 import { useAtom, useAtomValue } from 'jotai'
 import { questAtom } from '../atoms/questsAtom'
 import { formatNumber } from '../utils/formatNumber'
@@ -23,6 +23,7 @@ export const QuestPage: FC = () => {
   const [connectionStatus, checkConnection] = useAtom(
     userConnectionStatusAtom(quest?.account?.owner?.toBase58() ?? '')
   )
+  const [proposal, setProposal] = useState('')
 
   useEffect(() => {
     if (questDetailsRef.current) {
@@ -92,8 +93,8 @@ export const QuestPage: FC = () => {
       className={cn(
         'absolute inset-0',
         'flex justify-end',
-        'overflow-x-scroll overflow-y-hidden',
-        'gap-3 p-3 lg:gap-5 lg:p-5'
+        'overflow-x-scroll portrait:overflow-x-hidden overflow-y-hidden',
+        'gap-3 p-3 portrait:gap-0 portrait:p-0 lg:gap-5 lg:p-5 pl-0'
       )}
     >
       <Link to='/'>
@@ -110,7 +111,7 @@ export const QuestPage: FC = () => {
             style={{ width }}
             className={cn(
               'flex flex-col',
-              'h-full bg-amber-100 text-amber-950 overflow-hidden'
+              'h-full bg-amber-100 text-amber-950 overflow-x-hidden overflow-y-auto'
             )}
           >
             <div className='flex flex-col gap-5 flex-auto px-5 pb-5 pt-4'>
@@ -215,8 +216,8 @@ export const QuestPage: FC = () => {
                 </div>
               )}
             </div>
-            <div className='flex-none px-5 pb-5'>
-              {owner && (
+            <div className='flex-none px-5 pb-5 gap-5 flex flex-col'>
+              {owner ? (
                 <div className='bg-black/50 text-white'>
                   <button
                     disabled={busy}
@@ -233,6 +234,46 @@ export const QuestPage: FC = () => {
                     <span>{busy ? 'Please Wait' : 'Close Quest'}</span>
                   </button>
                 </div>
+              ) : (
+                <>
+                  <div className='flex flex-col gap-1'>
+                    <label
+                      htmlFor='proposal'
+                      className='text-xs uppercase tracking-wider font-bold opacity-50'
+                    >
+                      Make an Offer
+                    </label>
+                    <textarea
+                      id='proposal'
+                      placeholder='Provide an offer to the owner. Make it concise and convincing.'
+                      className='w-full bg-black/10 px-3 py-2'
+                      value={proposal}
+                      onChange={(e) =>
+                        setProposal(e.target.value.substring(0, 320))
+                      }
+                    />
+                  </div>
+                  <div className='bg-black/50 text-white'>
+                    <button
+                      disabled={busy || !connectionStatus}
+                      onClick={onClose}
+                      className={cn(
+                        busy || !connectionStatus
+                          ? 'opacity-50 pointer-events-none cursor-wait'
+                          : 'cursor-pointer',
+                        'w-full px-3 py-2 flex items-center justify-center gap-3',
+                        'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                      )}
+                    >
+                      <HandPalm size={32} />
+                      {connectionStatus ? (
+                        <span>{busy ? 'Please Wait' : 'Accept Quest'}</span>
+                      ) : (
+                        <span>Owner is Offline</span>
+                      )}
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>
