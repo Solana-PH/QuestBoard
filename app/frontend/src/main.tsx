@@ -10,6 +10,7 @@ import { AtomsInitializer } from './atoms/AtomsInitializer.tsx'
 import { BalanceListener } from './components/BalanceListener.tsx'
 import { ConfigListener } from './components/ConfigListener.tsx'
 import { CounterListener } from './components/CounterListener.tsx'
+import { QuestPage } from './components/QuestPage.tsx'
 
 const SplashScreen = () => {
   const { connected } = useWallet()
@@ -21,7 +22,9 @@ const SplashScreen = () => {
   return (
     <Router>
       <Routes>
-        <Route path='/' element={<App />} />
+        <Route path='/' element={<App />}>
+          <Route path='quest/:questId' element={<QuestPage />} />
+        </Route>
       </Routes>
     </Router>
   )

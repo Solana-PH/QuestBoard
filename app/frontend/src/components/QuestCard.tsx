@@ -7,6 +7,7 @@ import { questDetailsAtom } from '../atoms/questDetailsAtom'
 import { trimAddress } from '../utils/trimAddress'
 import { formatNumber } from '../utils/formatNumber'
 import cn from 'classnames'
+import { Link } from 'react-router-dom'
 
 export const QuestCard: FC<
   ProgramAccount<IdlAccounts<QuestBoard>['quest']>
@@ -26,7 +27,9 @@ export const QuestCard: FC<
     >
       <div className='flex flex-col gap-2'>
         {details ? (
-          <h2 className='text-2xl font-cursive font-bold'>{details.title}</h2>
+          <h2 className='text-2xl font-cursive font-bold'>
+            <Link to={`/quest/${publicKey.toBase58()}`}>{details.title}</Link>
+          </h2>
         ) : (
           <h2 className='h-8 w-64 bg-amber-950 animate-pulse rounded' />
         )}
