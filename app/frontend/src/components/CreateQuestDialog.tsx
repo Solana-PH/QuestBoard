@@ -35,27 +35,32 @@ export const CreateQuestDialog: FC = () => {
 
   const onPostQuest = async () => {
     if (!program) return
-    const title = title.trim()
-    const description = description.trim()
-    const reward = reward.trim()
+    const titleTrimmed = title.trim()
+    const descriptionTrimmed = description.trim()
+    const rewardTrimmed = reward.trim()
 
-    if (title === '' || title.length > 120) return
-    if (description === '' || description.length > 320) return
-    if (reward === '' || reward.length > 120) return
+    if (titleTrimmed === '' || titleTrimmed.length > 120) return
+    if (descriptionTrimmed === '' || descriptionTrimmed.length > 320) return
+    if (rewardTrimmed === '' || rewardTrimmed.length > 120) return
 
     setBusy(true)
     try {
       const idKeypair = Keypair.generate()
       const id = idKeypair.publicKey.toBase58()
 
-      const details = [id, title, description, reward].join('')
+      const details = [
+        id,
+        titleTrimmed,
+        descriptionTrimmed,
+        rewardTrimmed,
+      ].join('')
       const signature = sign.detached(Buffer.from(details), idKeypair.secretKey)
 
       const payload = {
         id,
-        title,
-        description,
-        reward,
+        title: titleTrimmed,
+        description: descriptionTrimmed,
+        reward: rewardTrimmed,
         signature: bs58.encode(signature),
       }
 
