@@ -6,6 +6,7 @@ import Core from './servers/Core'
 import Default from './servers/Default'
 import QuestInfo from './servers/QuestInfo'
 import UserInfo from './servers/UserInfo'
+import User from './servers/User'
 
 export default class Server implements Party.Server {
   readonly server: ServerCommon
@@ -16,6 +17,9 @@ export default class Server implements Party.Server {
     switch (role) {
       case 'core':
         this.server = new Core(room)
+        break
+      case 'user':
+        this.server = new User(room)
         break
       case 'chat':
         this.server = new Chat(room)
@@ -65,7 +69,7 @@ export default class Server implements Party.Server {
 
     return (
       this.server.onRequest?.(req) ??
-      new Response('Access denied', { status: 403 })
+      new Response('Access denied', { status: 403, headers: commonHeaders })
     )
   }
 
@@ -82,6 +86,8 @@ export default class Server implements Party.Server {
     switch (role) {
       case 'core':
         return Core.onBeforeRequest(req, lobby, ctx)
+      case 'user':
+        return User.onBeforeRequest(req, lobby, ctx)
       case 'chat':
         return Chat.onBeforeRequest(req, lobby, ctx)
       case 'questinfo':
@@ -102,6 +108,8 @@ export default class Server implements Party.Server {
     switch (role) {
       case 'core':
         return Core.onBeforeConnect(req, lobby, ctx)
+      case 'user':
+        return User.onBeforeConnect(req, lobby, ctx)
       case 'chat':
         return Chat.onBeforeConnect(req, lobby, ctx)
       case 'questinfo':
@@ -118,7 +126,7 @@ export default class Server implements Party.Server {
     lobby: Party.FetchLobby,
     ctx: Party.ExecutionContext
   ) {
-    return new Response(req.url, { status: 403 })
+    return new Response(req.url, { status: 403, headers: commonHeaders })
   }
 }
 

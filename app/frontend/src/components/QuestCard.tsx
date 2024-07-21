@@ -48,7 +48,7 @@ export const QuestCard: FC<
           <div className='h-6 w-64 bg-amber-950 animate-pulse rounded' />
         </div>
       )}
-      <div className='border-b border-dashed border-amber-950' />
+      <div className='border-b border-dashed border-amber-950 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
         <div>
           <span>Author: </span>
