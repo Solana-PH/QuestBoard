@@ -20,7 +20,8 @@ export const QuestCard: FC<
       className={cn(
         'col-span-12 portrait:md:col-span-6 landscape:md:col-span-4',
         'portrait:xl:col-span-4 landscape:xl:col-span-3',
-        'bg-amber-100 text-amber-950 p-5 flex flex-col gap-5'
+        'bg-amber-100 text-amber-950 p-5 flex flex-col gap-5',
+        'animate-fadeIn'
       )}
     >
       <div className='flex flex-col gap-2'>

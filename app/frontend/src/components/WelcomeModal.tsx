@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { useUserWallet } from '../atoms/userWalletAtom'
 import { useAtom, useAtomValue } from 'jotai'
-import { userDetailsAtom } from '../atoms/userDetailsAtom'
+import { myDetailsAtom } from '../atoms/userDetailsAtom'
 import Dialog from './Dialog'
 import { ScrollableContent } from './ScrollableContent'
 import cn from 'classnames'
@@ -12,9 +12,7 @@ import bs58 from 'bs58'
 
 export const WelcomeModal: FC = () => {
   const wallet = useUserWallet()
-  const [info, refreshInfo] = useAtom(
-    userDetailsAtom(wallet?.publicKey?.toBase58() ?? '')
-  )
+  const [info, refreshInfo] = useAtom(myDetailsAtom)
   const [start, setStart] = useState('8.0.AM')
   const [end, setEnd] = useState('8.0.PM')
   const [busy, setBusy] = useState(false)

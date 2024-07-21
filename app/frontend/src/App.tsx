@@ -11,7 +11,7 @@ function App() {
         <div className='show-next-when-empty grid grid-cols-12 gap-3 p-3 lg:gap-5 lg:p-5'>
           <QuestList />
         </div>
-        <div className='w-full h-full flex items-center justify-center'>
+        <div className='w-full h-full flex items-center justify-center animate-fadeIn'>
           <p className='font-cursive text-2xl opacity-50 text-center px-10 select-none'>
             There's no open Quest to show yet.
           </p>
