@@ -5,6 +5,7 @@ import { QuestList } from './components/QuestList'
 import { QuestPage } from './components/QuestPage'
 import { ScrollableContent } from './components/ScrollableContent'
 import { WelcomeModal } from './components/WelcomeModal'
+import { Suspense } from 'react'
 
 function App() {
   return (
@@ -20,7 +21,9 @@ function App() {
             </p>
           </div>
         </ScrollableContent>
-        <Outlet />
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </div>
       <ActionBar />
       <CreateQuestDialog />

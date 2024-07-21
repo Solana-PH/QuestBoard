@@ -1,7 +1,7 @@
 import { atom } from 'jotai'
 import { atomFamily } from 'jotai/utils'
 
-interface QuestDetails {
+export interface QuestDetails {
   id: string
   title: string
   description: string
@@ -10,6 +10,7 @@ interface QuestDetails {
 
 export const questDetailsAtom = atomFamily((id_hash: string) =>
   atom(async (get) => {
+    if (id_hash === '') return null
     const [id, hash] = id_hash.split('_')
 
     const response = await fetch(
