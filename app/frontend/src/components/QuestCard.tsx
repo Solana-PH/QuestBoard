@@ -17,7 +17,8 @@ export const QuestCard: FC<
   const details = useAtomValue(questDetailsAtom(id + '_' + hash))
 
   return (
-    <div
+    <Link
+      to={`/quest/${publicKey.toBase58()}`}
       className={cn(
         'col-span-12 portrait:md:col-span-6 landscape:md:col-span-4',
         'portrait:xl:col-span-4 landscape:xl:col-span-3',
@@ -27,9 +28,7 @@ export const QuestCard: FC<
     >
       <div className='flex flex-col gap-2'>
         {details ? (
-          <h2 className='text-2xl font-cursive font-bold'>
-            <Link to={`/quest/${publicKey.toBase58()}`}>{details.title}</Link>
-          </h2>
+          <h2 className='text-2xl font-cursive font-bold'>{details.title}</h2>
         ) : (
           <h2 className='h-8 w-64 bg-amber-950 animate-pulse rounded' />
         )}
@@ -70,6 +69,6 @@ export const QuestCard: FC<
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

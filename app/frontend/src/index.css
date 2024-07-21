@@ -16,6 +16,7 @@
 
 *::-webkit-scrollbar {
   width: 0.5em;
+  height: 0.5em;
 }
 
 *::-webkit-scrollbar-track {
