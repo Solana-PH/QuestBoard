@@ -21,6 +21,7 @@ export const WelcomeModal: FC = () => {
     if (!wallet) return
     setBusy(true)
     try {
+      const walletAddress = wallet.publicKey.toBase58()
       const sessionKeypair = Keypair.generate()
       const message = `I agree with QuestBoard's terms and privacy policy. ${sessionKeypair.publicKey.toBase58()}`
       const signature = await wallet.signMessage(Buffer.from(message))
@@ -33,7 +34,7 @@ export const WelcomeModal: FC = () => {
       }
 
       const response = await fetch(
-        `http://192.168.1.32:1999/parties/main/userinfo_${wallet.publicKey.toBase58()}`,
+        `http://192.168.1.32:1999/parties/main/userinfo_${walletAddress}`,
         {
           method: 'POST',
           headers: {
@@ -51,7 +52,7 @@ export const WelcomeModal: FC = () => {
 
       // store sessionKeypair
       window.localStorage.setItem(
-        'session_keypair',
+        `session_keypair_${walletAddress}`,
         bs58.encode(sessionKeypair.secretKey)
       )
     } catch (err) {

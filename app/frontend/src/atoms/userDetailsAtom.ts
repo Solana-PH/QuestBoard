@@ -51,13 +51,17 @@ export const myDetailsAtom = atom(
     const wallet = get(userWalletAtom)
     if (!wallet?.publicKey) return null
 
-    const details = await get(userDetailsAtom(wallet.publicKey.toBase58()))
+    const walletAddress = wallet.publicKey.toBase58()
+
+    const details = await get(userDetailsAtom(walletAddress))
     if (details === 'unregistered') return details
 
     // check if the user has the same session address
     // from the stored session keypair
 
-    const sessionKey = window.localStorage.getItem('session_keypair')
+    const sessionKey = window.localStorage.getItem(
+      `session_keypair_${walletAddress}`
+    )
     if (!sessionKey) return 'unregistered'
 
     const sessionKeypair = Keypair.fromSecretKey(bs58.decode(sessionKey))
