@@ -13,7 +13,7 @@ export const questsAtom = atom(async (get) => {
   const counter = get(counterAtom)
   if (!counter) return []
 
-  if (counter.postsOpen === 0) return []
+  if (counter.postsOpen.toNumber() === 0) return []
 
   // fetch all open quests
   const result = await program.account.quest.all([
@@ -30,6 +30,8 @@ export const questsAtom = atom(async (get) => {
 
 export const questAtom = atomFamily((questPda: string) =>
   atom(async (get) => {
+    if (questPda === '') return null
+
     const program = get(programAtom)
     if (!program) return null
 

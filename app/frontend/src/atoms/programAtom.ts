@@ -1,8 +1,8 @@
 import { atom } from 'jotai'
 import { Program } from '@coral-xyz/anchor'
 import { anchorProviderAtom } from './anchorProviderAtom'
-import { QuestBoard } from '../../../../target/types/quest_board'
-import QuestBoardIdl from '../../../../target/idl/quest_board.json'
+import { QuestBoard } from '../types/quest_board'
+import QuestBoardIdl from '../idl/quest_board.json'
 import { PublicKey } from '@solana/web3.js'
 
 const questBoard = QuestBoardIdl as QuestBoard

@@ -4,9 +4,7 @@ import { formatNumber, parseNumber } from '../utils/formatNumber'
 interface NumberInputProps
   extends Omit<
     InputHTMLAttributes<HTMLInputElement>,
-    'value' | 'onChange',
-    'onBlur',
-    'max'
+    'value' | 'onChange' | 'onBlur' | 'max'
   > {
   value: string
   onChange: (value: string) => void

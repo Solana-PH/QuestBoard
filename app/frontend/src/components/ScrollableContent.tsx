@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { FC, forwardRef, ReactNode } from 'react'
+import { FC, forwardRef, ReactNode, Ref } from 'react'
 
 interface ScrollableContentProps {
   children: ReactNode

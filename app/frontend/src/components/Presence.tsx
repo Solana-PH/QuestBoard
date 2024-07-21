@@ -16,14 +16,14 @@ import { partykitAddress } from '../constants/partykitAddress'
 const PresenceInner: FC<{
   details: UserDetails
   wallet: WalletContextState
-}> = ({ details, wallet }) => {
+}> = ({ wallet }) => {
   // must have the session keypair
   // consults own room
   // own room do POST request presence server
-  const address = wallet.publicKey.toBase58()
+  const address = wallet.publicKey?.toBase58()
   const setConnectionStatus = useSetAtom(connectionStatusAtom)
 
-  const ws = usePartySocket({
+  usePartySocket({
     host: partykitAddress,
     room: `user_${address}`,
 
@@ -57,7 +57,7 @@ const PresenceInner: FC<{
       setConnectionStatus(ConnectionStatus.CONNECTING)
     },
     onError(e) {
-      console.log('ws error')
+      console.log('ws error', e)
     },
   })
 

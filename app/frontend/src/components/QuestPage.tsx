@@ -1,6 +1,5 @@
 import cn from 'classnames'
-import { FC, useEffect, useMemo, useRef, useState } from 'react'
-import { ScrollableContent } from './ScrollableContent'
+import { FC, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { HandPalm, Trash, X } from '@phosphor-icons/react'
 import { useAtom, useAtomValue } from 'jotai'
@@ -18,7 +17,7 @@ export const QuestPage: FC = () => {
   const program = useAtomValue(programAtom)
   const questDetailsRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
-  const quest = useAtomValue(questAtom(questId))
+  const quest = useAtomValue(questAtom(questId ?? ''))
   const [busy, setBusy] = useState(false)
   const [connectionStatus, checkConnection] = useAtom(
     userConnectionStatusAtom(quest?.account?.owner?.toBase58() ?? '')
@@ -42,7 +41,7 @@ export const QuestPage: FC = () => {
   }, [checkConnection])
 
   const onClose = async () => {
-    if (!program) return
+    if (!program?.provider.sendAndConfirm) return
     if (!questId) return
 
     setBusy(true)

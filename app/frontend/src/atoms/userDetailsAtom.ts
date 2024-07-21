@@ -11,7 +11,7 @@ export interface UserDetails {
   availableEnd: number
 }
 
-const refresherAtom = atomFamily((address: string) => atom(Date.now()))
+const refresherAtom = atomFamily((_: string) => atom(Date.now()))
 
 export const userDetailsAtom = atomFamily((address: string) =>
   atom(
@@ -66,7 +66,7 @@ export const myDetailsAtom = atom(
     if (!sessionKey) return 'unregistered'
 
     const sessionKeypair = Keypair.fromSecretKey(bs58.decode(sessionKey))
-    if (sessionKeypair.publicKey.toBase58() !== details.sessionAddress) {
+    if (sessionKeypair.publicKey.toBase58() !== details?.sessionAddress) {
       // todo: return something different to differentiate from unregistered state
       return 'unregistered'
     }

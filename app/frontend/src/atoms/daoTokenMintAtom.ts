@@ -2,7 +2,6 @@ import { PublicKey } from '@solana/web3.js'
 import { configAtom } from './configAtom'
 import { userWalletAtom } from './userWalletAtom'
 import { getAssociatedTokenAddressSync } from '@solana/spl-token'
-import { connectionAtom } from './connectionAtom'
 import { atom } from 'jotai'
 
 export const daoTokenMintAtom = atom<string | null>((get) => {

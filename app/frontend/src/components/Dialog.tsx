@@ -8,7 +8,7 @@ import {
 export interface DialogProps {
   show: boolean
   children: React.ReactNode
-  onClose: () => void
+  onClose?: () => void
 }
 
 export default function Dialog({ show, children, onClose }: DialogProps) {

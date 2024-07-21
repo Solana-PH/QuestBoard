@@ -10,7 +10,7 @@ export interface QuestDetails {
 }
 
 export const questDetailsAtom = atomFamily((id_hash: string) =>
-  atom(async (get) => {
+  atom(async () => {
     if (id_hash === '') return null
     const [id, hash] = id_hash.split('_')
 

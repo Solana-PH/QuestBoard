@@ -5,7 +5,6 @@ import { Note, X } from '@phosphor-icons/react'
 import { Dialogs, showDialogAtom } from '../atoms/showDialogAtom'
 import Dialog from './Dialog'
 import { ScrollableContent } from './ScrollableContent'
-import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
 import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
 import { NumberInput } from './NumberInput'
 import { formatNumber, parseNumber } from '../utils/formatNumber'
@@ -23,7 +22,6 @@ import { partykitAddress } from '../constants/partykitAddress'
 
 export const CreateQuestDialog: FC = () => {
   const [showDialog, setShowDialog] = useAtom(showDialogAtom)
-  const solBalance = useAtomValue(solBalanceFormattedAtom)
   const daoBalance = useAtomValue(daoBalanceFormattedAtom)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -35,7 +33,7 @@ export const CreateQuestDialog: FC = () => {
   const [busy, setBusy] = useState(false)
 
   const onPostQuest = async () => {
-    if (!program) return
+    if (!program?.provider?.sendAndConfirm) return
     const titleTrimmed = title.trim()
     const descriptionTrimmed = description.trim()
     const rewardTrimmed = reward.trim()
@@ -217,19 +215,21 @@ export const CreateQuestDialog: FC = () => {
               className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
             >
               <span className='opacity-50'>Stake (Optional)</span>
-              <button
-                type='button'
-                onClick={() => setStake(daoBalance)}
-                className='uppercase tabular-nums'
-              >
-                Max <span>{daoBalance}</span>
-              </button>
+              {daoBalance && (
+                <button
+                  type='button'
+                  onClick={() => setStake(daoBalance)}
+                  className='uppercase tabular-nums'
+                >
+                  Max <span>{daoBalance}</span>
+                </button>
+              )}
             </label>
             <NumberInput
               id='stake'
               placeholder='How much are you willing to stake for this quest?'
               className='w-full bg-black/10 px-3 py-2'
-              max={parseNumber(daoBalance, 0)}
+              max={parseNumber(daoBalance ?? '', 0)}
               value={stake}
               onChange={setStake}
               onBlur={(val) => {

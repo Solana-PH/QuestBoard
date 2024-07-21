@@ -2,7 +2,7 @@ import { atom } from 'jotai'
 import { atomFamily } from 'jotai/utils'
 import { partykitAddress } from '../constants/partykitAddress'
 
-const refresherAtom = atomFamily((address: string) => atom(Date.now()))
+const refresherAtom = atomFamily((_: string) => atom(Date.now()))
 
 export const userConnectionStatusAtom = atomFamily((address: string) =>
   atom(

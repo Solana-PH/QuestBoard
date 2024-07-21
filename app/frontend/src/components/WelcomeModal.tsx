@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { useUserWallet } from '../atoms/userWalletAtom'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom } from 'jotai'
 import { myDetailsAtom } from '../atoms/userDetailsAtom'
 import Dialog from './Dialog'
 import { ScrollableContent } from './ScrollableContent'
@@ -19,7 +19,7 @@ export const WelcomeModal: FC = () => {
   const [busy, setBusy] = useState(false)
 
   const onSubmit = async () => {
-    if (!wallet) return
+    if (!wallet?.publicKey || !wallet.signMessage) return
     setBusy(true)
     try {
       const walletAddress = wallet.publicKey.toBase58()
