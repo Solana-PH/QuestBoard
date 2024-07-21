@@ -20,10 +20,27 @@ export default class User implements ServerCommon {
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
     this.connected = true
+    this.updateConnections('connect')
   }
 
   async onClose(conn: Party.Connection) {
     this.connected = false
+    this.updateConnections('disconnect')
+  }
+
+  async updateConnections(type: 'connect' | 'disconnect') {
+    const main = this.room.context.parties.main
+    const presenceRoom = main.get('presence')
+    const [, address] = this.room.id.split('_')
+
+    // TODO: add a password
+    await presenceRoom.fetch({
+      method: 'POST',
+      body: JSON.stringify({
+        type,
+        address,
+      }),
+    })
   }
 
   async onRequest(req: Party.Request) {
