@@ -12,9 +12,9 @@ interface UserDetails {
 
 const refresherAtom = atomFamily((address: string) => atom(Date.now()))
 
-export const userDetailsAtom = atomFamily(
-  (address: string) =>
-    atom(async (get) => {
+export const userDetailsAtom = atomFamily((address: string) =>
+  atom(
+    async (get) => {
       if (!address) return null
       get(refresherAtom(address))
       try {
@@ -39,10 +39,11 @@ export const userDetailsAtom = atomFamily(
         console.error('User Details Error:', e)
       }
       return null
-    }),
-  (_, set) => {
-    set(refresherAtom(address), Date.now())
-  }
+    },
+    (_, set) => {
+      set(refresherAtom(address), Date.now())
+    }
+  )
 )
 
 export const myDetailsAtom = atom(
