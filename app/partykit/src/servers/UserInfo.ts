@@ -66,11 +66,13 @@ export default class UserInfo implements ServerCommon {
         })
       }
 
-      const ownerPubkey = Buffer.from(address)
-      const sessionPubkey = bs58.decode(data.sessionAddress)
+      const message = new TextEncoder().encode(
+        `I agree with QuestBoard's terms and privacy policy. ${data.sessionAddress}`
+      )
+      const ownerPubkey = bs58.decode(address)
       const signature = bs58.decode(data.signature)
 
-      if (!sign.detached.verify(sessionPubkey, signature, ownerPubkey)) {
+      if (!sign.detached.verify(message, signature, ownerPubkey)) {
         return new Response('Invalid signature', {
           status: 400,
           headers: commonHeaders,
@@ -101,7 +103,10 @@ export default class UserInfo implements ServerCommon {
       )
     }
 
-    return new Response('Access denied', { status: 403 })
+    return new Response('Access denied', {
+      status: 403,
+      headers: commonHeaders,
+    })
   }
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {

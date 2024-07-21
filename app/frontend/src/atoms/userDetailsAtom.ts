@@ -7,29 +7,37 @@ interface UserDetails {
   availableEnd: number
 }
 
+const refresherAtom = atom(Date.now())
+
 export const userDetailsAtom = atomFamily((address: string) =>
-  atom(async (get) => {
-    if (!address) return null
-    try {
-      const response = await fetch(
-        `http://192.168.1.32:1999/parties/main/userinfo_${address}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+  atom(
+    async (get) => {
+      if (!address) return null
+      get(refresherAtom)
+      try {
+        const response = await fetch(
+          `http://192.168.1.32:1999/parties/main/userinfo_${address}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+
+        if (response.status === 404) {
+          return 'unregistered'
         }
-      )
 
-      if (response.status === 404) {
-        return 'unregistered'
+        const details = await response.json()
+        return details as UserDetails
+      } catch (e) {
+        console.error('User Details Error:', e)
       }
-
-      const details = await response.json()
-      return details as UserDetails
-    } catch (e) {
-      console.error('User Details Error:', e)
+      return null
+    },
+    (_, set) => {
+      set(refresherAtom, Date.now())
     }
-    return null
-  })
+  )
 )
