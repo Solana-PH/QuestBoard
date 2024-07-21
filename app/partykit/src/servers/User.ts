@@ -81,15 +81,15 @@ export default class User implements ServerCommon {
 
       const [message, signature] = token.split('.')
 
-      const remote = await fetch(
-        `${partykitAddress}/parties/main/userinfo_${address}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      const main = lobby.parties.main
+      const userInfo = main.get(`userinfo_${address}`)
+
+      const remote = await userInfo.fetch({
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
       if (!remote.ok) {
         throw new Error('Error fetching user session')
