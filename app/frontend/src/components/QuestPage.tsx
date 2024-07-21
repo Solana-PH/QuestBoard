@@ -214,7 +214,7 @@ const QuestPageInner: FC = () => {
             <div className='bg-black/50 text-white'>
               <button
                 disabled={busy || !connectionStatus}
-                onClick={onClose}
+                onClick={() => {}}
                 className={cn(
                   busy || !connectionStatus
                     ? 'opacity-50 pointer-events-none cursor-wait'
