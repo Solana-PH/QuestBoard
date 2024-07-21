@@ -1,5 +1,7 @@
 import { atom } from 'jotai'
 import { atomFamily } from 'jotai/utils'
+import bs58 from 'bs58'
+import { Keypair } from '@solana/web3.js'
 
 interface UserDetails {
   sessionAddress: string
@@ -29,8 +31,21 @@ export const userDetailsAtom = atomFamily((address: string) =>
           return 'unregistered'
         }
 
-        const details = await response.json()
-        return details as UserDetails
+        const details = (await response.json()) as UserDetails
+
+        // check if the user has the same session address
+        // from the stored session keypair
+
+        const sessionKey = window.localStorage.getItem('session_keypair')
+        if (!sessionKey) return 'unregistered'
+
+        const sessionKeypair = Keypair.fromSecretKey(bs58.decode(sessionKey))
+        if (sessionKeypair.publicKey.toBase58() !== details.sessionAddress) {
+          // todo: return something different to differentiate from unregistered state
+          return 'unregistered'
+        }
+
+        return details
       } catch (e) {
         console.error('User Details Error:', e)
       }

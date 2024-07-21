@@ -53,7 +53,7 @@ export const WelcomeModal: FC = () => {
 
       // store sessionKeypair
       window.localStorage.setItem(
-        'sessionAddress',
+        'session_keypair',
         bs58.encode(sessionKeypair.secretKey)
       )
     } catch (err) {
