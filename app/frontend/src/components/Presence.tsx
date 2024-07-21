@@ -12,6 +12,7 @@ import {
   connectionStatusAtom,
 } from '../atoms/connectionStatusAtom'
 import { partykitAddress } from '../constants/partykitAddress'
+import { presenceRawAtom } from '../atoms/presenceAtom'
 
 const PresenceInner: FC<{
   details: UserDetails
@@ -22,6 +23,7 @@ const PresenceInner: FC<{
   // own room do POST request presence server
   const address = wallet.publicKey?.toBase58()
   const setConnectionStatus = useSetAtom(connectionStatusAtom)
+  const setPresence = useSetAtom(presenceRawAtom)
 
   usePartySocket({
     host: partykitAddress,
@@ -58,6 +60,20 @@ const PresenceInner: FC<{
     },
     onError(e) {
       console.log('ws error', e)
+    },
+  })
+
+  usePartySocket({
+    host: partykitAddress,
+    room: 'presence',
+
+    onMessage(e) {
+      const connections = (JSON.parse(e.data) ?? []).sort()
+      setPresence(JSON.stringify(connections))
+    },
+
+    onError() {
+      // possibly fetch presence endpoint instead
     },
   })
 

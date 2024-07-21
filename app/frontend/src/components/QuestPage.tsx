@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { FC, Suspense, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { HandPalm, Handshake, Trash, X } from '@phosphor-icons/react'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtomValue } from 'jotai'
 import { questAtom } from '../atoms/questsAtom'
 import { formatNumber } from '../utils/formatNumber'
 import { useUserWallet } from '../atoms/userWalletAtom'
@@ -18,14 +18,10 @@ const QuestPageInner: FC = () => {
 
   const quest = useAtomValue(questAtom(questId ?? ''))
   const [busy, setBusy] = useState(false)
-  const [connectionStatus, checkConnection] = useAtom(
+  const connectionStatus = useAtomValue(
     userConnectionStatusAtom(quest?.account?.owner?.toBase58() ?? '')
   )
   const [proposal, setProposal] = useState('')
-
-  useEffect(() => {
-    checkConnection()
-  }, [checkConnection])
 
   const onClose = async () => {
     if (!program?.provider.sendAndConfirm) return
