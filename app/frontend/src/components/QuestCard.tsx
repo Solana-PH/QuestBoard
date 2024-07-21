@@ -8,6 +8,7 @@ import { trimAddress } from '../utils/trimAddress'
 import { formatNumber } from '../utils/formatNumber'
 import cn from 'classnames'
 import { Link } from 'react-router-dom'
+import { UserAddress } from './UserAddress'
 
 export const QuestCard: FC<
   ProgramAccount<IdlAccounts<QuestBoard>['quest']>
@@ -50,19 +51,19 @@ export const QuestCard: FC<
       )}
       <div className='border-b border-dashed border-amber-950 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
-        <div>
-          <span>Author: </span>
-          <span className='font-bold'>
-            {trimAddress(account.owner.toBase58())} (Offline)
+        <div className='flex items-center gap-2'>
+          <span className='font-bold'>Author: </span>
+          <span>
+            <UserAddress address={account.owner.toBase58()} trim />
           </span>
         </div>
-        <div>
+        <div className='flex items-center gap-2'>
           <span>Staked: </span>
           <span className='font-bold'>
             {formatNumber(account.staked.toNumber() / 10 ** 9 + '')}
           </span>
         </div>
-        <div>
+        <div className='flex items-center gap-2'>
           <span>Min Stake Required: </span>
           <span className='font-bold'>
             {formatNumber(account.minStakeRequired.toNumber() / 10 ** 9 + '')}

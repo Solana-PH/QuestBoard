@@ -13,6 +13,10 @@ export default {
           '50%': { opacity: 0 },
           '100%': { opacity: 1 },
         },
+        fadeInNoDelay: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
         fadeOut: {
           '0%': { opacity: 1 },
           '50%': { opacity: 1 },
@@ -28,6 +32,7 @@ export default {
       },
       animation: {
         fadeIn: 'fadeIn 500ms forwards',
+        fadeInNoDelay: 'fadeInNoDelay 500ms forwards',
         fadeOut: 'fadeOut 500ms forwards',
         slideIn: 'slideIn 300ms forwards',
       },

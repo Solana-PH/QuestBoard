@@ -3,23 +3,26 @@ import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { ScrollableContent } from './ScrollableContent'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Trash, X } from '@phosphor-icons/react'
-import { useAtomValue } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 import { questAtom } from '../atoms/questsAtom'
 import { formatNumber } from '../utils/formatNumber'
 import { useUserWallet } from '../atoms/userWalletAtom'
 import { programAtom } from '../atoms/programAtom'
 import { PublicKey, Transaction } from '@solana/web3.js'
+import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
 
 export const QuestPage: FC = () => {
   const { questId } = useParams()
   const navigate = useNavigate()
   const wallet = useUserWallet()
   const program = useAtomValue(programAtom)
-
   const questDetailsRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
   const quest = useAtomValue(questAtom(questId))
   const [busy, setBusy] = useState(false)
+  const [connectionStatus, checkConnection] = useAtom(
+    userConnectionStatusAtom(quest?.account?.owner?.toBase58() ?? '')
+  )
 
   useEffect(() => {
     if (questDetailsRef.current) {
@@ -32,6 +35,10 @@ export const QuestPage: FC = () => {
       return () => window.removeEventListener('resize', listener)
     }
   }, [setWidth])
+
+  useEffect(() => {
+    checkConnection()
+  }, [checkConnection])
 
   const onClose = async () => {
     if (!program) return
@@ -92,7 +99,7 @@ export const QuestPage: FC = () => {
       <Link to='/'>
         <div
           className={cn(
-            'absolute inset-0 animate-fadeIn',
+            'absolute inset-0 animate-fadeInNoDelay',
             'backdrop-grayscale backdrop-opacity-80 backdrop-blur bg-black/50'
           )}
         />
@@ -148,7 +155,34 @@ export const QuestPage: FC = () => {
                     <span className='font-bold break-all'>{questId}</span>
                   </div>
                   <div>
-                    <span>Author: </span>
+                    <span>
+                      <span>Author: </span>
+                      {!owner && (
+                        <span className='inline-flex items-center gap-1 font-bold'>
+                          {connectionStatus ? (
+                            <>
+                              <span className='text-green-500'>Online</span>
+                              <span
+                                className={cn(
+                                  'rounded-full w-2 h-2 flex-none',
+                                  'bg-green-500'
+                                )}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <span className='text-red-500'>Offline</span>
+                              <span
+                                className={cn(
+                                  'rounded-full w-2 h-2 flex-none',
+                                  'bg-red-500'
+                                )}
+                              />
+                            </>
+                          )}
+                        </span>
+                      )}
+                    </span>
                     {owner ? (
                       <span className='font-bold'>
                         You are the owner of this quest
