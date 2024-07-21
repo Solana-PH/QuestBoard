@@ -7,7 +7,7 @@ import { ScrollableContent } from './ScrollableContent'
 import cn from 'classnames'
 import TimeInput from './TimeInput'
 import { Keypair } from '@solana/web3.js'
-import { X } from '@phosphor-icons/react'
+import { Pen, X } from '@phosphor-icons/react'
 import bs58 from 'bs58'
 
 export const WelcomeModal: FC = () => {
@@ -123,6 +123,7 @@ export const WelcomeModal: FC = () => {
                 'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
               )}
             >
+              <Pen size={32} />
               <span>{busy ? 'Please Wait' : 'Sign & Submit'}</span>
             </button>
           </div>
