@@ -14,7 +14,6 @@ function App() {
         <ScrollableContent className='flex flex-col'>
           <div className='gap-3 px-3 pt-3 lg:gap-10 lg:px-5 lg:pt-10 lg:pb-5 flex-none flex text-xl lg:text-4xl text-stone-400 font-cursive'>
             <button className={''}>Open</button>
-            <button className={'opacity-20'}>Pending</button>
             <button className={'opacity-20'}>Ongoing</button>
           </div>
           <div className='show-next-when-empty grid grid-cols-12 gap-3 p-3 lg:gap-5 lg:p-5'>
