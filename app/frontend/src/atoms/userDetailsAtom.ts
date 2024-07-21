@@ -4,7 +4,7 @@ import bs58 from 'bs58'
 import { Keypair } from '@solana/web3.js'
 import { userWalletAtom } from './userWalletAtom'
 
-interface UserDetails {
+export interface UserDetails {
   sessionAddress: string
   availableStart: number
   availableEnd: number
