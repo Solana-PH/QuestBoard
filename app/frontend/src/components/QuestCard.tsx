@@ -51,8 +51,8 @@ export const QuestCard: FC<
       <div className='border-b border-dashed border-amber-950 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
         <div className='flex items-center gap-2'>
-          <span className='font-bold'>Author: </span>
-          <span>
+          <span>Author: </span>
+          <span className='font-bold'>
             <UserAddress address={account.owner.toBase58()} trim />
           </span>
         </div>
