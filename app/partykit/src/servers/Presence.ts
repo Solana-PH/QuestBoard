@@ -75,6 +75,4 @@ export default class Presence implements ServerCommon {
   ) {
     return req
   }
-
-  // TODO: cronjob to clean up stale connections
 }

@@ -10,7 +10,7 @@ export const Splash: FC = () => {
 
   return (
     <div className='flex flex-col animate-fadeIn'>
-      <div className='h-screen w-full flex flex-col gap-10 items-center justify-center'>
+      <div className='h-dvh w-full flex flex-col gap-10 items-center justify-center'>
         <div className='flex flex-col gap-5 items-center justify-center'>
           <img
             src='/QuestBoardLogo.svg'

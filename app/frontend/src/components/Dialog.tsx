@@ -25,7 +25,7 @@ export default function Dialog({ show, children, onClose }: DialogProps) {
           leaveTo='opacity-0'
         >
           <div
-            className={'fixed h-screen inset-0 overflow-hidden'}
+            className={'fixed h-dvh inset-x-0 top-0 overflow-hidden'}
             aria-hidden='true'
           >
             <div

@@ -86,34 +86,46 @@ export default class Server implements Party.Server {
     lobby: Party.CronLobby,
     ctx: Party.ExecutionContext
   ) {
-    const presenceRoom = lobby.parties.main.get('presence')
-    const req = await presenceRoom.fetch({ method: 'GET' })
-    const connections = (await req.json()) as string[]
+    try {
+      const presenceRoom = lobby.parties.main.get('presence')
+      const req = await presenceRoom.fetch({ method: 'GET' })
+      const connections = (await req.json()) as string[]
 
-    if (req.ok) {
-      const result = await Promise.all(
-        connections.map(async (address) => {
-          const userRoom = lobby.parties.main.get(`user_${address}`)
-          const userResponse = await userRoom.fetch({ method: 'GET' })
-          const userStatus = (await userResponse.json()) as {
-            online: boolean
-            heartbeat: number
-          }
+      if (req.ok && connections.length > 0) {
+        // disconnect inactive users
+        const result = (
+          await Promise.all(
+            connections.map(async (address) => {
+              const userRoom = lobby.parties.main.get(`user_${address}`)
+              const userResponse = await userRoom.fetch({ method: 'GET' })
+              const userStatus = (await userResponse.json()) as {
+                online: boolean
+                heartbeat: number
+              }
 
-          return {
-            type: userStatus.online ? 'connect' : 'disconnect',
-            address,
-          }
-        })
-      )
+              return {
+                type: userStatus.online ? 'connect' : 'disconnect',
+                address,
+              }
+            })
+          )
+        ).filter((update) => update.type === 'disconnect')
 
-      await presenceRoom.fetch({
-        method: 'POST',
-        body: JSON.stringify(result),
+        if (result.length > 0) {
+          await presenceRoom.fetch({
+            method: 'POST',
+            body: JSON.stringify(result),
+          })
+        }
+      }
+
+      return new Response('Ok', { status: 200, headers: commonHeaders })
+    } catch (e) {
+      return new Response('Not Ok: ' + e, {
+        status: 200,
+        headers: commonHeaders,
       })
     }
-
-    return new Response('Ok', { status: 200, headers: commonHeaders })
   }
 
   static async onBeforeRequest(
