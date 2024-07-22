@@ -61,7 +61,7 @@ const TimeInput: React.FC<TimeInputProps> = ({ value, onChange }) => {
       <div>
         <label>
           <input
-            className='bg-black/10 px-3 py-2 w-16 text-center'
+            className='bg-black/5 px-3 py-2 w-16 text-center'
             type='number'
             value={hours}
             onChange={handleHoursChange}
@@ -74,7 +74,7 @@ const TimeInput: React.FC<TimeInputProps> = ({ value, onChange }) => {
       <div>
         <label>
           <input
-            className='bg-black/10 px-3 py-2 w-16 text-center'
+            className='bg-black/5 px-3 py-2 w-16 text-center'
             type='number'
             value={minutes}
             onChange={handleMinutesChange}
@@ -87,7 +87,7 @@ const TimeInput: React.FC<TimeInputProps> = ({ value, onChange }) => {
       <div>
         <label>
           <select
-            className='bg-black/10 px-3 py-2 h-10'
+            className='bg-black/5 px-3 py-2 h-10'
             value={period}
             onChange={handlePeriodChange}
           >

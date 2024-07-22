@@ -186,7 +186,7 @@ export const CreateQuestDialog: FC = () => {
               type='text'
               id='title'
               placeholder='LF> A friend to join me on my birthday :('
-              className='w-full bg-black/10 px-3 py-2'
+              className='w-full bg-black/5 px-3 py-2'
               value={title}
               onChange={(e) => setTitle(e.target.value.substring(0, 120))}
             />
@@ -201,7 +201,7 @@ export const CreateQuestDialog: FC = () => {
             <textarea
               id='description'
               placeholder='Provide a meaningful description of your expectations for this quest.'
-              className='w-full bg-black/10 px-3 py-2'
+              className='w-full bg-black/5 px-3 py-2'
               value={description}
               onChange={(e) => setDescription(e.target.value.substring(0, 320))}
             />
@@ -217,7 +217,7 @@ export const CreateQuestDialog: FC = () => {
               type='text'
               id='reward'
               placeholder='A birthday cake and a hug.'
-              className='w-full bg-black/10 px-3 py-2'
+              className='w-full bg-black/5 px-3 py-2'
               value={reward}
               onChange={(e) => setReward(e.target.value.substring(0, 120))}
             />
@@ -243,7 +243,7 @@ export const CreateQuestDialog: FC = () => {
                 <NumberInput
                   id='stake'
                   placeholder='How much are you willing to stake for this quest?'
-                  className='w-full bg-black/10 px-3 py-2'
+                  className='w-full bg-black/5 px-3 py-2'
                   max={parseNumber(daoBalance ?? '', 0)}
                   value={stake}
                   onChange={setStake}
@@ -280,7 +280,7 @@ export const CreateQuestDialog: FC = () => {
                   type='text'
                   id='minstake'
                   placeholder='How much you require the taker to stake for this.'
-                  className='w-full bg-black/10 px-3 py-2'
+                  className='w-full bg-black/5 px-3 py-2'
                   value={minStake}
                   onChange={setMinStake}
                   onBlur={(minStake) => {
@@ -307,7 +307,7 @@ export const CreateQuestDialog: FC = () => {
               type='text'
               id='placement'
               placeholder='Boost visibility of your post.'
-              className='w-full bg-black/10 px-3 py-2'
+              className='w-full bg-black/5 px-3 py-2'
               value={placement}
               onChange={setPlacement}
             />
@@ -346,7 +346,7 @@ export const CreateQuestDialog: FC = () => {
                 <span className='opacity-50'>Insufficient Balance</span>
                 <span className='font-bold text-red-500'>
                   (
-                  {cost.toLocaleString('en-US', {
+                  {Math.max(cost, -9999).toLocaleString('en-US', {
                     minimumFractionDigits: 4,
                     maximumFractionDigits: 4,
                   })}{' '}

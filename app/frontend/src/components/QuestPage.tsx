@@ -202,12 +202,12 @@ const QuestPageInner: FC = () => {
               <textarea
                 id='proposal'
                 placeholder='Provide an offer to the owner. Make it concise and convincing.'
-                className='w-full bg-black/10 px-3 py-2'
+                className='w-full bg-black/5 px-3 py-2'
                 value={proposal}
                 onChange={(e) => setProposal(e.target.value.substring(0, 320))}
               />
             </div>
-            <div className='bg-black/50 text-white'>
+            <div className={cn(connectionStatus && 'bg-black/50 text-white')}>
               <button
                 disabled={busy || !connectionStatus}
                 onClick={() => {}}
