@@ -11,6 +11,7 @@ import { BalanceListener } from './components/BalanceListener.tsx'
 import { ConfigListener } from './components/ConfigListener.tsx'
 import { CounterListener } from './components/CounterListener.tsx'
 import { QuestPage } from './components/QuestPage.tsx'
+import { Presence } from './components/Presence.tsx'
 
 const SplashScreen = () => {
   const { connected } = useWallet()
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <WalletAdapter>
       <AtomsInitializer>
+        <Presence />
         <BalanceListener />
         <ConfigListener />
         <CounterListener />

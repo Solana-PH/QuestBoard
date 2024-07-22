@@ -7,7 +7,8 @@ import { questDetailsAtom } from '../atoms/questDetailsAtom'
 import { formatNumber } from '../utils/formatNumber'
 import cn from 'classnames'
 import { Link } from 'react-router-dom'
-import { UserAddress } from './UserAddress'
+import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
+import { trimAddress } from '../utils/trimAddress'
 
 export const QuestCard: FC<
   ProgramAccount<IdlAccounts<QuestBoard>['quest']>
@@ -15,15 +16,19 @@ export const QuestCard: FC<
   const id = account.id.toBase58()
   const hash = bs58.encode(account.detailsHash)
   const details = useAtomValue(questDetailsAtom(id + '_' + hash))
+  const connectionStatus = useAtomValue(
+    userConnectionStatusAtom(account.owner.toBase58())
+  )
 
   return (
     <Link
       to={`/quest/${publicKey.toBase58()}`}
       className={cn(
+        !connectionStatus && 'brightness-75 grayscale',
         'col-span-12 portrait:md:col-span-6 landscape:md:col-span-4',
         'portrait:xl:col-span-4 landscape:xl:col-span-3',
         'bg-amber-100 text-amber-950 p-5 flex flex-col gap-5',
-        'animate-fadeIn'
+        'animate-fadeIn transition-all'
       )}
     >
       <div className='flex flex-col gap-2'>
@@ -52,8 +57,13 @@ export const QuestCard: FC<
       <div className='flex flex-col gap-2 text-xs'>
         <div className='flex items-center gap-2'>
           <span>Author: </span>
-          <span className='font-bold'>
-            <UserAddress address={account.owner.toBase58()} trim />
+          <span className='font-bold flex items-center gap-2'>
+            <span>{trimAddress(account.owner.toBase58())}</span>
+            {connectionStatus && (
+              <span
+                className={cn('rounded-full w-2 h-2 flex-none', 'bg-green-500')}
+              />
+            )}
           </span>
         </div>
         <div className='flex items-center gap-2'>
@@ -68,6 +78,12 @@ export const QuestCard: FC<
             {formatNumber(account.minStakeRequired.toNumber() / 10 ** 9 + '')}
           </span>
         </div>
+        {/* <div className='flex items-center gap-2'>
+          <span>Placement Paid: </span>
+          <span className='font-bold'>
+            {formatNumber(account.placementPaid.toNumber() / 10 ** 9 + '')}
+          </span>
+        </div> */}
       </div>
     </Link>
   )

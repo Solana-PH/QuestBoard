@@ -5,6 +5,7 @@ import bs58 from 'bs58'
 import { atomFamily } from 'jotai/utils'
 import { PublicKey } from '@solana/web3.js'
 import { questDetailsAtom } from './questDetailsAtom'
+import { presenceRawAtom } from './presenceAtom'
 
 export const questsAtom = atom(async (get) => {
   const program = get(programAtom)
@@ -15,6 +16,8 @@ export const questsAtom = atom(async (get) => {
 
   if (counter.postsOpen.toNumber() === 0) return []
 
+  const presence = get(presenceRawAtom)
+
   // fetch all open quests
   const result = await program.account.quest.all([
     {
@@ -24,6 +27,24 @@ export const questsAtom = atom(async (get) => {
       },
     },
   ])
+
+  // sort the result based on the number of placement boosts
+  // descending
+  result.sort((a, b) => {
+    // check presence
+    const aOwnerPresent = presence.includes(a.account.owner.toBase58())
+    const bOwnerPresent = presence.includes(b.account.owner.toBase58())
+
+    if (aOwnerPresent !== bOwnerPresent) {
+      return aOwnerPresent ? -1 : 1
+    }
+
+    // check amount paid
+    const aBoost = a.account.placementPaid.toNumber()
+    const bBoost = b.account.placementPaid.toNumber()
+
+    return bBoost - aBoost
+  })
 
   return result ?? []
 })

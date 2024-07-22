@@ -25,7 +25,7 @@ const PresenceInner: FC<{
   const setConnectionStatus = useSetAtom(connectionStatusAtom)
   const setPresence = useSetAtom(presenceRawAtom)
 
-  const presence = usePartySocket({
+  const ws = usePartySocket({
     host: partykitAddress,
     room: `user_${address}`,
 
@@ -79,20 +79,20 @@ const PresenceInner: FC<{
 
   const heartbeat = useRef(-1)
   useEffect(() => {
-    if (!presence) return
+    if (!ws) return
 
     if (heartbeat.current !== -1) {
       window.clearInterval(heartbeat.current)
     }
 
     heartbeat.current = window.setInterval(() => {
-      presence.send(JSON.stringify({ type: 'heartbeat' }))
+      ws.send(JSON.stringify({ type: 'heartbeat' }))
     }, 1000 * 5)
 
     return () => {
       window.clearInterval(heartbeat.current)
     }
-  }, [presence])
+  }, [ws])
 
   return null
 }
