@@ -270,7 +270,7 @@ export const QuestPage: FC = () => {
           'absolute inset-0 pointer-events-none',
           'flex justify-end',
           'overflow-x-scroll portrait:overflow-x-hidden overflow-y-hidden',
-          'gap-3 p-3 portrait:gap-0 portrait:p-0 lg:gap-5 lg:p-5 pl-0'
+          'gap-0 p-0 md:gap-3 md:p-3 lg:gap-5 lg:p-5 pl-0'
         )}
       >
         <div
