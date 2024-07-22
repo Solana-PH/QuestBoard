@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai'
-import { FC, useState } from 'react'
+import { FC, useMemo, useState } from 'react'
 import cn from 'classnames'
-import { Note, X } from '@phosphor-icons/react'
+import { HandPalm, Note, X } from '@phosphor-icons/react'
 import { Dialogs, showDialogAtom } from '../atoms/showDialogAtom'
 import Dialog from './Dialog'
 import { ScrollableContent } from './ScrollableContent'
@@ -19,10 +19,13 @@ import bs58 from 'bs58'
 import { PROGRAM_ID, programAtom } from '../atoms/programAtom'
 import { BN } from '@coral-xyz/anchor'
 import { partykitAddress } from '../constants/partykitAddress'
+import { solBalanceAtom } from '../atoms/solBalanceAtom'
+import { configAtom } from '../atoms/configAtom'
 
 export const CreateQuestDialog: FC = () => {
   const [showDialog, setShowDialog] = useAtom(showDialogAtom)
   const daoBalance = useAtomValue(daoBalanceFormattedAtom)
+  const solBalance = useAtomValue(solBalanceAtom)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [reward, setReward] = useState('')
@@ -31,6 +34,16 @@ export const CreateQuestDialog: FC = () => {
   const [placement, setPlacement] = useState('')
   const program = useAtomValue(programAtom)
   const [busy, setBusy] = useState(false)
+  const config = useAtomValue(configAtom)
+
+  const cost = useMemo(() => {
+    if (!config) return 1
+    const baseFee = config.baseFee.toNumber()
+    const minSol = 0.0047 * LAMPORTS_PER_SOL + baseFee
+    const placementFee = parseNumber(placement, 0) * LAMPORTS_PER_SOL
+    const totalCost = minSol + placementFee
+    return ((solBalance ?? 0) - totalCost) / LAMPORTS_PER_SOL
+  }, [config, placement, solBalance])
 
   const onPostQuest = async () => {
     if (!program?.provider?.sendAndConfirm) return
@@ -209,65 +222,80 @@ export const CreateQuestDialog: FC = () => {
               onChange={(e) => setReward(e.target.value.substring(0, 120))}
             />
           </div>
-          <div className='flex flex-col gap-1'>
-            <label
-              htmlFor='stake'
-              className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
-            >
-              <span className='opacity-50'>Stake (Optional)</span>
-              {daoBalance && (
-                <button
-                  type='button'
-                  onClick={() => setStake(daoBalance)}
-                  className='uppercase tabular-nums'
+          {parseNumber(daoBalance ?? '', 0) > 0 && (
+            <>
+              <div className='flex flex-col gap-1'>
+                <label
+                  htmlFor='stake'
+                  className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
                 >
-                  Max <span>{daoBalance}</span>
-                </button>
-              )}
-            </label>
-            <NumberInput
-              id='stake'
-              placeholder='How much are you willing to stake for this quest?'
-              className='w-full bg-black/10 px-3 py-2'
-              max={parseNumber(daoBalance ?? '', 0)}
-              value={stake}
-              onChange={setStake}
-              onBlur={(val) => {
-                if (minStake !== '') {
-                  const stakeNum = parseNumber(val, 0)
-                  const minStakeNum = parseNumber(minStake, 0)
-                  setMinStake(
-                    formatNumber(Math.min(stakeNum, minStakeNum) + '')
-                  )
-                }
-              }}
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <label
-              htmlFor='minstake'
-              className='text-xs uppercase tracking-wider font-bold opacity-50'
-            >
-              Minimum Stake Requirement (Optional)
-            </label>
-            <NumberInput
-              type='text'
-              id='minstake'
-              placeholder='How much you require the taker to stake for this.'
-              className='w-full bg-black/10 px-3 py-2'
-              value={minStake}
-              onChange={setMinStake}
-              onBlur={(minStake) => {
-                if (minStake !== '') {
-                  const stakeNum = parseNumber(stake, 0)
-                  const minStakeNum = parseNumber(minStake, 0)
-                  setMinStake(
-                    formatNumber(Math.min(stakeNum, minStakeNum) + '')
-                  )
-                }
-              }}
-            />
-          </div>
+                  <span className='opacity-50'>Stake (Optional)</span>
+                  {daoBalance && (
+                    <button
+                      type='button'
+                      onClick={() => setStake(daoBalance)}
+                      className='uppercase tabular-nums'
+                    >
+                      Max <span>{daoBalance}</span>
+                    </button>
+                  )}
+                </label>
+                <NumberInput
+                  id='stake'
+                  placeholder='How much are you willing to stake for this quest?'
+                  className='w-full bg-black/10 px-3 py-2'
+                  max={parseNumber(daoBalance ?? '', 0)}
+                  value={stake}
+                  onChange={setStake}
+                  onBlur={(val) => {
+                    if (minStake !== '') {
+                      const stakeNum = parseNumber(val, 0)
+                      const minStakeNum = parseNumber(minStake, 0)
+                      setMinStake(
+                        formatNumber(Math.min(stakeNum, minStakeNum) + '')
+                      )
+                    }
+                  }}
+                />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <label
+                  htmlFor='minstake'
+                  className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
+                >
+                  <span className='opacity-50'>
+                    Minimum Stake Requirement (Optional)
+                  </span>
+                  {parseNumber(stake, 0) > 0 && (
+                    <button
+                      type='button'
+                      onClick={() => setMinStake(stake)}
+                      className='uppercase tabular-nums'
+                    >
+                      Max
+                    </button>
+                  )}
+                </label>
+                <NumberInput
+                  type='text'
+                  id='minstake'
+                  placeholder='How much you require the taker to stake for this.'
+                  className='w-full bg-black/10 px-3 py-2'
+                  value={minStake}
+                  onChange={setMinStake}
+                  onBlur={(minStake) => {
+                    if (minStake !== '') {
+                      const stakeNum = parseNumber(stake, 0)
+                      const minStakeNum = parseNumber(minStake, 0)
+                      setMinStake(
+                        formatNumber(Math.min(stakeNum, minStakeNum) + '')
+                      )
+                    }
+                  }}
+                />
+              </div>
+            </>
+          )}
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='placement'
@@ -284,22 +312,49 @@ export const CreateQuestDialog: FC = () => {
               onChange={setPlacement}
             />
           </div>
-          <div className='bg-black/50 text-white'>
-            <button
-              type='submit'
-              disabled={busy}
-              className={cn(
-                busy
-                  ? 'opacity-50 pointer-events-none cursor-wait'
-                  : 'cursor-pointer',
-                'w-full px-3 py-2 flex items-center justify-center gap-3',
-                'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
-              )}
-            >
-              <Note size={32} />
-              <span>{busy ? 'Please Wait' : 'Post a Quest'}</span>
-            </button>
-          </div>
+          {cost > 0 ? (
+            <div className='bg-black/50 text-white'>
+              <button
+                type='submit'
+                disabled={busy}
+                className={cn(
+                  busy
+                    ? 'opacity-50 pointer-events-none cursor-wait'
+                    : 'cursor-pointer',
+                  'w-full px-3 py-2 flex items-center justify-center gap-3',
+                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                )}
+              >
+                <Note size={32} />
+                <span>{busy ? 'Please Wait' : 'Post a Quest'}</span>
+              </button>
+            </div>
+          ) : (
+            <div>
+              <button
+                type='button'
+                disabled={true}
+                className={cn(
+                  'pointer-events-none',
+                  'w-full px-3 py-2 flex items-center justify-center gap-3',
+                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                )}
+              >
+                <span className='opacity-50'>
+                  <HandPalm size={32} />
+                </span>
+                <span className='opacity-50'>Insufficient Balance</span>
+                <span className='font-bold text-red-500'>
+                  (
+                  {cost.toLocaleString('en-US', {
+                    minimumFractionDigits: 4,
+                    maximumFractionDigits: 4,
+                  })}{' '}
+                  SOL)
+                </span>
+              </button>
+            </div>
+          )}
         </form>
       </ScrollableContent>
     </Dialog>

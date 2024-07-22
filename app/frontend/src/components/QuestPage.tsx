@@ -261,7 +261,7 @@ export const QuestPage: FC = () => {
         <div
           className={cn(
             'absolute inset-0 animate-fadeInNoDelay overflow-hidden',
-            'backdrop-grayscale backdrop-opacity-80 backdrop-blur bg-black/50'
+            'backdrop-grayscale backdrop-opacity-80 bg-black/50'
           )}
         />
       </Link>
@@ -269,7 +269,7 @@ export const QuestPage: FC = () => {
         className={cn(
           'absolute inset-0 pointer-events-none',
           'flex justify-end',
-          'overflow-x-scroll portrait:overflow-x-hidden overflow-y-hidden',
+          'overflow-x-scroll md:overflow-x-hidden overflow-y-hidden',
           'gap-0 p-0 md:gap-3 md:p-3 lg:gap-5 lg:p-5 pl-0'
         )}
       >

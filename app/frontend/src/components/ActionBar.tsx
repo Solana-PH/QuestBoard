@@ -36,7 +36,7 @@ export const ActionBar: FC = () => {
           alt='QuestBoard'
           className='aspect-square object-contain h-10 w-10 flex-none'
         />
-        <div className='w-full hidden landscape:flex flex-auto'>
+        <div className='w-full hidden md:flex flex-auto'>
           <input
             type='text'
             placeholder='Search Quests'
@@ -88,6 +88,16 @@ export const ActionBar: FC = () => {
               </p>
             </div>
             <MenuSeparator className='my-1' />
+            {/* 
+            <MenuItem>
+              <button
+                onClick={() => {}}
+                className='bg-amber-300/5 px-3 py-2 text-left data-[focus]:bg-amber-300/10 transition-colors'
+              >
+                Go Offline
+              </button>
+            </MenuItem>
+             */}
             <MenuItem>
               <button
                 onClick={() => setVisible(true)}

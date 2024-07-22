@@ -30,7 +30,7 @@ export default function Dialog({ show, children, onClose }: DialogProps) {
           >
             <div
               className={
-                'backdrop-grayscale backdrop-opacity-80 backdrop-blur bg-black/50 w-full h-full'
+                'backdrop-grayscale backdrop-opacity-80 bg-black/50 w-full h-full'
               }
             />
           </div>
