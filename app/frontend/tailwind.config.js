@@ -6,6 +6,7 @@ export default {
       fontFamily: {
         cursive: ['IM Fell English', 'cursive'],
         serif: ['IM Fell English', 'serif'],
+        sans: ['Open Sans', 'sans-serif'],
       },
       keyframes: {
         fadeIn: {
