@@ -81,6 +81,41 @@ export default class Server implements Party.Server {
     return this.server.onAlarm?.()
   }
 
+  static async onCron(
+    cron: Party.Cron,
+    lobby: Party.CronLobby,
+    ctx: Party.ExecutionContext
+  ) {
+    const presenceRoom = lobby.parties.main.get('presence')
+    const req = await presenceRoom.fetch({ method: 'GET' })
+    const connections = (await req.json()) as string[]
+
+    if (req.ok) {
+      const result = await Promise.all(
+        connections.map(async (address) => {
+          const userRoom = lobby.parties.main.get(`user_${address}`)
+          const userResponse = await userRoom.fetch({ method: 'GET' })
+          const userStatus = (await userResponse.json()) as {
+            online: boolean
+            heartbeat: number
+          }
+
+          return {
+            type: userStatus.online ? 'connect' : 'disconnect',
+            address,
+          }
+        })
+      )
+
+      await presenceRoom.fetch({
+        method: 'POST',
+        body: JSON.stringify(result),
+      })
+    }
+
+    return new Response('Ok', { status: 200, headers: commonHeaders })
+  }
+
   static async onBeforeRequest(
     req: Party.Request,
     lobby: Party.Lobby,

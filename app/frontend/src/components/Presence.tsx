@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import usePartySocket from 'partysocket/react'
-import { FC } from 'react'
+import { FC, useEffect, useRef } from 'react'
 import { myDetailsAtom, UserDetails } from '../atoms/userDetailsAtom'
 import { useUserWallet } from '../atoms/userWalletAtom'
 import { WalletContextState } from '@solana/wallet-adapter-react'
@@ -25,7 +25,7 @@ const PresenceInner: FC<{
   const setConnectionStatus = useSetAtom(connectionStatusAtom)
   const setPresence = useSetAtom(presenceRawAtom)
 
-  usePartySocket({
+  const presence = usePartySocket({
     host: partykitAddress,
     room: `user_${address}`,
 
@@ -73,9 +73,26 @@ const PresenceInner: FC<{
     },
 
     onError() {
-      // possibly fetch presence endpoint instead
+      // todo: possibly fetch presence endpoint instead
     },
   })
+
+  const heartbeat = useRef(-1)
+  useEffect(() => {
+    if (!presence) return
+
+    if (heartbeat.current !== -1) {
+      window.clearInterval(heartbeat.current)
+    }
+
+    heartbeat.current = window.setInterval(() => {
+      presence.send(JSON.stringify({ type: 'heartbeat' }))
+    }, 1000 * 5)
+
+    return () => {
+      window.clearInterval(heartbeat.current)
+    }
+  }, [presence])
 
   return null
 }

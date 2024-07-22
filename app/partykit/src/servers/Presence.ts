@@ -31,17 +31,20 @@ export default class Presence implements ServerCommon {
         headers: commonHeaders,
       })
     } else if (req.method === 'POST') {
-      const update = (await req.json()) as {
+      const updates = (await req.json()) as {
         type: 'connect' | 'disconnect'
         address: string
-      }
-      if (update.type === 'connect') {
-        this.connections.add(update.address)
-        this.room.storage.put(`user_${update.address}`, '')
-      } else {
-        this.connections.delete(update.address)
-        this.room.storage.delete(`user_${update.address}`)
-      }
+      }[]
+
+      updates.forEach((update) => {
+        if (update.type === 'connect') {
+          this.connections.add(update.address)
+          this.room.storage.put(`user_${update.address}`, '')
+        } else {
+          this.connections.delete(update.address)
+          this.room.storage.delete(`user_${update.address}`)
+        }
+      })
 
       this.room.broadcast(JSON.stringify(Array.from(this.connections)))
 
@@ -72,4 +75,6 @@ export default class Presence implements ServerCommon {
   ) {
     return req
   }
+
+  // TODO: cronjob to clean up stale connections
 }

@@ -17,10 +17,10 @@ export default function Dialog({ show, children, onClose }: DialogProps) {
       <UiDialog onClose={onClose ?? (() => {})} className='relative z-50'>
         <TransitionChild
           as={Fragment}
-          enter='ease-linear duration-300'
+          enter='ease-linear duration-500'
           enterFrom='opacity-0'
           enterTo='opacity-100'
-          leave='ease-linear duration-300'
+          leave='ease-linear duration-500'
           leaveFrom='opacity-100'
           leaveTo='opacity-0'
         >

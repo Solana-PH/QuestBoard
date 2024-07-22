@@ -19,6 +19,7 @@ export default class User implements ServerCommon {
   constructor(readonly room: Party.Room) {}
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
+    this.room.storage.put(`heartbeat`, Date.now())
     this.connected = true
     this.updateConnections('connect')
   }
@@ -32,22 +33,33 @@ export default class User implements ServerCommon {
     const main = this.room.context.parties.main
     const presenceRoom = main.get('presence')
     const [, address] = this.room.id.split('_')
-
     // TODO: add a password
     await presenceRoom.fetch({
       method: 'POST',
-      body: JSON.stringify({
-        type,
-        address,
-      }),
+      body: JSON.stringify([
+        {
+          type,
+          address,
+        },
+      ]),
     })
   }
 
   async onRequest(req: Party.Request) {
     if (req.method === 'GET') {
+      // check last heartbeat and disconnect more than 10 seconds of no response
+      const heartbeat = parseInt(
+        (await this.room.storage.get(`heartbeat`)) + ''
+      )
+
+      if (!heartbeat || Date.now() - heartbeat > 10000) {
+        this.connected = false
+      }
+
       return new Response(
         JSON.stringify({
           online: this.connected,
+          heartbeat,
         }),
         { status: 200, headers: commonHeaders }
       )
@@ -58,10 +70,9 @@ export default class User implements ServerCommon {
     })
   }
 
-  async onMessage(
-    message: string | ArrayBufferLike,
-    sender: Party.Connection
-  ) {}
+  async onMessage(message: string | ArrayBufferLike, sender: Party.Connection) {
+    this.room.storage.put(`heartbeat`, Date.now())
+  }
 
   static async onBeforeRequest(
     req: Party.Request,

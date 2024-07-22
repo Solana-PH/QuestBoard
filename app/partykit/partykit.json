@@ -2,5 +2,8 @@
   "$schema": "https://www.partykit.io/schema.json",
   "name": "quest-board",
   "main": "src/server.ts",
-  "compatibilityDate": "2024-05-31"
+  "compatibilityDate": "2024-05-31",
+  "crons": {
+    "every-minute": "*/1 * * * *"
+  }
 }
