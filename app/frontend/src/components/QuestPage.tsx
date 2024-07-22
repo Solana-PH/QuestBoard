@@ -76,15 +76,15 @@ const QuestPageInner: FC = () => {
         <div className='flex flex-col gap-2'>
           {quest?.details ? (
             <>
-              <h2 className='font-cursive text-2xl flex justify-between py-1 sticky top-0 bg-amber-100 z-10 gap-5'>
-                <span className='font-bold flex-auto break-all'>
+              <h2 className='font-cursive text-2xl flex justify-between py-1 sticky top-0 bg-stone-100 z-10 gap-5'>
+                <span className='font-bold flex-auto break-before-all'>
                   {quest.details.title}
                 </span>
                 <Link to='/'>
                   <X size={24} />
                 </Link>
               </h2>
-              <h2 className='font-cursive opacity-80 font-bold'>
+              <h2 className='text-sm font-bold uppercase tracking-wider opacity-80'>
                 Reward: {quest.details.reward}
               </h2>
             </>
@@ -96,7 +96,7 @@ const QuestPageInner: FC = () => {
           )}
         </div>
         {quest?.details ? (
-          <div className='font-cursive text-lg'>
+          <div className='break-before-all text-black'>
             {quest.details.description}
           </div>
         ) : (
@@ -105,19 +105,16 @@ const QuestPageInner: FC = () => {
             <div className='h-6 w-64 bg-amber-950 animate-pulse rounded' />
           </div>
         )}
-        <div className='border-b border-dashed border-amber-950' />
         {quest?.account && (
-          <div className='flex flex-col gap-2'>
-            <div>
-              <span>Quest Account: </span>
-              <br />
-              <span className='font-bold break-all'>{questId}</span>
-            </div>
-            <div>
-              <span>
-                <span>Author: </span>
+          <>
+            <div className='border-b border-dashed border-amber-300/30 mt-auto' />
+            <div className='flex flex-col gap-2'>
+              <span className='flex items-center gap-2'>
+                <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                  Author{' '}
+                </span>
                 {!owner && (
-                  <span className='inline-flex items-center gap-1 font-bold'>
+                  <span className='text-xs uppercase tracking-wider inline-flex items-center gap-1 font-bold'>
                     {connectionStatus ? (
                       <>
                         <span className='text-green-500'>Online</span>
@@ -143,33 +140,50 @@ const QuestPageInner: FC = () => {
                 )}
               </span>
               {owner ? (
-                <span className='font-bold'>
+                <span className='font-bold text-sm'>
                   You are the owner of this quest
                 </span>
               ) : (
-                <>
-                  <br />
-                  <span className='font-bold break-all'>
-                    {quest.account.owner.toBase58()}
-                  </span>
-                </>
+                <span className='font-bold text-sm break-before-all'>
+                  {quest.account.owner.toBase58()}
+                </span>
               )}
             </div>
-            <div>
-              <span>Staked: </span>
-              <span className='font-bold'>
-                {formatNumber(quest.account.staked.toNumber() / 10 ** 9 + '')}
-              </span>
+            <div className='border-b border-dashed border-amber-300/30' />
+            <div className='flex flex-col gap-5'>
+              <div className='flex flex-col gap-2'>
+                <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                  Quest Account
+                </span>
+                <span className='text-sm font-bold break-before-all'>
+                  {questId}
+                </span>
+              </div>
+              <div className='grid grid-cols-2 gap-2'>
+                <div className='flex flex-col gap-2'>
+                  <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                    Staked
+                  </span>
+                  <span className='font-bold text-sm'>
+                    {formatNumber(
+                      quest.account.staked.toNumber() / 10 ** 9 + ''
+                    )}
+                  </span>
+                </div>
+                <div className='flex flex-col gap-2'>
+                  <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                    Min Stake Required
+                  </span>
+                  <span className='font-bold text-sm'>
+                    {formatNumber(
+                      quest.account.minStakeRequired.toNumber() / 10 ** 9 + ''
+                    )}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div>
-              <span>Min Stake Required: </span>
-              <span className='font-bold'>
-                {formatNumber(
-                  quest.account.minStakeRequired.toNumber() / 10 ** 9 + ''
-                )}
-              </span>
-            </div>
-          </div>
+            <div className='border-b border-dashed border-amber-300/30' />
+          </>
         )}
       </div>
       <div className='flex-none px-5 pb-5 gap-5 flex flex-col'>
@@ -195,7 +209,7 @@ const QuestPageInner: FC = () => {
             <div className='flex flex-col gap-1'>
               <label
                 htmlFor='proposal'
-                className='text-xs uppercase tracking-wider font-bold opacity-50'
+                className='text-xs uppercase tracking-wider font-bold opacity-75'
               >
                 Make an Offer
               </label>
@@ -282,7 +296,8 @@ export const QuestPage: FC = () => {
               style={{ width }}
               className={cn(
                 'flex flex-col',
-                'h-full bg-amber-100 text-amber-950 overflow-x-hidden overflow-y-auto'
+                'border border-amber-300 shadow-2xl',
+                'h-full bg-stone-100 text-amber-950 overflow-x-hidden overflow-y-auto'
               )}
             >
               <Suspense fallback={null}>

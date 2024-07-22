@@ -24,21 +24,24 @@ export const QuestCard: FC<
     <Link
       to={`/quest/${publicKey.toBase58()}`}
       className={cn(
-        !connectionStatus && 'brightness-75 grayscale',
+        !connectionStatus && 'brightness-50 grayscale',
+        'border border-amber-300',
         'col-span-12 portrait:md:col-span-6 landscape:md:col-span-4',
         'portrait:xl:col-span-4 landscape:xl:col-span-3',
-        'bg-amber-100 text-amber-950 p-5 flex flex-col gap-5',
+        'bg-stone-100 text-amber-950 p-5 flex flex-col gap-5',
         'animate-fadeIn transition-all'
       )}
     >
       <div className='flex flex-col gap-2'>
         {details ? (
-          <h2 className='text-2xl font-cursive font-bold'>{details.title}</h2>
+          <h2 className='text-2xl font-cursive font-bold break-before-all'>
+            {details.title}
+          </h2>
         ) : (
           <h2 className='h-8 w-64 bg-amber-950 animate-pulse rounded' />
         )}
         {details ? (
-          <h2 className='font-cursive opacity-80 font-bold'>
+          <h2 className='text-xs font-bold uppercase tracking-wider opacity-80'>
             Reward: {details.reward}
           </h2>
         ) : (
@@ -46,14 +49,16 @@ export const QuestCard: FC<
         )}
       </div>
       {details ? (
-        <div className='font-cursive'>{details.description}</div>
+        <div className='text-black break-all text-sm'>
+          {details.description}
+        </div>
       ) : (
         <div className='flex flex-col gap-2'>
           <div className='h-6 w-72 bg-amber-950 animate-pulse rounded' />
           <div className='h-6 w-64 bg-amber-950 animate-pulse rounded' />
         </div>
       )}
-      <div className='border-b border-dashed border-amber-950 mt-auto' />
+      <div className='border-b border-dashed border-amber-300/30 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
         <div className='flex items-center gap-2'>
           <span>Author: </span>
@@ -66,17 +71,19 @@ export const QuestCard: FC<
             )}
           </span>
         </div>
-        <div className='flex items-center gap-2'>
-          <span>Staked: </span>
-          <span className='font-bold'>
-            {formatNumber(account.staked.toNumber() / 10 ** 9 + '')}
-          </span>
-        </div>
-        <div className='flex items-center gap-2'>
-          <span>Min Stake Required: </span>
-          <span className='font-bold'>
-            {formatNumber(account.minStakeRequired.toNumber() / 10 ** 9 + '')}
-          </span>
+        <div className='grid grid-cols-2 gap-5'>
+          <div className='flex items-center justify-between gap-2'>
+            <span>Staked: </span>
+            <span className='font-bold text-right'>
+              {formatNumber(account.staked.toNumber() / 10 ** 9 + '')}
+            </span>
+          </div>
+          <div className='flex items-center justify-between gap-2'>
+            <span>Min Stake: </span>
+            <span className='font-bold text-right'>
+              {formatNumber(account.minStakeRequired.toNumber() / 10 ** 9 + '')}
+            </span>
+          </div>
         </div>
         {/* <div className='flex items-center gap-2'>
           <span>Placement Paid: </span>

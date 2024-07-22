@@ -165,10 +165,11 @@ export const CreateQuestDialog: FC = () => {
           }}
           className={cn(
             'flex flex-col gap-5',
-            'mx-auto max-w-md w-full bg-amber-100 text-amber-950 px-5 pb-5 pt-4'
+            'border border-amber-300 shadow-2xl',
+            'mx-auto max-w-md w-full bg-stone-100 text-amber-950 px-5 pb-5 pt-4'
           )}
         >
-          <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-amber-100 z-10'>
+          <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-stone-100 z-10'>
             <span className='font-bold'>Create a Quest</span>
             <button type='button' onClick={() => setShowDialog(Dialogs.NONE)}>
               <X size={24} />
@@ -177,7 +178,7 @@ export const CreateQuestDialog: FC = () => {
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='title'
-              className='text-xs uppercase tracking-wider font-bold opacity-50'
+              className='text-xs uppercase tracking-wider font-bold opacity-75'
             >
               Title
             </label>
@@ -194,7 +195,7 @@ export const CreateQuestDialog: FC = () => {
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='description'
-              className='text-xs uppercase tracking-wider font-bold opacity-50'
+              className='text-xs uppercase tracking-wider font-bold opacity-75'
             >
               Description
             </label>
@@ -209,7 +210,7 @@ export const CreateQuestDialog: FC = () => {
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='reward'
-              className='text-xs uppercase tracking-wider font-bold opacity-50'
+              className='text-xs uppercase tracking-wider font-bold opacity-75'
             >
               Reward
             </label>
@@ -229,12 +230,12 @@ export const CreateQuestDialog: FC = () => {
                   htmlFor='stake'
                   className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
                 >
-                  <span className='opacity-50'>Stake (Optional)</span>
+                  <span className='opacity-75'>Stake (Optional)</span>
                   {daoBalance && (
                     <button
                       type='button'
                       onClick={() => setStake(daoBalance)}
-                      className='uppercase tabular-nums'
+                      className='uppercase tabular-nums underline'
                     >
                       Max <span>{daoBalance}</span>
                     </button>
@@ -263,14 +264,14 @@ export const CreateQuestDialog: FC = () => {
                   htmlFor='minstake'
                   className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
                 >
-                  <span className='opacity-50'>
+                  <span className='opacity-75'>
                     Minimum Stake Requirement (Optional)
                   </span>
                   {parseNumber(stake, 0) > 0 && (
                     <button
                       type='button'
                       onClick={() => setMinStake(stake)}
-                      className='uppercase tabular-nums'
+                      className='uppercase tabular-nums underline'
                     >
                       Max
                     </button>
@@ -299,7 +300,7 @@ export const CreateQuestDialog: FC = () => {
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='placement'
-              className='text-xs uppercase tracking-wider font-bold opacity-50'
+              className='text-xs uppercase tracking-wider font-bold opacity-75'
             >
               Placement Boost (Optional)
             </label>
