@@ -72,6 +72,11 @@ export default class User implements ServerCommon {
 
   async onMessage(message: string | ArrayBufferLike, sender: Party.Connection) {
     this.room.storage.put(`heartbeat`, Date.now())
+    // restore the state
+    if (!this.connected) {
+      this.connected = true
+      this.updateConnections('connect')
+    }
   }
 
   static async onBeforeRequest(
