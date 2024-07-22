@@ -40,7 +40,7 @@ export const ActionBar: FC = () => {
           <input
             type='text'
             placeholder='Search Quests'
-            className='bg-transparent px-3 py-2 w-full'
+            className='bg-transparent px-3 py-2 w-full placeholder-stone-500'
           />
         </div>
       </div>
