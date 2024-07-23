@@ -10,7 +10,7 @@ import {
 } from '@headlessui/react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { trimAddress } from '../utils/trimAddress'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { solBalanceFormattedAtom } from '../atoms/solBalanceAtom'
 import { daoBalanceFormattedAtom } from '../atoms/daoBalanceAtom'
 import { Dialogs, showDialogAtom } from '../atoms/showDialogAtom'
@@ -19,6 +19,7 @@ import {
   connectionStatusAtom,
 } from '../atoms/connectionStatusAtom'
 import cn from 'classnames'
+import { searchAtom } from '../atoms/searchAtom'
 
 export const ActionBar: FC = () => {
   const { disconnect, publicKey } = useWallet()
@@ -27,6 +28,7 @@ export const ActionBar: FC = () => {
   const daoBalance = useAtomValue(daoBalanceFormattedAtom)
   const setShowDialog = useSetAtom(showDialogAtom)
   const connectionStatus = useAtomValue(connectionStatusAtom)
+  const [search, setSearch] = useAtom(searchAtom)
 
   return (
     <div className='animate-fadeIn flex flex-none px-2 h-16 bg-black/50 items-center justify-between gap-5'>
@@ -38,9 +40,11 @@ export const ActionBar: FC = () => {
         />
         <div className='w-full hidden md:flex flex-auto'>
           <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             type='text'
             placeholder='Search Quests'
-            className='bg-transparent px-3 py-2 w-full placeholder-stone-500'
+            className='bg-transparent px-3 py-2 w-full placeholder-stone-500 text-white'
           />
         </div>
       </div>

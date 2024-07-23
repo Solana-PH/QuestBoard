@@ -9,6 +9,7 @@ import cn from 'classnames'
 import { Link } from 'react-router-dom'
 import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
 import { trimAddress } from '../utils/trimAddress'
+import { searchAtom } from '../atoms/searchAtom'
 
 export const QuestCard: FC<
   ProgramAccount<IdlAccounts<QuestBoard>['quest']>
@@ -19,6 +20,20 @@ export const QuestCard: FC<
   const connectionStatus = useAtomValue(
     userConnectionStatusAtom(account.owner.toBase58())
   )
+  const searchFilter = useAtomValue(searchAtom)
+
+  if (details) {
+    let search = searchFilter.toLowerCase()
+    if (search.startsWith('reward')) {
+      search = search.replace('reward', '').replace(':', '').trim()
+
+      if (!details.reward.toLowerCase().includes(search)) {
+        return null
+      }
+    } else if (!details.title.toLowerCase().includes(search)) {
+      return null
+    }
+  }
 
   return (
     <Link
