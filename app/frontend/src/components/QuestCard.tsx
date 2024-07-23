@@ -22,17 +22,17 @@ export const QuestCard: FC<
   )
   const searchFilter = useAtomValue(searchAtom)
 
-  if (details) {
-    let search = searchFilter.toLowerCase()
-    if (search.startsWith('reward')) {
-      search = search.replace('reward', '').replace(':', '').trim()
+  if (!details) return null
 
-      if (!details.reward.toLowerCase().includes(search)) {
-        return null
-      }
-    } else if (!details.title.toLowerCase().includes(search)) {
+  let search = searchFilter.toLowerCase()
+  if (search.startsWith('reward')) {
+    search = search.replace('reward', '').replace(':', '').trim()
+
+    if (!details.reward.toLowerCase().includes(search)) {
       return null
     }
+  } else if (!details.title.toLowerCase().includes(search)) {
+    return null
   }
 
   return (
@@ -43,37 +43,21 @@ export const QuestCard: FC<
         'border border-amber-300',
         'col-span-12 portrait:md:col-span-6 landscape:md:col-span-4',
         'portrait:xl:col-span-4 landscape:xl:col-span-3',
-        'bg-stone-100 text-amber-950 p-5 flex flex-col gap-5',
+        'bg-stone-200 text-amber-950 p-5 flex flex-col gap-5',
         'animate-fadeIn transition-all'
       )}
     >
       <div className='flex flex-col gap-2'>
-        {details ? (
-          <h2 className='text-2xl font-cursive font-bold break-before-all'>
-            {details.title}
-          </h2>
-        ) : (
-          <h2 className='h-8 w-64 bg-amber-950 animate-pulse rounded' />
-        )}
-        {details ? (
-          <h2 className='text-xs font-bold uppercase tracking-wider opacity-80'>
-            Reward: {details.reward}
-          </h2>
-        ) : (
-          <h2 className='h-6 w-56 bg-amber-950 animate-pulse rounded' />
-        )}
+        <h2 className='text-2xl font-cursive font-bold break-before-all'>
+          {details.title}
+        </h2>
+
+        <h2 className='text-xs font-bold uppercase tracking-wider opacity-80'>
+          Reward: {details.reward}
+        </h2>
       </div>
-      {details ? (
-        <div className='text-black break-all text-sm'>
-          {details.description}
-        </div>
-      ) : (
-        <div className='flex flex-col gap-2'>
-          <div className='h-6 w-72 bg-amber-950 animate-pulse rounded' />
-          <div className='h-6 w-64 bg-amber-950 animate-pulse rounded' />
-        </div>
-      )}
-      <div className='border-b border-dashed border-amber-300/30 mt-auto' />
+      <div className='text-black break-all text-sm'>{details.description}</div>
+      <div className='border-b border-dashed border-black/25 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
         <div className='flex items-center gap-2'>
           <span>Author: </span>

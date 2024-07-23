@@ -74,10 +74,10 @@ export const WelcomeModal: FC = () => {
           className={cn(
             'flex flex-col gap-5',
             'border border-amber-300 shadow-2xl',
-            'mx-auto max-w-md w-full bg-stone-100 text-amber-950 px-5 pb-5 pt-4'
+            'mx-auto max-w-md w-full bg-stone-200 text-amber-950 px-5 pb-5 pt-4'
           )}
         >
-          <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-stone-100 z-10'>
+          <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-stone-200 z-10'>
             <span className='font-bold'>Welcome to QuestBoard!</span>
             <button type='button' onClick={() => wallet?.disconnect()}>
               <X size={24} />
@@ -100,7 +100,7 @@ export const WelcomeModal: FC = () => {
             </span>
             <TimeInput value={end} onChange={setEnd} />
           </div>
-          <div className='border-b border-dashed border-amber-300' />
+          <div className='border-b border-dashed border-black/25' />
           <div className='flex flex-col gap-1'>
             <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
               Disclosure
