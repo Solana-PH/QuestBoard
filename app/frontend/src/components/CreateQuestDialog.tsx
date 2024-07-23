@@ -135,8 +135,14 @@ export const CreateQuestDialog: FC = () => {
 
       console.log('Transaction submitted:', txSignature)
 
+      // check notification settings
+      if (Notification.permission === 'default') {
+        setShowDialog(Dialogs.ENABLE_NOTIF)
+      } else {
+        setShowDialog(Dialogs.NONE)
+      }
+
       // clear all fields
-      setShowDialog(Dialogs.NONE)
       setTitle('')
       setDescription('')
       setReward('')

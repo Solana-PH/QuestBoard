@@ -4,6 +4,7 @@ import { CreateQuestDialog } from './components/CreateQuestDialog'
 import { QuestList } from './components/QuestList'
 import { ScrollableContent } from './components/ScrollableContent'
 import { WelcomeModal } from './components/WelcomeModal'
+import { EnableNotifDialog } from './components/EnableNotifDialog'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       </div>
       <ActionBar />
       <CreateQuestDialog />
+      <EnableNotifDialog />
       <WelcomeModal />
     </div>
   )

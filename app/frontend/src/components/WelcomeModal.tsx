@@ -83,7 +83,7 @@ export const WelcomeModal: FC = () => {
               <X size={24} />
             </button>
           </h2>
-          <p>
+          <p className='text-black'>
             Please provide your availability so that other users know when they
             can reach you.
           </p>
@@ -105,12 +105,15 @@ export const WelcomeModal: FC = () => {
             <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
               Disclosure
             </span>
-            <p className='text-sm'>
+            <p className='text-sm text-black'>
               By submitting, you agree to our{' '}
-              <span className='font-bold'>terms and conditions</span> and{' '}
-              <span className='font-bold'>privacy policy</span>. The team behind
-              this dApp is not responsible for any loss of funds or damages
-              caused by the use of this application.
+              <span className='font-bold text-amber-950'>
+                terms and conditions
+              </span>{' '}
+              and{' '}
+              <span className='font-bold text-amber-950'>privacy policy</span>.
+              The team behind this dApp is not responsible for any loss of funds
+              or damages caused by the use of this application.
             </p>
           </div>
           <div className='bg-black/50 text-white'>
