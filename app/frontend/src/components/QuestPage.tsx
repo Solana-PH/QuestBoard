@@ -144,9 +144,14 @@ const QuestPageInner: FC = () => {
                   You are the owner of this quest
                 </span>
               ) : (
-                <span className='font-bold text-sm break-before-all'>
+                <a
+                  target='_blank'
+                  rel='noreferrer'
+                  href={`https://solana.fm/address/${quest.account.owner.toBase58()}/?cluster=devnet-alpha`}
+                  className='font-bold text-sm break-all'
+                >
                   {quest.account.owner.toBase58()}
-                </span>
+                </a>
               )}
             </div>
             <div className='border-b border-dashed border-amber-300/30' />
@@ -155,9 +160,14 @@ const QuestPageInner: FC = () => {
                 <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
                   Quest Account
                 </span>
-                <span className='text-sm font-bold break-before-all'>
+                <a
+                  target='_blank'
+                  rel='noreferrer'
+                  href={`https://solana.fm/address/${questId}/?cluster=devnet-alpha`}
+                  className='text-sm font-bold break-all'
+                >
                   {questId}
-                </span>
+                </a>
               </div>
               <div className='grid grid-cols-2 gap-2'>
                 <div className='flex flex-col gap-2'>

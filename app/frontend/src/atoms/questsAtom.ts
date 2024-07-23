@@ -28,8 +28,6 @@ export const questsAtom = atom(async (get) => {
     },
   ])
 
-  // sort the result based on the number of placement boosts
-  // descending
   result.sort((a, b) => {
     // check presence
     const aOwnerPresent = presence.includes(a.account.owner.toBase58())
@@ -40,10 +38,43 @@ export const questsAtom = atom(async (get) => {
     }
 
     // check amount paid
+    // sort the result based on the number of placement boosts
     const aBoost = a.account.placementPaid.toNumber()
     const bBoost = b.account.placementPaid.toNumber()
 
-    return bBoost - aBoost
+    if (aBoost !== bBoost) {
+      return bBoost - aBoost
+    }
+
+    // check amount staked
+    const aStake = a.account.staked.toNumber()
+    const bStake = b.account.staked.toNumber()
+
+    if (aStake !== bStake) {
+      return bStake - aStake
+    }
+
+    // check min required stake
+    const aMinStake = a.account.minStakeRequired.toNumber()
+    const bMinStake = b.account.minStakeRequired.toNumber()
+
+    if (aMinStake !== bMinStake) {
+      return aMinStake - bMinStake // should be opposite
+    }
+
+    // sort by block height, newer ones on top
+    const aTimeStamp = a.account.timestamp.toNumber()
+    const bTimeStamp = b.account.timestamp.toNumber()
+
+    if (aTimeStamp !== bTimeStamp) {
+      return bTimeStamp - aTimeStamp
+    }
+
+    // rest, just sort by id
+    const aPubkey = a.publicKey.toBase58()
+    const bPubkey = b.publicKey.toBase58()
+
+    return aPubkey.localeCompare(bPubkey)
   })
 
   return result ?? []
