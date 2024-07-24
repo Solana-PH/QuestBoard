@@ -5,7 +5,7 @@ export interface Notification {
   message: string
   messageType: string
   visitorAddress: string
-  visitorSessionAddress: string
+  visitorNotifAddress: string
   timestamp: number
 }
 

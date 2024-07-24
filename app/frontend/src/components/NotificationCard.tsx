@@ -21,12 +21,10 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       return
     }
 
-    const secret = deriveSharedSecret(
-      keypair,
-      notification.visitorSessionAddress
-    )
-
-    decryptMessage(notification.message, secret)
+    deriveSharedSecret(keypair, notification.visitorNotifAddress)
+      .then((secret) => {
+        return decryptMessage(notification.message, secret)
+      })
       .then((decryptedMessage) => {
         setMessage(decryptedMessage)
       })

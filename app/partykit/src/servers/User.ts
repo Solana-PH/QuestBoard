@@ -10,7 +10,7 @@ interface Notification {
   message: string
   messageType: string
   visitorAddress: string
-  visitorSessionAddress: string
+  visitorNotifAddress: string
   timestamp: number
 }
 
@@ -81,11 +81,11 @@ export default class User implements ServerCommon {
       )
     } else if (req.method === 'POST') {
       const visitorAddress = req.headers.get('X-Visitor-Address') ?? ''
-      const visitorSessionAddress =
-        req.headers.get('X-Visitor-Session-Address') ?? ''
+      const visitorNotifAddress =
+        req.headers.get('X-Visitor-Notif-Address') ?? ''
       const messageType = req.headers.get('X-Message-Type') ?? ''
 
-      if (visitorAddress && visitorSessionAddress && messageType) {
+      if (visitorAddress && visitorNotifAddress && messageType) {
         // notification message
         // note: message should be encrypted right before being submitted here
 
@@ -96,7 +96,7 @@ export default class User implements ServerCommon {
           message,
           messageType,
           visitorAddress,
-          visitorSessionAddress,
+          visitorNotifAddress,
           timestamp: Date.now(),
         }
         this.notifications.set(`notification_${id}`, content)
@@ -196,10 +196,7 @@ export default class User implements ServerCommon {
         }
 
         req.headers.set('X-Visitor-Address', visitorAddress)
-        req.headers.set(
-          'X-Visitor-Session-Address',
-          visitorDetails.sessionAddress
-        )
+        req.headers.set('X-Visitor-Notif-Address', visitorDetails.notifAddress)
 
         return req
       } catch (e) {

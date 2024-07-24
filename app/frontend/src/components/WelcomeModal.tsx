@@ -11,6 +11,7 @@ import { DownloadSimple, Pen, X } from '@phosphor-icons/react'
 import bs58 from 'bs58'
 import { partykitAddress } from '../constants/partykitAddress'
 import { getSessionKeypair } from '../utils/getSessionKeypair'
+import { convertEd25519ToCurve25519 } from '../utils/crypto'
 
 export const WelcomeModal: FC = () => {
   const wallet = useUserWallet()
@@ -28,16 +29,34 @@ export const WelcomeModal: FC = () => {
       const walletAddress = wallet.publicKey.toBase58()
       const sessionKeypair =
         getSessionKeypair(walletAddress) ?? Keypair.generate()
-      const message = `I agree with QuestBoard's terms and privacy policy. ${sessionKeypair.publicKey.toBase58()}`
+      const curveKeypair = await convertEd25519ToCurve25519(
+        sessionKeypair.secretKey
+      )
+      const notifAddress = bs58.encode(curveKeypair.publicKey)
+
+      const message = `I agree with QuestBoard's terms and privacy policy. ${sessionKeypair.publicKey.toBase58()}.${notifAddress}`
       const signature = await wallet.signMessage(Buffer.from(message))
 
-      const payload = {
+      const payload: {
+        sessionAddress: string
+        signature: string
+        notifAddress: string
+        availableStart?: string
+        availableEnd?: string
+      } = {
         sessionAddress: sessionKeypair.publicKey.toBase58(),
         signature: bs58.encode(signature),
-        // todo: this will overwrite the values from the previos session
-        // if info === 'different', exclude these fields
-        availableStart: start,
-        availableEnd: end,
+        notifAddress,
+      }
+
+      if (
+        !(
+          typeof info === 'string' &&
+          (info === 'missing' || info.startsWith('different'))
+        )
+      ) {
+        payload.availableStart = start
+        payload.availableEnd = end
       }
 
       const response = await fetch(
