@@ -63,12 +63,11 @@ export const myDetailsAtom = atom(
     const sessionKey = window.localStorage.getItem(
       `session_keypair_${walletAddress}`
     )
-    if (!sessionKey) return 'unregistered'
+    if (!sessionKey) return 'missing'
 
     const sessionKeypair = Keypair.fromSecretKey(bs58.decode(sessionKey))
     if (sessionKeypair.publicKey.toBase58() !== details?.sessionAddress) {
-      // todo: return something different to differentiate from unregistered state
-      return 'unregistered'
+      return `different_${details?.sessionAddress ?? ''}`
     }
 
     return details

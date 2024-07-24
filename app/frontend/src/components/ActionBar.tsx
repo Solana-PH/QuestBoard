@@ -126,6 +126,21 @@ export const ActionBar: FC = () => {
              */}
             <MenuItem>
               <button
+                onClick={() => {
+                  if (!publicKey) return
+                  const sessionKey = window.localStorage.getItem(
+                    `session_keypair_${publicKey.toBase58()}`
+                  )
+                  // copy to clipboard
+                  navigator.clipboard.writeText(sessionKey || '')
+                }}
+                className='bg-amber-300/5 px-3 py-2 text-left data-[focus]:bg-amber-300/10 transition-colors'
+              >
+                Copy Session Keypair
+              </button>
+            </MenuItem>
+            <MenuItem>
+              <button
                 onClick={() => setVisible(true)}
                 className='bg-amber-300/5 px-3 py-2 text-left data-[focus]:bg-amber-300/10 transition-colors'
               >

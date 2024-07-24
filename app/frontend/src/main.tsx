@@ -13,6 +13,7 @@ import { CounterListener } from './components/CounterListener.tsx'
 import { QuestPage } from './components/QuestPage.tsx'
 import { Presence } from './components/Presence.tsx'
 import { NotificationPage } from './components/NotificationPage.tsx'
+import { ErrorBoundary } from './components/ErrorBoundary.tsx'
 
 const SplashScreen = () => {
   const { connected } = useWallet()
@@ -33,16 +34,23 @@ const SplashScreen = () => {
   )
 }
 
+const Reload = () => {
+  window.location.reload()
+  return null
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <WalletAdapter>
-      <AtomsInitializer>
-        <Presence />
-        <BalanceListener />
-        <ConfigListener />
-        <CounterListener />
-        <SplashScreen />
-      </AtomsInitializer>
-    </WalletAdapter>
+    <ErrorBoundary fallback={<Reload />}>
+      <WalletAdapter>
+        <AtomsInitializer>
+          <Presence />
+          <BalanceListener />
+          <ConfigListener />
+          <CounterListener />
+          <SplashScreen />
+        </AtomsInitializer>
+      </WalletAdapter>
+    </ErrorBoundary>
   </React.StrictMode>
 )

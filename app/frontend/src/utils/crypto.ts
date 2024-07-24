@@ -48,7 +48,6 @@ export async function decryptMessage(
   const [iv, ciphertext] = encryptedMessage.split('.')
   const ivArray = new Uint8Array(bs58.decode(iv))
   const ciphertextArray = new Uint8Array(bs58.decode(ciphertext))
-  debugger
 
   const aesKey = await crypto.subtle.importKey(
     'raw',
