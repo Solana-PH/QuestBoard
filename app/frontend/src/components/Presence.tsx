@@ -4,15 +4,15 @@ import { FC, useEffect, useRef } from 'react'
 import { myDetailsAtom, UserDetails } from '../atoms/userDetailsAtom'
 import { useUserWallet } from '../atoms/userWalletAtom'
 import { WalletContextState } from '@solana/wallet-adapter-react'
-import { Keypair } from '@solana/web3.js'
-import bs58 from 'bs58'
-import { sign } from 'tweetnacl'
+
 import {
   ConnectionStatus,
   connectionStatusAtom,
 } from '../atoms/connectionStatusAtom'
 import { partykitAddress } from '../constants/partykitAddress'
 import { presenceRawAtom } from '../atoms/presenceAtom'
+import { getAccessToken } from '../utils/getAccessToken'
+import { getSessionKeypair } from '../utils/getSessionKeypair'
 
 // todo: https://www.youtube.com/watch?v=Bm0JjR4kP8w
 // https://chatgpt.com/c/969d9a40-6af0-4c7e-bbcf-1734d1fbbba9
@@ -35,20 +35,14 @@ const PresenceInner: FC<{
     room: `user_${address}`,
 
     query: async () => {
-      // using the session keypair, sign the date today and a nonce
-      const sessionKeypair = window.localStorage.getItem(
-        `session_keypair_${address}`
-      )
-      if (!sessionKeypair) return {}
+      if (!address) return {}
+      const keypair = getSessionKeypair(address)
 
-      const keypair = Keypair.fromSecretKey(bs58.decode(sessionKeypair))
-      const nonce = Keypair.generate().publicKey.toBase58()
-      const today = Date.now()
-      const message = `${today}_${nonce}`
-      const signature = sign.detached(Buffer.from(message), keypair.secretKey)
+      if (!keypair) return {}
+      const token = getAccessToken(keypair)
 
       return {
-        token: `${message}.${bs58.encode(signature)}`,
+        token,
       }
     },
 
@@ -82,7 +76,7 @@ const PresenceInner: FC<{
     },
   })
 
-  // move this to service worker
+  // todo: move this to service worker
   const heartbeat = useRef(-1)
   useEffect(() => {
     if (!ws) return

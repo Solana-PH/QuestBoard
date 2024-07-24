@@ -103,6 +103,8 @@ export default class User implements ServerCommon {
           `notifications`,
           Array.from(this.notifications.entries())
         )
+
+        return new Response('Ok', { status: 200, headers: commonHeaders })
       }
     }
 
@@ -212,6 +214,8 @@ export default class User implements ServerCommon {
       }
 
       const [message, signature] = token.split('.')
+      // todo: verify message `${today}_${nonce}`
+      // message should be around 5 mins old
       const main = lobby.parties.main
       const userInfo = main.get(`userinfo_${address}`)
       const userDetails = await getUserDetails(userInfo)
