@@ -282,7 +282,7 @@ const QuestPageInner: FC = () => {
                 onChange={(e) => setProposal(e.target.value.substring(0, 320))}
               />
             </div>
-            {(daoBalance ?? 0) > 0 && (
+            {(daoBalance ?? 0) > 0 && stakedValue > 0 && (
               <div className='flex flex-col gap-1'>
                 <label
                   htmlFor='minstake'
@@ -291,6 +291,7 @@ const QuestPageInner: FC = () => {
                   <span className='opacity-75'>Stake</span>
                 </label>
                 <NumberInput
+                  disabled={stakedValue === minStakeValue}
                   type='text'
                   id='minstake'
                   placeholder='Required stake amount for this Quest.'

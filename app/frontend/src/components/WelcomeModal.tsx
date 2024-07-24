@@ -209,11 +209,11 @@ export const WelcomeModal: FC = () => {
               {info === 'missing' ? (
                 <>
                   <p className='text-black'>
-                    It seems like you have lost your old session or might be
-                    using a different device.
+                    It seems like you have lost your old session for this wallet
+                    or might be using a different device.
                   </p>
                   <p className='text-black'>
-                    To retain your session and be able decrypt your old
+                    To retain your session and be able to decrypt your old
                     messages, it is recommended to recover your previous
                     keypair.
                   </p>
@@ -221,8 +221,8 @@ export const WelcomeModal: FC = () => {
               ) : (
                 <>
                   <p className='text-black'>
-                    It seems like you are using a different session and might be
-                    on a different device.
+                    It seems like you are using a different session for this
+                    wallet and might be on a different device.
                   </p>
                   <p className='text-black'>
                     Would you like to recover your keypair from the other
