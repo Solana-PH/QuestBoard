@@ -3,20 +3,28 @@ import type { ServerCommon } from './ServerCommon'
 import { commonHeaders } from '../commonHeaders'
 import bs58 from 'bs58'
 import { sign } from 'tweetnacl'
-import { partykitAddress } from '../partykitAddress'
+import { getUserDetails } from '../getUserDetails'
 
-interface UserDetails {
-  sessionAddress: string
-  signature: string
-  availableStart: string
-  availableEnd: string
+interface Notification {
+  message: string
+  messageType: string
+  visitorAddress: string
+  visitorSessionAddress: string
+  timestamp: number
 }
 
 export default class User implements ServerCommon {
   name = 'user'
   connected = false
+  notifications = new Map<string, Notification>([])
 
   constructor(readonly room: Party.Room) {}
+
+  async onStart() {
+    this.notifications = new Map(
+      (await this.room.storage.get('notifications')) ?? []
+    )
+  }
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
     this.room.storage.put(`heartbeat`, Date.now())
@@ -63,14 +71,67 @@ export default class User implements ServerCommon {
         }),
         { status: 200, headers: commonHeaders }
       )
+    } else if (req.method === 'POST') {
+      const visitorAddress = req.headers.get('X-Visitor-Address') ?? ''
+      const visitorSessionAddress =
+        req.headers.get('X-Visitor-Session-Address') ?? ''
+      const messageType = req.headers.get('X-Message-Type') ?? ''
+
+      if (visitorAddress && visitorSessionAddress && messageType) {
+        // notification message
+        // note: message should be encrypted right before being submitted here
+
+        const message = await req.text()
+        const content: Notification = {
+          message,
+          messageType,
+          visitorAddress,
+          visitorSessionAddress,
+          timestamp: Date.now(),
+        }
+        this.notifications.set(visitorAddress, content)
+
+        // broadcast
+        this.room.broadcast(
+          JSON.stringify({
+            type: 'notification',
+            notification: content,
+          })
+        )
+
+        await this.room.storage.put(
+          `notifications`,
+          Array.from(this.notifications.entries())
+        )
+      }
     }
+
     return new Response('Access denied', {
       status: 403,
       headers: commonHeaders,
     })
   }
 
-  async onMessage(message: string | ArrayBufferLike, sender: Party.Connection) {
+  async onMessage(
+    messageStr: string | ArrayBufferLike,
+    sender: Party.Connection
+  ) {
+    const message = JSON.parse(messageStr as string)
+
+    switch (message.type) {
+      case 'get_notifications':
+        this.room.broadcast(
+          JSON.stringify({
+            type: 'notifications',
+            notifications: Array.from(this.notifications.values()),
+          })
+        )
+      case 'clear_notifications':
+        this.notifications.clear()
+        await this.room.storage.put(`notifications`, [])
+        break
+    }
+
     this.room.storage.put(`heartbeat`, Date.now())
     // restore the state
     if (!this.connected) {
@@ -89,6 +150,44 @@ export default class User implements ServerCommon {
         status: 200,
         headers: commonHeaders,
       })
+
+    if (req.method === 'POST') {
+      try {
+        // verify visitor token
+        const token = req.headers.get('Authorization') ?? ''
+
+        if (!token) {
+          throw new Error('Token not provided')
+        }
+
+        const [visitorAddress, message, signature] = token.split('.')
+        const main = lobby.parties.main
+        const visitorInfo = main.get(`userinfo_${visitorAddress}`)
+        const visitorDetails = await getUserDetails(visitorInfo)
+        const sessionAddress = bs58.decode(visitorDetails.sessionAddress)
+
+        if (
+          !sign.detached.verify(
+            new TextEncoder().encode(message),
+            bs58.decode(signature),
+            sessionAddress
+          )
+        ) {
+          throw new Error('Invalid signature')
+        }
+
+        req.headers.set('X-Visitor-Address', visitorAddress)
+        req.headers.set(
+          'X-Visitor-Session-Address',
+          visitorDetails.sessionAddress
+        )
+
+        return req
+      } catch (e) {
+        console.error(e)
+        return new Response('Unauthorized', { status: 401 })
+      }
+    }
 
     return req
   }
@@ -113,22 +212,9 @@ export default class User implements ServerCommon {
       }
 
       const [message, signature] = token.split('.')
-
       const main = lobby.parties.main
       const userInfo = main.get(`userinfo_${address}`)
-
-      const remote = await userInfo.fetch({
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!remote.ok) {
-        throw new Error('Error fetching user session')
-      }
-
-      const userDetails = (await remote.json()) as UserDetails
+      const userDetails = await getUserDetails(userInfo)
       const sessionAddress = bs58.decode(userDetails.sessionAddress)
 
       if (
