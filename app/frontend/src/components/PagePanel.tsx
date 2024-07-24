@@ -33,7 +33,7 @@ export const PagePanel: FC<{ children: ReactNode; className?: string }> = ({
           style={{ width }}
           className={cn(
             'flex flex-col',
-            'border border-amber-300 shadow-2xl',
+            'border border-amber-300',
             'h-full bg-stone-200 text-amber-950 overflow-x-hidden overflow-y-auto'
           )}
         >

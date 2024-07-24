@@ -4,8 +4,10 @@ import { commonHeaders } from '../commonHeaders'
 import bs58 from 'bs58'
 import { sign } from 'tweetnacl'
 import { getUserDetails } from '../getUserDetails'
+import { Keypair } from '@solana/web3.js'
 
 interface Notification {
+  id: string
   message: string
   messageType: string
   visitorAddress: string
@@ -82,14 +84,16 @@ export default class User implements ServerCommon {
         // note: message should be encrypted right before being submitted here
 
         const message = await req.text()
+        const id = Keypair.generate().publicKey.toBase58()
         const content: Notification = {
+          id,
           message,
           messageType,
           visitorAddress,
           visitorSessionAddress,
           timestamp: Date.now(),
         }
-        this.notifications.set(visitorAddress, content)
+        this.notifications.set(`notification_${id}`, content)
 
         // broadcast
         this.room.broadcast(
@@ -121,6 +125,13 @@ export default class User implements ServerCommon {
     const message = JSON.parse(messageStr as string)
 
     switch (message.type) {
+      case 'delete_notification':
+        this.notifications.delete(`notification_${message.id}`)
+        await this.room.storage.put(
+          `notifications`,
+          Array.from(this.notifications.entries())
+        )
+        break
       case 'get_notifications':
         this.room.broadcast(
           JSON.stringify({

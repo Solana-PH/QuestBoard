@@ -26,7 +26,7 @@ const SplashScreen = () => {
       <Routes>
         <Route path='/' element={<App />}>
           <Route path='quest/:questId' element={<QuestPage />} />
-          <Route path='notification' element={<NotificationPage />} />
+          <Route path='notifications' element={<NotificationPage />} />
         </Route>
       </Routes>
     </Router>

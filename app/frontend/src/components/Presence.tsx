@@ -51,7 +51,7 @@ const PresenceInner: FC<{
       setConnectionStatus(ConnectionStatus.CONNECTED)
     },
     onMessage(e) {
-      console.log('ws message', e.data)
+      console.log('ws message', e.data, typeof e.data)
     },
     onClose() {
       console.log('ws closed')

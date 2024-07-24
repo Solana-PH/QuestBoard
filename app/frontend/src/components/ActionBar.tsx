@@ -50,7 +50,10 @@ export const ActionBar: FC = () => {
         </div>
       </div>
       <div className='flex-none flex items-center gap-5'>
-        <Link to='/notification' className={cn('py-2 flex items-center gap-2')}>
+        <Link
+          to='/notifications'
+          className={cn('py-2 flex items-center gap-2')}
+        >
           <div className='animate-shake'>
             <BellRinging size={32} />
           </div>

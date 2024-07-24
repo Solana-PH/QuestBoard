@@ -171,7 +171,7 @@ export const CreateQuestDialog: FC = () => {
           }}
           className={cn(
             'flex flex-col gap-5',
-            'border border-amber-300 shadow-2xl',
+            'border border-amber-300',
             'mx-auto max-w-md w-full bg-stone-200 text-amber-950 px-5 pb-5 pt-4'
           )}
         >
