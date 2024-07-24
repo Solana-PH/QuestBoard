@@ -1,10 +1,16 @@
 import cn from 'classnames'
-import { FC, Suspense, useState } from 'react'
+import { FC, Suspense, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { HandPalm, Handshake, Trash, X } from '@phosphor-icons/react'
+import {
+  HandPalm,
+  Handshake,
+  PaperPlaneTilt,
+  Trash,
+  X,
+} from '@phosphor-icons/react'
 import { useAtomValue } from 'jotai'
 import { questAtom } from '../atoms/questsAtom'
-import { formatNumber } from '../utils/formatNumber'
+import { formatNumber, parseNumber } from '../utils/formatNumber'
 import { useUserWallet } from '../atoms/userWalletAtom'
 import { programAtom } from '../atoms/programAtom'
 import { PublicKey, Transaction } from '@solana/web3.js'
@@ -12,6 +18,8 @@ import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
 import { PageBackdrop } from './PageBackdrop'
 import { PagePanel } from './PagePanel'
 import { PageScroller } from './PageScroller'
+import { NumberInput } from './NumberInput'
+import { daoBalanceAtom } from '../atoms/daoBalanceAtom'
 
 const QuestPageInner: FC = () => {
   const { questId } = useParams()
@@ -24,7 +32,14 @@ const QuestPageInner: FC = () => {
   const connectionStatus = useAtomValue(
     userConnectionStatusAtom(quest?.account?.owner?.toBase58() ?? '')
   )
+
+  const minStakeValue = quest
+    ? quest.account.minStakeRequired.toNumber() / 10 ** 9
+    : 0
+  const maxStakeValue = quest ? quest.account.staked.toNumber() / 10 ** 9 : 0
   const [proposal, setProposal] = useState('')
+  const [minStake, setMinStake] = useState(formatNumber(minStakeValue + ''))
+  const daoBalance = useAtomValue(daoBalanceAtom)
 
   const onClose = async () => {
     if (!program?.provider.sendAndConfirm) return
@@ -68,6 +83,11 @@ const QuestPageInner: FC = () => {
     }
     setBusy(false)
   }
+
+  const daoDiff = useMemo(
+    () => (daoBalance ?? 0) / 10 ** 9 - parseNumber(minStake, 0),
+    [daoBalance, minStake]
+  )
 
   const owner =
     (wallet?.publicKey && quest?.account?.owner.equals(wallet.publicKey)) ??
@@ -165,16 +185,16 @@ const QuestPageInner: FC = () => {
                 {formatNumber(quest.account.staked.toNumber() / 10 ** 9 + '')}
               </span>
             </div>
-            <div className='flex flex-col gap-2'>
-              <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
-                Min Stake Required
-              </span>
-              <span className='font-bold text-sm'>
-                {formatNumber(
-                  quest.account.minStakeRequired.toNumber() / 10 ** 9 + ''
-                )}
-              </span>
-            </div>
+            {minStakeValue > 0 && (
+              <div className='flex flex-col gap-2'>
+                <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                  Min Stake Required
+                </span>
+                <span className='font-bold text-sm'>
+                  {formatNumber(minStakeValue + '')}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className='border-b border-dashed border-black/25' />
@@ -214,31 +234,70 @@ const QuestPageInner: FC = () => {
                 onChange={(e) => setProposal(e.target.value.substring(0, 320))}
               />
             </div>
-            <div className={cn(connectionStatus && 'bg-black/50 text-white')}>
-              <button
-                disabled={busy || !connectionStatus}
-                onClick={() => {}}
-                className={cn(
-                  busy || !connectionStatus
-                    ? 'opacity-50 pointer-events-none cursor-wait'
-                    : 'cursor-pointer',
-                  'w-full px-3 py-2 flex items-center justify-center gap-3',
-                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
-                )}
-              >
-                {connectionStatus ? (
-                  <>
-                    <Handshake size={32} />
-                    <span>{busy ? 'Please Wait' : 'Accept Quest'}</span>
-                  </>
-                ) : (
-                  <>
-                    <HandPalm size={32} />
-                    <span>Owner is Offline</span>
-                  </>
-                )}
-              </button>
-            </div>
+            {(daoBalance ?? 0) > 0 && (
+              <div className='flex flex-col gap-1'>
+                <label
+                  htmlFor='minstake'
+                  className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
+                >
+                  <span className='opacity-75'>Stake</span>
+                </label>
+                <NumberInput
+                  type='text'
+                  id='minstake'
+                  placeholder='Required stake amount for this Quest.'
+                  className='w-full bg-black/5 px-3 py-2'
+                  value={minStake}
+                  min={minStakeValue}
+                  max={maxStakeValue}
+                  onChange={setMinStake}
+                  onBlur={(minStake) => {
+                    const minStakeNum = parseNumber(minStake, 0)
+                    formatNumber(Math.max(minStakeValue, minStakeNum) + '')
+                  }}
+                />
+              </div>
+            )}
+            {daoDiff >= 0 ? (
+              <div className={cn('bg-black/50 text-white')}>
+                <button
+                  disabled={busy}
+                  onClick={() => {}}
+                  className={cn(
+                    busy
+                      ? 'opacity-50 pointer-events-none cursor-wait'
+                      : 'cursor-pointer',
+                    'w-full px-3 py-2 flex items-center justify-center gap-3',
+                    'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                  )}
+                >
+                  {connectionStatus ? (
+                    <>
+                      <Handshake size={32} />
+                      <span>{busy ? 'Please Wait' : 'Accept Quest'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <PaperPlaneTilt size={32} />
+                      <span>Notify Owner</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div>
+                <button
+                  disabled
+                  className={cn(
+                    'bg-amber-300/10',
+                    'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
+                  )}
+                >
+                  <HandPalm size={32} />
+                  <span>Insufficient DAO Tokens</span>
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

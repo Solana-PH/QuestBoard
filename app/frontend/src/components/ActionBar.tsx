@@ -1,5 +1,5 @@
 import { useWallet } from '@solana/wallet-adapter-react'
-import { Wallet, Note, BellRinging } from '@phosphor-icons/react'
+import { Wallet, Note, BellRinging, Bell } from '@phosphor-icons/react'
 import { FC } from 'react'
 import {
   Menu,
@@ -21,6 +21,7 @@ import {
 import cn from 'classnames'
 import { searchAtom } from '../atoms/searchAtom'
 import { Link } from 'react-router-dom'
+import { notificationsAtom } from '../atoms/notificationsAtom'
 
 export const ActionBar: FC = () => {
   const { disconnect, publicKey } = useWallet()
@@ -30,6 +31,7 @@ export const ActionBar: FC = () => {
   const setShowDialog = useSetAtom(showDialogAtom)
   const connectionStatus = useAtomValue(connectionStatusAtom)
   const [search, setSearch] = useAtom(searchAtom)
+  const notif = useAtomValue(notificationsAtom)
 
   return (
     <div className='animate-fadeIn flex flex-none px-2 h-16 bg-black/50 items-center justify-between gap-5'>
@@ -54,12 +56,20 @@ export const ActionBar: FC = () => {
           to='/notifications'
           className={cn('py-2 flex items-center gap-2')}
         >
-          <div className='animate-shake'>
-            <BellRinging size={32} />
-          </div>
-          <span className='text-white font-bold bg-red-600 px-2 py-1 rounded'>
-            99
-          </span>
+          {notif.length > 0 ? (
+            <>
+              <div className='animate-shake'>
+                <BellRinging size={32} />
+              </div>
+              <span className='text-white font-bold bg-red-600 px-2 py-1 rounded'>
+                {notif.length}
+              </span>
+            </>
+          ) : (
+            <>
+              <Bell size={32} />
+            </>
+          )}
         </Link>
         <Menu>
           <MenuButton className='px-3 py-2 flex items-center gap-2'>

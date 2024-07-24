@@ -10,6 +10,7 @@ interface NumberInputProps
   onChange: (value: string) => void
   onBlur?: (value: string) => void
   max?: number
+  min?: number
 }
 
 export const NumberInput: React.FC<NumberInputProps> = ({
@@ -17,6 +18,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   onChange,
   onBlur,
   max,
+  min,
   ...props
 }) => {
   const [displayValue, setDisplayValue] = useState<string>(value)
@@ -30,6 +32,10 @@ export const NumberInput: React.FC<NumberInputProps> = ({
 
     if (typeof max === 'number') {
       num = Math.min(num, max)
+    }
+
+    if (typeof min === 'number') {
+      num = Math.max(num, min)
     }
 
     const formattedValue = formatNumber(num + '')
