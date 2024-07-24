@@ -4,8 +4,12 @@ import { PageScroller } from './PageScroller'
 import { PagePanel } from './PagePanel'
 import { Link } from 'react-router-dom'
 import { X } from '@phosphor-icons/react'
+import { notificationsAtom } from '../atoms/notificationsAtom'
+import { useAtomValue } from 'jotai'
+import { NotificationCard } from './NotificationCard'
 
 const NotificationPageInner: FC = () => {
+  const notifications = useAtomValue(notificationsAtom)
   return (
     <div className='flex flex-col gap-5 flex-auto px-5 pb-5 pt-4'>
       <div className='flex flex-col gap-2'>
@@ -19,7 +23,13 @@ const NotificationPageInner: FC = () => {
         </h2>
       </div>
       <div className='flex flex-col flex-auto relative'>
-        <div className='show-next-when-empty'></div>
+        <div className='show-next-when-empty'>
+          {notifications.map((notif) => (
+            <Suspense key={notif.id} fallback={null}>
+              <NotificationCard notification={notif} />
+            </Suspense>
+          ))}
+        </div>
         <div className='flex flex-col flex-auto items-center justify-center'>
           <p className='text-black'>You all caught up!</p>
         </div>

@@ -13,10 +13,21 @@ import { partykitAddress } from '../constants/partykitAddress'
 import { presenceRawAtom } from '../atoms/presenceAtom'
 import { getAccessToken } from '../utils/getAccessToken'
 import { getSessionKeypair } from '../utils/getSessionKeypair'
+import { Notification, notificationsAtom } from '../atoms/notificationsAtom'
 
 // todo: https://www.youtube.com/watch?v=Bm0JjR4kP8w
 // https://chatgpt.com/c/969d9a40-6af0-4c7e-bbcf-1734d1fbbba9
 // https://chatgpt.com/c/9b5ca61d-d053-4fcd-89dc-24e7dc7551ca
+
+type ServerMessage =
+  | {
+      type: 'notification'
+      notification: Notification
+    }
+  | {
+      type: 'notifications'
+      notifications: Notification[]
+    }
 
 const PresenceInner: FC<{
   details: UserDetails
@@ -28,6 +39,7 @@ const PresenceInner: FC<{
   const address = wallet.publicKey?.toBase58()
   const setConnectionStatus = useSetAtom(connectionStatusAtom)
   const setPresence = useSetAtom(presenceRawAtom)
+  const setNotifs = useSetAtom(notificationsAtom)
 
   // move this to service worker
   const ws = usePartySocket({
@@ -51,7 +63,20 @@ const PresenceInner: FC<{
       setConnectionStatus(ConnectionStatus.CONNECTED)
     },
     onMessage(e) {
-      console.log('ws message', e.data, typeof e.data)
+      console.log('ws message', e.data)
+      const partykitMessage = JSON.parse(
+        e.data || 'null'
+      ) as ServerMessage | null
+      if (partykitMessage) {
+        switch (partykitMessage.type) {
+          case 'notification':
+            setNotifs((prev) => [...prev, partykitMessage.notification])
+            break
+          case 'notifications':
+            setNotifs(partykitMessage.notifications)
+            break
+        }
+      }
     },
     onClose() {
       console.log('ws closed')

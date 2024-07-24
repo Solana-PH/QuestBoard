@@ -5,6 +5,7 @@ import {
   HandPalm,
   Handshake,
   PaperPlaneTilt,
+  ThumbsUp,
   Trash,
   X,
 } from '@phosphor-icons/react'
@@ -20,6 +21,7 @@ import { PagePanel } from './PagePanel'
 import { PageScroller } from './PageScroller'
 import { NumberInput } from './NumberInput'
 import { daoBalanceAtom } from '../atoms/daoBalanceAtom'
+import { sendNotification } from '../utils/sendNotification'
 
 const QuestPageInner: FC = () => {
   const { questId } = useParams()
@@ -41,6 +43,12 @@ const QuestPageInner: FC = () => {
   const [proposal, setProposal] = useState('')
   const [minStake, setMinStake] = useState(formatNumber(minStakeValue + ''))
   const daoBalance = useAtomValue(daoBalanceAtom)
+  const [notifySuccess, setNotifySuccess] = useState(false)
+
+  const daoDiff = useMemo(
+    () => (daoBalance ?? 0) / 10 ** 9 - parseNumber(minStake, 0),
+    [daoBalance, minStake]
+  )
 
   const onClose = async () => {
     if (!program?.provider.sendAndConfirm) return
@@ -85,10 +93,34 @@ const QuestPageInner: FC = () => {
     setBusy(false)
   }
 
-  const daoDiff = useMemo(
-    () => (daoBalance ?? 0) / 10 ** 9 - parseNumber(minStake, 0),
-    [daoBalance, minStake]
-  )
+  const onSendNotification = async () => {
+    if (!wallet?.publicKey) return
+    if (!quest) return
+
+    setBusy(true)
+
+    try {
+      const notification = {
+        quest: questId,
+        content: proposal,
+        minStake: parseNumber(minStake, 0),
+      }
+
+      const message = JSON.stringify(notification)
+
+      await sendNotification(
+        wallet.publicKey.toBase58(),
+        quest.account.owner.toBase58(),
+        message,
+        'quest_proposal'
+      )
+
+      setNotifySuccess(true)
+    } catch (e) {
+      console.error(e)
+    }
+    setBusy(false)
+  }
 
   const owner =
     (wallet?.publicKey && quest?.account?.owner.equals(wallet.publicKey)) ??
@@ -274,33 +306,7 @@ const QuestPageInner: FC = () => {
                 />
               </div>
             )}
-            {daoDiff >= 0 ? (
-              <div className={cn('bg-black/50 text-white')}>
-                <button
-                  disabled={busy}
-                  onClick={() => {}}
-                  className={cn(
-                    busy
-                      ? 'opacity-50 pointer-events-none cursor-wait'
-                      : 'cursor-pointer',
-                    'w-full px-3 py-2 flex items-center justify-center gap-3',
-                    'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
-                  )}
-                >
-                  {connectionStatus ? (
-                    <>
-                      <Handshake size={32} />
-                      <span>{busy ? 'Please Wait' : 'Accept Quest'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <PaperPlaneTilt size={32} />
-                      <span>Notify Owner</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            ) : (
+            {notifySuccess ? (
               <div>
                 <button
                   disabled
@@ -309,10 +315,53 @@ const QuestPageInner: FC = () => {
                     'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
                   )}
                 >
-                  <HandPalm size={32} />
-                  <span>Insufficient DAO Tokens</span>
+                  <ThumbsUp size={32} />
+                  <span>Owner is notified</span>
                 </button>
               </div>
+            ) : (
+              <>
+                {daoDiff >= 0 ? (
+                  <div className={cn('bg-black/50 text-white')}>
+                    <button
+                      disabled={busy}
+                      onClick={onSendNotification}
+                      className={cn(
+                        busy
+                          ? 'opacity-50 pointer-events-none cursor-wait'
+                          : 'cursor-pointer',
+                        'w-full px-3 py-2 flex items-center justify-center gap-3',
+                        'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                      )}
+                    >
+                      {connectionStatus ? (
+                        <>
+                          <Handshake size={32} />
+                          <span>{busy ? 'Please Wait' : 'Accept Quest'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <PaperPlaneTilt size={32} />
+                          <span>Notify Owner</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <button
+                      disabled
+                      className={cn(
+                        'bg-amber-300/10',
+                        'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
+                      )}
+                    >
+                      <HandPalm size={32} />
+                      <span>Insufficient DAO Tokens</span>
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
