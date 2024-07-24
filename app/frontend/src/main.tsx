@@ -12,6 +12,7 @@ import { ConfigListener } from './components/ConfigListener.tsx'
 import { CounterListener } from './components/CounterListener.tsx'
 import { QuestPage } from './components/QuestPage.tsx'
 import { Presence } from './components/Presence.tsx'
+import { NotificationPage } from './components/NotificationPage.tsx'
 
 const SplashScreen = () => {
   const { connected } = useWallet()
@@ -25,6 +26,7 @@ const SplashScreen = () => {
       <Routes>
         <Route path='/' element={<App />}>
           <Route path='quest/:questId' element={<QuestPage />} />
+          <Route path='notification' element={<NotificationPage />} />
         </Route>
       </Routes>
     </Router>

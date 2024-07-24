@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import { FC, Suspense, useEffect, useRef, useState } from 'react'
+import { FC, Suspense, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { HandPalm, Handshake, Trash, X } from '@phosphor-icons/react'
 import { useAtomValue } from 'jotai'
@@ -9,6 +9,9 @@ import { useUserWallet } from '../atoms/userWalletAtom'
 import { programAtom } from '../atoms/programAtom'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
+import { PageBackdrop } from './PageBackdrop'
+import { PagePanel } from './PagePanel'
+import { PageScroller } from './PageScroller'
 
 const QuestPageInner: FC = () => {
   const { questId } = useParams()
@@ -244,76 +247,33 @@ const QuestPageInner: FC = () => {
 }
 
 export const QuestPage: FC = () => {
-  const questDetailsRef = useRef<HTMLDivElement>(null)
-  const [width, setWidth] = useState(0)
-
-  useEffect(() => {
-    if (questDetailsRef.current) {
-      const rect = questDetailsRef.current.getBoundingClientRect()
-      const listener = () => setWidth(rect.width)
-      window.addEventListener('resize', listener)
-
-      listener()
-
-      return () => window.removeEventListener('resize', listener)
-    }
-  }, [setWidth])
-
   return (
     <>
-      <Link to='/'>
-        <div
-          className={cn(
-            'absolute inset-0 animate-fadeInNoDelay overflow-hidden',
-            'backdrop-grayscale backdrop-opacity-80 bg-black/50'
-          )}
-        />
-      </Link>
-      <div
-        className={cn(
-          'absolute inset-0 pointer-events-none',
-          'flex justify-end',
-          'overflow-x-scroll md:overflow-x-hidden overflow-y-hidden',
-          'gap-0 p-0 md:gap-3 md:p-3 lg:gap-5 lg:p-5 pl-0'
-        )}
-      >
-        <div
-          ref={questDetailsRef}
-          className='flex justify-end max-w-md w-full pointer-events-auto'
-        >
-          <div className='animate-slideIn overflow-hidden'>
-            <div
-              style={{ width }}
-              className={cn(
-                'flex flex-col',
-                'border border-amber-300 shadow-2xl',
-                'h-full bg-stone-200 text-amber-950 overflow-x-hidden overflow-y-auto'
-              )}
-            >
-              <Suspense
-                fallback={
-                  <div className='flex flex-col gap-5 flex-auto p-5'>
-                    <div className='flex flex-col gap-2'>
-                      <h2 className='h-10 w-64 bg-amber-950/50 animate-pulse rounded' />
-                      <h2 className='h-5 w-56 bg-amber-950/50 animate-pulse rounded' />
-                    </div>
-                    <div className='flex flex-col gap-2'>
-                      <div className='h-6 w-72 bg-amber-950/50 animate-pulse rounded' />
-                      <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
-                    </div>
-                    <div className='flex flex-col gap-2'>
-                      <div className='h-6 w-36 bg-amber-950/50 animate-pulse rounded' />
-                      <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
-                    </div>
-                  </div>
-                }
-              >
-                <QuestPageInner />
-              </Suspense>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageBackdrop />
+      <PageScroller>
+        <PagePanel>
+          <Suspense
+            fallback={
+              <div className='flex flex-col gap-5 flex-auto p-5'>
+                <div className='flex flex-col gap-2'>
+                  <h2 className='h-10 w-64 bg-amber-950/50 animate-pulse rounded' />
+                  <h2 className='h-5 w-56 bg-amber-950/50 animate-pulse rounded' />
+                </div>
+                <div className='flex flex-col gap-2'>
+                  <div className='h-6 w-72 bg-amber-950/50 animate-pulse rounded' />
+                  <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+                </div>
+                <div className='flex flex-col gap-2'>
+                  <div className='h-6 w-36 bg-amber-950/50 animate-pulse rounded' />
+                  <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+                </div>
+              </div>
+            }
+          >
+            <QuestPageInner />
+          </Suspense>
+        </PagePanel>
+      </PageScroller>
     </>
   )
 }

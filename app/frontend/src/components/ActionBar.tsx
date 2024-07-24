@@ -1,5 +1,5 @@
 import { useWallet } from '@solana/wallet-adapter-react'
-import { Wallet, Note } from '@phosphor-icons/react'
+import { Wallet, Note, BellRinging } from '@phosphor-icons/react'
 import { FC } from 'react'
 import {
   Menu,
@@ -20,6 +20,7 @@ import {
 } from '../atoms/connectionStatusAtom'
 import cn from 'classnames'
 import { searchAtom } from '../atoms/searchAtom'
+import { Link } from 'react-router-dom'
 
 export const ActionBar: FC = () => {
   const { disconnect, publicKey } = useWallet()
@@ -49,6 +50,14 @@ export const ActionBar: FC = () => {
         </div>
       </div>
       <div className='flex-none flex items-center gap-5'>
+        <Link to='/notification' className={cn('py-2 flex items-center gap-2')}>
+          <div className='animate-shake'>
+            <BellRinging size={32} />
+          </div>
+          <span className='text-white font-bold bg-red-600 px-2 py-1 rounded'>
+            99
+          </span>
+        </Link>
         <Menu>
           <MenuButton className='px-3 py-2 flex items-center gap-2'>
             <Wallet size={32} />
