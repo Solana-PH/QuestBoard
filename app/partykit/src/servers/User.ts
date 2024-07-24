@@ -4,7 +4,6 @@ import { commonHeaders } from '../commonHeaders'
 import bs58 from 'bs58'
 import { sign } from 'tweetnacl'
 import { getUserDetails } from '../getUserDetails'
-import { Keypair } from '@solana/web3.js'
 
 interface Notification {
   id: string
@@ -32,6 +31,13 @@ export default class User implements ServerCommon {
     this.room.storage.put(`heartbeat`, Date.now())
     this.connected = true
     this.updateConnections('connect')
+
+    this.room.broadcast(
+      JSON.stringify({
+        type: 'notifications',
+        notifications: Array.from(this.notifications.values()),
+      })
+    )
   }
 
   async onClose(conn: Party.Connection) {
@@ -84,7 +90,7 @@ export default class User implements ServerCommon {
         // note: message should be encrypted right before being submitted here
 
         const message = await req.text()
-        const id = Keypair.generate().publicKey.toBase58()
+        const id = bs58.encode(crypto.getRandomValues(new Uint8Array(32)))
         const content: Notification = {
           id,
           message,

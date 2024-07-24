@@ -33,6 +33,7 @@ const QuestPageInner: FC = () => {
     userConnectionStatusAtom(quest?.account?.owner?.toBase58() ?? '')
   )
 
+  const stakedValue = quest ? quest.account.staked.toNumber() / 10 ** 9 : 0
   const minStakeValue = quest
     ? quest.account.minStakeRequired.toNumber() / 10 ** 9
     : 0
@@ -118,7 +119,7 @@ const QuestPageInner: FC = () => {
         <div className='flex flex-col gap-2'>
           <span className='flex items-center gap-2'>
             <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
-              Author{' '}
+              Owner{' '}
             </span>
             {!owner && (
               <span className='text-xs uppercase tracking-wider inline-flex items-center gap-1 font-bold'>
@@ -148,7 +149,7 @@ const QuestPageInner: FC = () => {
           </span>
           {owner ? (
             <span className='font-bold text-sm'>
-              You are the owner of this quest
+              You are the owner of this quest.
             </span>
           ) : (
             <a
@@ -177,14 +178,29 @@ const QuestPageInner: FC = () => {
             </a>
           </div>
           <div className='grid grid-cols-2 gap-2'>
-            <div className='flex flex-col gap-2'>
-              <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
-                Staked
-              </span>
-              <span className='font-bold text-sm'>
-                {formatNumber(quest.account.staked.toNumber() / 10 ** 9 + '')}
-              </span>
-            </div>
+            {stakedValue > 0 ? (
+              <>
+                <div className='flex flex-col gap-2'>
+                  <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                    Staked
+                  </span>
+                  <span className='font-bold text-sm'>
+                    {formatNumber(stakedValue + '')}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className='flex flex-col gap-2 col-span-2 text-red-500'>
+                  <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                    Warning
+                  </span>
+                  <span className='font-bold text-sm'>
+                    Owner did not stake any DAO Tokens. Proceed with caution.
+                  </span>
+                </div>
+              </>
+            )}
             {minStakeValue > 0 && (
               <div className='flex flex-col gap-2'>
                 <span className='text-xs uppercase tracking-wider font-bold opacity-75'>

@@ -35,6 +35,9 @@ export const QuestCard: FC<
     return null
   }
 
+  const staked = account.staked.toNumber() / 10 ** 9
+  const minStakeRequired = account.minStakeRequired.toNumber() / 10 ** 9
+
   return (
     <Link
       to={`/quest/${publicKey.toBase58()}`}
@@ -60,7 +63,7 @@ export const QuestCard: FC<
       <div className='border-b border-dashed border-black/25 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
         <div className='flex items-center gap-2'>
-          <span>Author: </span>
+          <span>Owner: </span>
           <span className='font-bold flex items-center gap-2'>
             <span>{trimAddress(account.owner.toBase58())}</span>
             {connectionStatus && (
@@ -74,13 +77,15 @@ export const QuestCard: FC<
           <div className='flex items-center justify-between gap-2'>
             <span>Staked: </span>
             <span className='font-bold text-right'>
-              {formatNumber(account.staked.toNumber() / 10 ** 9 + '')}
+              {staked > 0 ? formatNumber(staked + '') : 'None'}
             </span>
           </div>
           <div className='flex items-center justify-between gap-2'>
             <span>Min Stake: </span>
             <span className='font-bold text-right'>
-              {formatNumber(account.minStakeRequired.toNumber() / 10 ** 9 + '')}
+              {minStakeRequired > 0
+                ? formatNumber(minStakeRequired + '')
+                : 'None'}
             </span>
           </div>
         </div>
