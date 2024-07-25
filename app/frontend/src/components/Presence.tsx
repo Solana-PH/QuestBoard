@@ -13,8 +13,13 @@ import { partykitAddress } from '../constants/partykitAddress'
 import { presenceRawAtom } from '../atoms/presenceAtom'
 import { getAccessToken } from '../utils/getAccessToken'
 import { getSessionKeypair } from '../utils/getSessionKeypair'
-import { Notification, notificationsAtom } from '../atoms/notificationsAtom'
+import {
+  Notification,
+  NotificationMessageType,
+  notificationsAtom,
+} from '../atoms/notificationsAtom'
 import { myRoomWebsocketAtom } from '../atoms/myRoomWebsocketAtom'
+import { trimAddress } from '../utils/trimAddress'
 
 // todo: https://www.youtube.com/watch?v=Bm0JjR4kP8w
 // https://chatgpt.com/c/969d9a40-6af0-4c7e-bbcf-1734d1fbbba9
@@ -69,7 +74,7 @@ const PresenceInner: FC<{
       setConnectionStatus(ConnectionStatus.CONNECTED)
     },
     onMessage(e) {
-      console.log('ws message', e.data)
+      // console.log('ws message', e.data)
       const partykitMessage = JSON.parse(
         e.data || 'null'
       ) as ServerMessage | null
@@ -77,6 +82,30 @@ const PresenceInner: FC<{
         switch (partykitMessage.type) {
           case 'notification':
             setNotifs((prev) => [...prev, partykitMessage.notification])
+            if (window.Notification.permission === 'granted') {
+              let body = ''
+              switch (partykitMessage.notification.messageType) {
+                case NotificationMessageType.QUEST_PROPOSAL:
+                  body = `Quest Proposal`
+                  break
+                case NotificationMessageType.QUEST_ACCEPTED:
+                  body = `Quest Accepted`
+                  break
+                case NotificationMessageType.QUEST_REJECTED:
+                  body = `Quest Rejected`
+                  break
+              }
+
+              new window.Notification(
+                `From ${trimAddress(
+                  partykitMessage.notification.visitorAddress
+                )}`,
+                {
+                  body,
+                  icon: '/QuestBoardLogo_blackandwhite.png',
+                }
+              )
+            }
             break
           case 'notifications':
             setNotifs(partykitMessage.notifications)

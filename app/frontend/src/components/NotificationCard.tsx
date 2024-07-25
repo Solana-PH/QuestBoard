@@ -1,5 +1,9 @@
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
-import { Notification, NotificationMessage } from '../atoms/notificationsAtom'
+import {
+  Notification,
+  NotificationMessage,
+  NotificationMessageType,
+} from '../atoms/notificationsAtom'
 import { decryptMessage, deriveSharedSecret } from '../utils/crypto'
 import { getSessionKeypair } from '../utils/getSessionKeypair'
 import { useUserWallet } from '../atoms/userWalletAtom'
@@ -19,23 +23,44 @@ dayjs.extend(relativeTime)
 
 const Card: FC<{
   children: ReactNode
+  messageType: NotificationMessageType
   fromAddress: string
   isOnline: boolean
   since: string
   onDelete: () => void
-}> = ({ children, fromAddress, isOnline, since, onDelete }) => {
+}> = ({ children, messageType, fromAddress, isOnline, since, onDelete }) => {
+  const tag = useMemo(() => {
+    switch (messageType) {
+      case NotificationMessageType.QUEST_PROPOSAL:
+        return { label: `Offer by `, color: 'border-blue-500' }
+      case NotificationMessageType.QUEST_ACCEPTED:
+        return { label: `Accepted by `, color: 'border-green-500' }
+      case NotificationMessageType.QUEST_REJECTED:
+        return { label: `Rejected by `, color: 'border-red-500' }
+    }
+  }, [messageType])
+
   return (
     <div className='flex flex-col gap-3'>
       <div className='flex justify-between'>
-        <span className='flex items-center gap-2 text-sm'>
-          <span className='font-bold'>{fromAddress}</span>
+        <span
+          className={cn(
+            tag.color,
+            'border-l-8 pl-1',
+            'flex items-center gap-2 text-sm'
+          )}
+        >
+          <span>
+            <span className='opacity-75'>{tag.label}</span>
+            <span className='font-bold'>{fromAddress}</span>
+          </span>
           <span
             className={cn(
               isOnline ? 'bg-green-500' : 'bg-red-500',
               'rounded-full w-2 h-2 flex-none'
             )}
           />
-          <span>{since}</span>
+          <span className='opacity-75'>{since}</span>
         </span>
         <div className='flex items-center gap-2'>
           <button onClick={onDelete}>
@@ -43,6 +68,7 @@ const Card: FC<{
           </button>
         </div>
       </div>
+
       {children}
       <div className='border-b border-dashed border-black/25 mt-3 mb-5' />
     </div>
@@ -108,6 +134,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
   if (decryptionError) {
     return (
       <Card
+        messageType={notification.messageType}
         fromAddress={trimAddress(notification.visitorAddress)}
         isOnline={isVisitorOnline ?? false}
         since={since}
@@ -123,6 +150,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
 
   return (
     <Card
+      messageType={notification.messageType}
       fromAddress={trimAddress(notification.visitorAddress)}
       isOnline={isVisitorOnline ?? false}
       since={since}
