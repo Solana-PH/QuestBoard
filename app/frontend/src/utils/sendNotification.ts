@@ -31,12 +31,12 @@ export const sendNotification = async (
   }
 
   const details = (await response.json()) as UserDetails
-  const sessionAddress = details.sessionAddress
+  const notifAddress = details.notifAddress
 
-  if (!sessionAddress) throw Error('Recipient session not found')
+  if (!notifAddress) throw Error('Recipient notification address not found')
 
   // encrypt the message
-  const sharedSecret = deriveSharedSecret(keypair, sessionAddress)
+  const sharedSecret = await deriveSharedSecret(keypair, notifAddress)
   const encrypted = await encryptMessage(message, sharedSecret)
 
   return fetch(`${partykitAddress}/parties/main/user_${to}`, {

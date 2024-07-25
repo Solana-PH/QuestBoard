@@ -7,6 +7,7 @@ import bs58 from 'bs58'
 export default class UserInfo implements ServerCommon {
   name = 'userinfo'
   sessionAddress = ''
+  notifAddress = '' // derived from session keypair into Curve25519
   signature = ''
   availableStart = '8.0.AM'
   availableEnd = '8.0.PM'
@@ -15,6 +16,7 @@ export default class UserInfo implements ServerCommon {
 
   async onStart() {
     this.sessionAddress = (await this.room.storage.get('sessionAddress')) ?? ''
+    this.notifAddress = (await this.room.storage.get('notifAddress')) ?? ''
     this.signature = (await this.room.storage.get('signature')) ?? ''
     this.availableStart =
       (await this.room.storage.get('availableStart')) ?? '8.0.AM'
@@ -34,6 +36,7 @@ export default class UserInfo implements ServerCommon {
       return new Response(
         JSON.stringify({
           sessionAddress: this.sessionAddress,
+          notifAddress: this.notifAddress,
           signature: this.signature,
           availableStart: this.availableStart,
           availableEnd: this.availableEnd,
@@ -48,16 +51,16 @@ export default class UserInfo implements ServerCommon {
 
       const data: {
         sessionAddress: string
+        notifAddress: string
         signature: string
-        availableStart: string
-        availableEnd: string
+        availableStart?: string
+        availableEnd?: string
       } = await req.json()
 
       if (
         !address ||
         !data.sessionAddress ||
-        !data.availableStart ||
-        !data.availableEnd ||
+        !data.notifAddress ||
         !data.signature
       ) {
         return new Response('Missing required fields', {
@@ -67,7 +70,7 @@ export default class UserInfo implements ServerCommon {
       }
 
       const message = new TextEncoder().encode(
-        `I agree with QuestBoard's terms and privacy policy. ${data.sessionAddress}`
+        `I agree with QuestBoard's terms and privacy policy. ${data.sessionAddress}.${data.notifAddress}`
       )
       const ownerPubkey = bs58.decode(address)
       const signature = bs58.decode(data.signature)
@@ -80,11 +83,13 @@ export default class UserInfo implements ServerCommon {
       }
 
       this.sessionAddress = data.sessionAddress
+      this.notifAddress = data.notifAddress
       this.signature = data.signature
-      this.availableStart = data.availableStart
-      this.availableEnd = data.availableEnd
+      this.availableStart = this.availableStart ?? data.availableStart
+      this.availableEnd = this.availableEnd ?? data.availableEnd
 
       this.room.storage.put('sessionAddress', this.sessionAddress)
+      this.room.storage.put('notifAddress', this.notifAddress)
       this.room.storage.put('signature', this.signature)
       this.room.storage.put('availableStart', this.availableStart)
       this.room.storage.put('availableEnd', this.availableEnd)
@@ -92,6 +97,7 @@ export default class UserInfo implements ServerCommon {
       return new Response(
         JSON.stringify({
           sessionAddress: this.sessionAddress,
+          notifAddress: this.notifAddress,
           signature: this.signature,
           availableStart: this.availableStart,
           availableEnd: this.availableEnd,

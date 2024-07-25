@@ -7,6 +7,7 @@ import { partykitAddress } from '../constants/partykitAddress'
 
 export interface UserDetails {
   sessionAddress: string
+  notifAddress: string
   availableStart: number
   availableEnd: number
 }
@@ -57,8 +58,7 @@ export const myDetailsAtom = atom(
     const details = await get(userDetailsAtom(walletAddress))
     if (details === 'unregistered') return details
 
-    // check if the user has the same session address
-    // from the stored session keypair
+    if (details !== null && !details.notifAddress) return 'unregistered'
 
     const sessionKey = window.localStorage.getItem(
       `session_keypair_${walletAddress}`

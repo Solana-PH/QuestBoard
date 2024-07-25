@@ -2,6 +2,7 @@ import type { Stub } from 'partykit/server'
 
 export interface UserDetails {
   sessionAddress: string
+  notifAddress: string
   signature: string
   availableStart: string
   availableEnd: string
