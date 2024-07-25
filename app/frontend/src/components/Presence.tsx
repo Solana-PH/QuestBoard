@@ -29,6 +29,10 @@ type ServerMessage =
       type: 'notifications'
       notifications: Notification[]
     }
+  | {
+      type: 'delete_notification'
+      notificationId: string
+    }
 
 const PresenceInner: FC<{
   details: UserDetails
@@ -76,6 +80,11 @@ const PresenceInner: FC<{
             break
           case 'notifications':
             setNotifs(partykitMessage.notifications)
+            break
+          case 'delete_notification':
+            setNotifs((prev) =>
+              prev.filter((n) => n.id !== partykitMessage.notificationId)
+            )
             break
         }
       }

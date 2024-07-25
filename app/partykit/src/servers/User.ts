@@ -133,6 +133,12 @@ export default class User implements ServerCommon {
     switch (message.type) {
       case 'delete_notification':
         this.notifications.delete(`notification_${message.id}`)
+        this.room.broadcast(
+          JSON.stringify({
+            type: 'delete_notification',
+            notificationId: message.id,
+          })
+        )
         await this.room.storage.put(
           `notifications`,
           Array.from(this.notifications.entries())
@@ -145,8 +151,15 @@ export default class User implements ServerCommon {
             notifications: Array.from(this.notifications.values()),
           })
         )
+        break
       case 'clear_notifications':
         this.notifications.clear()
+        this.room.broadcast(
+          JSON.stringify({
+            type: 'notifications',
+            notifications: [],
+          })
+        )
         await this.room.storage.put(`notifications`, [])
         break
     }

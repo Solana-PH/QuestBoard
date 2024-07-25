@@ -25,10 +25,13 @@ export default {
         },
         slideIn: {
           '0%': {
-            width: '0%',
+            marginRight: '-100%',
             opacity: 0,
           },
-          '100%': { width: '100%', opacity: 1 },
+          '100%': {
+            marginRight: '0',
+            opacity: 1,
+          },
         },
         shake: {
           '0%, 100%': { transform: 'rotate(0deg)' },
@@ -41,7 +44,7 @@ export default {
         fadeIn: 'fadeIn 500ms forwards',
         fadeInNoDelay: 'fadeInNoDelay 500ms forwards',
         fadeOut: 'fadeOut 500ms forwards',
-        slideIn: 'slideIn 300ms forwards',
+        slideIn: 'slideIn 500ms forwards',
         shake: 'shake 0.5s ease-in-out infinite',
       },
     },

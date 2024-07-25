@@ -13,6 +13,7 @@ import { TrashSimple, Warning } from '@phosphor-icons/react'
 import { questAtom } from '../atoms/questsAtom'
 import { Link } from 'react-router-dom'
 import { formatNumber } from '../utils/formatNumber'
+import { myRoomWebsocketAtom } from '../atoms/myRoomWebsocketAtom'
 
 dayjs.extend(relativeTime)
 
@@ -21,7 +22,8 @@ const Card: FC<{
   fromAddress: string
   isOnline: boolean
   since: string
-}> = ({ children, fromAddress, isOnline, since }) => {
+  onDelete: () => void
+}> = ({ children, fromAddress, isOnline, since, onDelete }) => {
   return (
     <div className='flex flex-col gap-3'>
       <div className='flex justify-between'>
@@ -36,7 +38,7 @@ const Card: FC<{
           <span>{since}</span>
         </span>
         <div className='flex items-center gap-2'>
-          <button>
+          <button onClick={onDelete}>
             <TrashSimple size={16} />
           </button>
         </div>
@@ -65,9 +67,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
     }
   }, [message, notification.messageType])
   const questDetails = useAtomValue(questAtom(messageDetails?.quest ?? ''))
-  // const questDetails = useAtomValue(
-  //   questDetailsAtom(messageDetails?.quest ?? '')
-  // )
+  const ws = useAtomValue(myRoomWebsocketAtom)
 
   const since = dayjs(notification.timestamp).fromNow()
 
@@ -95,12 +95,23 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       })
   }, [wallet, notification.message, notification.visitorNotifAddress])
 
+  const onDelete = () => {
+    if (!ws) return
+    ws.send(
+      JSON.stringify({
+        type: 'delete_notification',
+        id: notification.id,
+      })
+    )
+  }
+
   if (decryptionError) {
     return (
       <Card
         fromAddress={trimAddress(notification.visitorAddress)}
         isOnline={isVisitorOnline ?? false}
         since={since}
+        onDelete={onDelete}
       >
         <p className='text-red-500 flex gap-2 items-center'>
           <Warning size={20} />
@@ -115,6 +126,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       fromAddress={trimAddress(notification.visitorAddress)}
       isOnline={isVisitorOnline ?? false}
       since={since}
+      onDelete={onDelete}
     >
       {messageDetails ? (
         <div className='flex flex-col gap-3'>
