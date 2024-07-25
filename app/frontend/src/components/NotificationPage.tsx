@@ -23,7 +23,7 @@ const NotificationPageInner: FC = () => {
         </h2>
       </div>
       <div className='flex flex-col flex-auto relative'>
-        <div className='show-next-when-empty'>
+        <div className='show-next-when-empty flex flex-col'>
           {notifications.map((notif) => (
             <Suspense key={notif.id} fallback={null}>
               <NotificationCard notification={notif} />

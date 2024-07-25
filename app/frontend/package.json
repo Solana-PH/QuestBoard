@@ -22,6 +22,7 @@
     "@solana/web3.js": "^1.95.1",
     "bs58": "^6.0.0",
     "classnames": "^2.5.1",
+    "dayjs": "^1.11.12",
     "idb": "^8.0.0",
     "jotai": "^2.9.0",
     "partysocket": "^1.0.1",
