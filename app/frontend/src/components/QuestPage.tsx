@@ -133,7 +133,7 @@ const QuestPageInner: FC = () => {
       <div className='flex flex-col gap-5 flex-auto px-5 pb-5 pt-4'>
         <div className='flex flex-col gap-2'>
           <h2 className='font-cursive text-2xl flex justify-between py-1 sticky top-0 bg-stone-200 z-10 gap-5'>
-            <span className='font-bold flex-auto break-before-all'>
+            <span className='font-bold flex-auto break-words'>
               {quest.details.title}
             </span>
             <Link to='/'>
@@ -144,7 +144,7 @@ const QuestPageInner: FC = () => {
             Reward: {quest.details.reward}
           </p>
         </div>
-        <div className='break-before-all text-black'>
+        <div className='break-words text-black'>
           {quest.details.description}
         </div>
         <div className='border-b border-dashed border-black/25 mt-auto' />
@@ -188,7 +188,7 @@ const QuestPageInner: FC = () => {
               target='_blank'
               rel='noreferrer'
               href={`https://solana.fm/address/${quest.account.owner.toBase58()}/?cluster=devnet-alpha`}
-              className='font-bold text-sm break-all'
+              className='font-bold text-sm break-words'
             >
               {quest.account.owner.toBase58()}
             </a>
@@ -204,7 +204,7 @@ const QuestPageInner: FC = () => {
               target='_blank'
               rel='noreferrer'
               href={`https://solana.fm/address/${questId}/?cluster=devnet-alpha`}
-              className='text-sm font-bold break-all'
+              className='text-sm font-bold break-words'
             >
               {questId}
             </a>

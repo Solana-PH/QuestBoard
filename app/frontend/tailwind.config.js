@@ -44,7 +44,7 @@ export default {
         fadeIn: 'fadeIn 500ms forwards',
         fadeInNoDelay: 'fadeInNoDelay 500ms forwards',
         fadeOut: 'fadeOut 500ms forwards',
-        slideIn: 'slideIn 500ms forwards',
+        slideIn: 'slideIn 300ms forwards',
         shake: 'shake 0.5s ease-in-out infinite',
       },
     },

@@ -51,7 +51,7 @@ export const QuestCard: FC<
       )}
     >
       <div className='flex flex-col gap-2'>
-        <h2 className='text-2xl font-cursive font-bold break-before-all'>
+        <h2 className='text-2xl font-cursive font-bold break-words'>
           {details.title}
         </h2>
 
@@ -59,7 +59,9 @@ export const QuestCard: FC<
           Reward: {details.reward}
         </h2>
       </div>
-      <div className='text-black break-all text-sm'>{details.description}</div>
+      <div className='text-black break-words text-sm'>
+        {details.description}
+      </div>
       <div className='border-b border-dashed border-black/25 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
         <div className='flex items-center gap-2'>
@@ -89,12 +91,6 @@ export const QuestCard: FC<
             </span>
           </div>
         </div>
-        {/* <div className='flex items-center gap-2'>
-          <span>Placement Paid: </span>
-          <span className='font-bold'>
-            {formatNumber(account.placementPaid.toNumber() / 10 ** 9 + '')}
-          </span>
-        </div> */}
       </div>
     </Link>
   )

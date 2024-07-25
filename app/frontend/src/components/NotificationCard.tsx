@@ -138,7 +138,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
                 <span className='font-bold flex items-center gap-2'>
                   <Link
                     to={`/quest/${messageDetails.quest}`}
-                    className='text-sm font-bold break-all'
+                    className='text-sm font-bold break-words'
                   >
                     {questDetails.details.title}
                   </Link>
