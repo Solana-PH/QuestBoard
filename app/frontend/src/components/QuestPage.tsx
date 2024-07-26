@@ -181,7 +181,7 @@ const QuestPageInner: FC = () => {
           </span>
           {owner ? (
             <span className='font-bold text-sm'>
-              You are the owner of this quest.
+              You are the owner of this Quest.
             </span>
           ) : (
             <a

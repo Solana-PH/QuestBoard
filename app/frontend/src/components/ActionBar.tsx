@@ -22,6 +22,7 @@ import cn from 'classnames'
 import { searchAtom } from '../atoms/searchAtom'
 import { Link } from 'react-router-dom'
 import { notificationsAtom } from '../atoms/notificationsAtom'
+import { playAlertSound } from '../utils/playAlert'
 
 export const ActionBar: FC = () => {
   const { disconnect, publicKey } = useWallet()
@@ -37,6 +38,7 @@ export const ActionBar: FC = () => {
     <div className='animate-fadeIn flex flex-none px-2 h-16 bg-black/50 items-center justify-between gap-5'>
       <div className='flex flex-auto items-center px-3 gap-5 max-w-3xl'>
         <img
+          onClick={() => playAlertSound()}
           src='/QuestBoardLogo.svg'
           alt='QuestBoard'
           className='aspect-square object-contain h-10 w-10 flex-none'
