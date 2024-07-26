@@ -13,7 +13,7 @@
         const oscillator = audioContext.createOscillator()
         const gainNode = audioContext.createGain()
 
-        oscillator.type = 'sawtooth' // square wave for chiptune sound
+        oscillator.type = 'square' // square wave for chiptune sound
         // gainNode.gain.value = 2 // lower volume to avoid loud sound
 
         // Connect the oscillator to the gain node and the gain node to the audio context
@@ -22,14 +22,22 @@
 
         // Define the notes and their durations
         const notes = [
-          { frequency: 784, duration: 0.1 }, // G5
-          { frequency: 622, duration: 0.1 }, // D#5
           { frequency: 523, duration: 0.1 }, // C5
+          { frequency: 0, duration: 0.05 }, // G5
+
           { frequency: 622, duration: 0.1 }, // D#5
+          { frequency: 0, duration: 0.05 }, // G5
+
           { frequency: 784, duration: 0.1 }, // G5
+          { frequency: 0, duration: 0.05 }, // G5
           { frequency: 622, duration: 0.1 }, // D#5
+          { frequency: 0, duration: 0.05 }, // G5
           { frequency: 523, duration: 0.1 }, // C5
-          { frequency: 622, duration: 0.1 }, // D#5
+          { frequency: 0, duration: 0.05 }, // G5
+          { frequency: 784, duration: 0.1 }, // G5
+          { frequency: 0, duration: 0.05 }, // G5
+          { frequency: 784, duration: 0.1 }, // G5
+          { frequency: 0, duration: 0.05 }, // G5
         ]
 
         let currentTime = audioContext.currentTime
