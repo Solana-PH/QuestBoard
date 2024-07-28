@@ -21,6 +21,8 @@ import {
 import { myRoomWebsocketAtom } from '../atoms/myRoomWebsocketAtom'
 import { trimAddress } from '../utils/trimAddress'
 import { blockedAddressesAtom } from '../atoms/blockedAddressesAtom'
+import { useNavigate } from 'react-router-dom'
+import { playAlertSound } from '../utils/playAlert'
 
 // todo: https://www.youtube.com/watch?v=Bm0JjR4kP8w
 // https://chatgpt.com/c/969d9a40-6af0-4c7e-bbcf-1734d1fbbba9
@@ -52,6 +54,7 @@ const PresenceInner: FC<{
   // consults own room
   // own room do POST request presence server
   const address = wallet.publicKey?.toBase58()
+  const navigate = useNavigate()
   const setConnectionStatus = useSetAtom(connectionStatusAtom)
   const setPresence = useSetAtom(presenceRawAtom)
   const setNotifs = useSetAtom(notificationsAtom)
@@ -86,7 +89,7 @@ const PresenceInner: FC<{
       ) as ServerMessage | null
       if (partykitMessage) {
         switch (partykitMessage.type) {
-          case 'notification':
+          case 'notification': {
             setNotifs((prev) => [...prev, partykitMessage.notification])
             if (window.Notification.permission === 'granted') {
               let body = ''
@@ -112,7 +115,15 @@ const PresenceInner: FC<{
                 }
               )
             }
+            if (
+              partykitMessage.notification.messageType ===
+              NotificationMessageType.QUEST_ACCEPTED
+            ) {
+              playAlertSound(0.1)
+              navigate(`/notifications`)
+            }
             break
+          }
           case 'notifications':
             setNotifs(partykitMessage.notifications)
             break

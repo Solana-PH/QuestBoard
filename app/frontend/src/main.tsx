@@ -24,6 +24,10 @@ const SplashScreen = () => {
 
   return (
     <Router>
+      <Presence />
+      <BalanceListener />
+      <ConfigListener />
+      <CounterListener />
       <Routes>
         <Route path='/' element={<App />}>
           <Route path='quest/:questId' element={<QuestPage />} />
@@ -35,8 +39,17 @@ const SplashScreen = () => {
 }
 
 const Reload = () => {
-  window.location.reload()
-  return null
+  return (
+    <div className='flex items-center justify-center flex-col absolute inset-0 gap-2'>
+      <span>An error occurred. Please refresh the page.</span>
+      <button
+        className='px-3 py-2 bg-amber-300/10'
+        onClick={() => window.location.reload()}
+      >
+        Refresh
+      </button>
+    </div>
+  )
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -44,10 +57,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ErrorBoundary fallback={<Reload />}>
       <WalletAdapter>
         <AtomsInitializer>
-          <Presence />
-          <BalanceListener />
-          <ConfigListener />
-          <CounterListener />
           <SplashScreen />
         </AtomsInitializer>
       </WalletAdapter>

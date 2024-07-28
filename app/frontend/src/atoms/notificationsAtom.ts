@@ -5,6 +5,7 @@ export enum NotificationMessageType {
   QUEST_ACCEPTED = 'quest_accepted',
   QUEST_REJECTED = 'quest_rejected',
   QUEST_CANCELED = 'quesy_canceled',
+  QUEST_SETTLED = 'quesy_settled',
 }
 
 export type NotificationMessage = {

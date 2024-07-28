@@ -45,6 +45,8 @@ const Card: FC<{
         return { label: `Declined by `, color: 'border-red-500' }
       case NotificationMessageType.QUEST_CANCELED:
         return { label: `Canceled by `, color: 'border-amber-500' }
+      case NotificationMessageType.QUEST_SETTLED:
+        return { label: `Settled by `, color: 'border-blue-500' }
     }
   }, [messageType])
 
@@ -126,16 +128,29 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
         }
 
         if (
-          notification.messageType === NotificationMessageType.QUEST_CANCELED &&
+          (notification.messageType ===
+            NotificationMessageType.QUEST_CANCELED ||
+            notification.messageType ===
+              NotificationMessageType.QUEST_SETTLED) &&
           message.cancelId
         ) {
-          // cancel the notification
           ws?.send(
             JSON.stringify({
               type: 'delete_notification',
               id: message.cancelId,
             })
           )
+          if (
+            notification.messageType === NotificationMessageType.QUEST_SETTLED
+          ) {
+            // todo: forward to Quest chat
+            ws?.send(
+              JSON.stringify({
+                type: 'delete_notification',
+                id: notification.id,
+              })
+            )
+          }
         }
 
         setMessage(message)
@@ -293,6 +308,15 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
 
       console.log(result)
 
+      await sendNotification(
+        wallet.publicKey.toBase58(),
+        notification.visitorAddress,
+        JSON.stringify(messageDetails),
+        NotificationMessageType.QUEST_SETTLED
+      )
+
+      // todo: forward to Quest chat
+
       ws?.send(
         JSON.stringify({
           type: 'delete_notification',
@@ -331,6 +355,10 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       console.error(e)
       setBusy(false)
     }
+  }
+
+  if (notification.messageType === NotificationMessageType.QUEST_SETTLED) {
+    return null
   }
 
   if (decryptionError) {
