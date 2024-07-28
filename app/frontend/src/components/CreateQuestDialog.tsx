@@ -184,9 +184,14 @@ export const CreateQuestDialog: FC = () => {
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='title'
-              className='text-xs uppercase tracking-wider font-bold opacity-75'
+              className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
             >
-              Title
+              <span className='opacity-75'>Title</span>
+              {title.length > 60 && (
+                <span className={cn(title.length === 120 && 'text-red-500')}>
+                  {title.length}/120
+                </span>
+              )}
             </label>
             <input
               autoFocus
@@ -201,24 +206,36 @@ export const CreateQuestDialog: FC = () => {
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='description'
-              className='text-xs uppercase tracking-wider font-bold opacity-75'
+              className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
             >
-              Description
+              <span className='opacity-75'>Description</span>
+              {description.length > 320 && (
+                <span
+                  className={cn(description.length === 640 && 'text-red-500')}
+                >
+                  {description.length}/640
+                </span>
+              )}
             </label>
             <textarea
               id='description'
               placeholder='Provide a meaningful description of your expectations for this quest.'
               className='w-full bg-black/5 px-3 py-2'
               value={description}
-              onChange={(e) => setDescription(e.target.value.substring(0, 320))}
+              onChange={(e) => setDescription(e.target.value.substring(0, 640))}
             />
           </div>
           <div className='flex flex-col gap-1'>
             <label
               htmlFor='reward'
-              className='text-xs uppercase tracking-wider font-bold opacity-75'
+              className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
             >
-              Reward
+              <span className='opacity-75'>Reward</span>
+              {reward.length > 60 && (
+                <span className={cn(reward.length === 120 && 'text-red-500')}>
+                  {reward.length}/120
+                </span>
+              )}
             </label>
             <input
               type='text'
@@ -308,7 +325,7 @@ export const CreateQuestDialog: FC = () => {
               htmlFor='placement'
               className='text-xs uppercase tracking-wider font-bold opacity-75'
             >
-              Placement Boost (Optional)
+              Placement Boost (Optional, in SOL)
             </label>
             <NumberInput
               type='text'

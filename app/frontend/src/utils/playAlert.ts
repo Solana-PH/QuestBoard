@@ -1,6 +1,7 @@
 const frequencies: Record<string, number> = {
   d6: 1174.66,
   c6: 1046.5,
+  g5: 950,
   'a#': 466.16,
   a: 440.0,
   g: 392.0,
@@ -25,7 +26,7 @@ const notes = [
   { note: 'd6', duration: thirtySecondNoteDuration },
   { note: '-', duration: thirtySecondNoteDuration },
   { note: 'd6', duration: quarterNoteDuration },
-  { note: 'a#', duration: quarterNoteDuration },
+  { note: 'g5', duration: quarterNoteDuration },
   { note: 'c6', duration: quarterNoteDuration },
   { note: 'd6', duration: sixteenthNoteDuration },
   { note: '-', duration: eighthNoteDuration },

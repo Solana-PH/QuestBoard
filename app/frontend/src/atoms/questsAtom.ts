@@ -62,12 +62,12 @@ export const questsAtom = atom(async (get) => {
       return aMinStake - bMinStake // should be opposite
     }
 
-    // sort by block height, newer ones on top
+    // sort by block height, older ones on top
     const aTimeStamp = a.account.timestamp.toNumber()
     const bTimeStamp = b.account.timestamp.toNumber()
 
     if (aTimeStamp !== bTimeStamp) {
-      return bTimeStamp - aTimeStamp
+      return aTimeStamp - bTimeStamp
     }
 
     // rest, just sort by id

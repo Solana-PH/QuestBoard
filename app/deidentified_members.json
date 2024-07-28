@@ -135,7 +135,8 @@
     "address": "2VUEGzZDnpUmKrwcd46nEzK9BjPQP7QCSrWtneSNTLL5",
     "tags": [
       "OG",
-      "Phase 2: Quest Creation"
+      "Phase 2: Quest Creation",
+      "Secret 1: Notif Testing"
     ]
   },
   {
@@ -1913,7 +1914,8 @@
     "address": "Ad9S4ZTF8tTJQLyxwMGtxawxQWSXWDQKV7ePN7iZM2ab",
     "tags": [
       "Phase 1: Tester",
-      "Phase 2: Quest Creation"
+      "Phase 2: Quest Creation",
+      "Secret 1: Notif Testing"
     ]
   },
   {
@@ -2079,6 +2081,7 @@
     "address": "9vaYXjbjKXM21n7ZykbrkiDvg96X37uqKocGHHuaXFa",
     "tags": [
       "OG",
+      "Phase 2: Quest Creation",
       "Secret 1: Notif Testing: First Blood"
     ]
   },
@@ -2101,7 +2104,9 @@
   {
     "address": "FRfxLnSuvxzGc4ZSjmr76nzRAdPC5icnHjZHDhtTb9GN",
     "tags": [
-      "OG"
+      "OG",
+      "Phase 2: Quest Creation",
+      "Secret 1: Notif Testing"
     ]
   },
   {
