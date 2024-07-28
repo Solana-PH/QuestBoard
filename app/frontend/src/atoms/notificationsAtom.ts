@@ -11,7 +11,7 @@ export type NotificationMessage = {
   quest: string
   content: string
   minStake: number
-  txSignature?: string
+  serializedTx?: string
 }
 
 export interface Notification {

@@ -122,7 +122,7 @@ const PresenceInner: FC<{
             )
             break
           case 'blocklist':
-            setBlockList(partykitMessage.list)
+            setBlockList(partykitMessage.list ?? [])
             break
         }
       }
