@@ -271,9 +271,16 @@ const QuestPageInner: FC = () => {
             <div className='flex flex-col gap-1'>
               <label
                 htmlFor='proposal'
-                className='text-xs uppercase tracking-wider font-bold opacity-75'
+                className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
               >
-                Make an Offer
+                <span className='opacity-75'>Make an Offer</span>
+                {proposal.length > 210 && (
+                  <span
+                    className={cn(proposal.length === 320 && 'text-red-500')}
+                  >
+                    {proposal.length}/320
+                  </span>
+                )}
               </label>
               <textarea
                 id='proposal'

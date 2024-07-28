@@ -19,6 +19,10 @@ import { Link } from 'react-router-dom'
 import { formatNumber } from '../utils/formatNumber'
 import { myRoomWebsocketAtom } from '../atoms/myRoomWebsocketAtom'
 import { sendNotification } from '../utils/sendNotification'
+import { programAtom } from '../atoms/programAtom'
+import { BN } from '@coral-xyz/anchor'
+import { PublicKey, Transaction } from '@solana/web3.js'
+import bs58 from 'bs58'
 
 dayjs.extend(relativeTime)
 
@@ -38,6 +42,8 @@ const Card: FC<{
         return { label: `Accepted by `, color: 'border-green-500' }
       case NotificationMessageType.QUEST_REJECTED:
         return { label: `Rejected by `, color: 'border-red-500' }
+      case NotificationMessageType.QUEST_CANCELED:
+        return { label: `Canceled by `, color: 'border-amber-500' }
     }
   }, [messageType])
 
@@ -80,6 +86,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
   notification,
 }) => {
   const wallet = useUserWallet()
+  const program = useAtomValue(programAtom)
   const [message, setMessage] = useState<string | null>(null)
   const [decryptionError, setDecryptionError] = useState<string | null>(null)
   const isVisitorOnline = useAtomValue(
@@ -158,6 +165,52 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       console.error(e)
       setBusy(false)
     }
+  }
+
+  const onApprove = async () => {
+    // notify taker to start sending the serialized transaction
+
+    if (!program) return
+    if (!wallet?.signTransaction) return
+    if (!messageDetails) return
+
+    const stakeAmount = new BN(messageDetails.minStake * 10 ** 9)
+    const messageString = JSON.stringify(messageDetails)
+    const offereeProposalHash = Array.from(
+      new Uint8Array(
+        await crypto.subtle.digest(
+          'SHA-256',
+          Buffer.from(messageString, 'utf-8')
+        )
+      )
+    )
+
+    const ixAcceptQuest = await program.methods
+      .acceptQuest({
+        stakeAmount,
+        offereeProposalHash,
+      })
+      .accounts({
+        offeree: new PublicKey(notification.visitorAddress),
+      })
+      .accountsPartial({
+        quest: new PublicKey(messageDetails.quest),
+      })
+      .instruction()
+
+    let tx = new Transaction()
+    tx.add(ixAcceptQuest)
+    tx.feePayer = wallet.publicKey!
+
+    const { blockhash } = await program.provider.connection.getLatestBlockhash()
+    tx.recentBlockhash = blockhash
+
+    tx = await wallet.signTransaction(tx)
+    const serializedTx = bs58.encode(
+      tx.serialize({ requireAllSignatures: false })
+    )
+
+    console.log(serializedTx)
   }
 
   if (decryptionError) {
@@ -241,6 +294,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           >
             <button
               type='submit'
+              onClick={onApprove}
               disabled={busy || !isVisitorOnline}
               className={cn(
                 busy || !isVisitorOnline
@@ -252,7 +306,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
             >
               <Signature size={32} />
               {isVisitorOnline ? (
-                <span>{busy ? 'Waiting' : 'Accept'}</span>
+                <span>{busy ? 'Waiting' : 'Approve'}</span>
               ) : (
                 <span>Offline</span>
               )}
