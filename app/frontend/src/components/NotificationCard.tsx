@@ -198,55 +198,61 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
 
     setBusy(true)
 
-    const stakeAmount = new BN(messageDetails.minStake * 10 ** 9)
-    const messageString = JSON.stringify(messageDetails)
-    const offereeProposalHash = Array.from(
-      new Uint8Array(
-        await crypto.subtle.digest(
-          'SHA-256',
-          Buffer.from(messageString, 'utf-8')
+    try {
+      const stakeAmount = new BN(messageDetails.minStake * 10 ** 9)
+      const messageString = JSON.stringify(messageDetails)
+      const offereeProposalHash = Array.from(
+        new Uint8Array(
+          await crypto.subtle.digest(
+            'SHA-256',
+            Buffer.from(messageString, 'utf-8')
+          )
         )
       )
-    )
 
-    const ixAcceptQuest = await program.methods
-      .acceptQuest({
-        stakeAmount,
-        offereeProposalHash,
-      })
-      .accounts({
-        offeree: new PublicKey(notification.visitorAddress),
-      })
-      .accountsPartial({
-        quest: new PublicKey(messageDetails.quest),
-      })
-      .instruction()
+      const ixAcceptQuest = await program.methods
+        .acceptQuest({
+          stakeAmount,
+          offereeProposalHash,
+        })
+        .accounts({
+          offeree: new PublicKey(notification.visitorAddress),
+        })
+        .accountsPartial({
+          quest: new PublicKey(messageDetails.quest),
+        })
+        .instruction()
 
-    let tx = new Transaction()
-    tx.add(ixAcceptQuest)
-    tx.feePayer = wallet.publicKey
+      let tx = new Transaction()
+      tx.add(ixAcceptQuest)
+      tx.feePayer = wallet.publicKey
 
-    const { blockhash } = await program.provider.connection.getLatestBlockhash()
-    tx.recentBlockhash = blockhash
+      const { blockhash } =
+        await program.provider.connection.getLatestBlockhash()
+      tx.recentBlockhash = blockhash
 
-    tx = await wallet.signTransaction(tx)
-    const serializedTx = bs58.encode(
-      tx.serialize({ requireAllSignatures: false })
-    )
+      tx = await wallet.signTransaction(tx)
+      const serializedTx = bs58.encode(
+        tx.serialize({ requireAllSignatures: false })
+      )
 
-    await sendNotification(
-      wallet.publicKey.toBase58(),
-      notification.visitorAddress,
-      JSON.stringify({
-        ...messageDetails,
-        cancelId: notification.id,
-        serializedTx,
-      } as NotificationMessage),
-      NotificationMessageType.QUEST_ACCEPTED
-    )
+      await sendNotification(
+        wallet.publicKey.toBase58(),
+        notification.visitorAddress,
+        JSON.stringify({
+          ...messageDetails,
+          cancelId: notification.id,
+          serializedTx,
+        } as NotificationMessage),
+        NotificationMessageType.QUEST_ACCEPTED
+      )
+
+      setCooldown(Date.now() + 180000)
+    } catch (e) {
+      console.error(e)
+    }
 
     setBusy(false)
-    setCooldown(Date.now() + 60000)
   }
 
   const onSign = async () => {
@@ -256,7 +262,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
     if (!wallet?.signTransaction) return
     if (!messageDetails?.serializedTx) return
 
-    if (notification.timestamp + 60000 < Date.now()) {
+    // todo: replace date now with something reliable
+    if (notification.timestamp + 180000 < Date.now()) {
       alert(
         'Transaction is already expired. Please wait for the Quest owner to submit a new one.'
       )
@@ -441,29 +448,31 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
               {!!cooldown && (
                 <CooldownTimer
                   dateTo={cooldown}
-                  format='[(]s[)]'
+                  format='[(]m:ss[)]'
                   trigger={() => setCooldown(null)}
                 />
               )}
             </button>
           </div>
-          <div className='bg-red-800/50 text-white flex-1'>
-            <button
-              type='submit'
-              onClick={onDecline}
-              disabled={busy}
-              className={cn(
-                busy
-                  ? 'opacity-50 pointer-events-none cursor-wait'
-                  : 'cursor-pointer',
-                'w-full px-3 py-2 flex items-center justify-center gap-3',
-                'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
-              )}
-            >
-              <X size={32} />
-              <span>Decline</span>
-            </button>
-          </div>
+          {cooldown === null && (
+            <div className='bg-red-800/50 text-white flex-1'>
+              <button
+                type='submit'
+                onClick={onDecline}
+                disabled={busy}
+                className={cn(
+                  busy
+                    ? 'opacity-50 pointer-events-none cursor-wait'
+                    : 'cursor-pointer',
+                  'w-full px-3 py-2 flex items-center justify-center gap-3',
+                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                )}
+              >
+                <X size={32} />
+                <span>Decline</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
       {notification.messageType === NotificationMessageType.QUEST_ACCEPTED && (
