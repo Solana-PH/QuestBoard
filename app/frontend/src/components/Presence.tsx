@@ -20,6 +20,7 @@ import {
 } from '../atoms/notificationsAtom'
 import { myRoomWebsocketAtom } from '../atoms/myRoomWebsocketAtom'
 import { trimAddress } from '../utils/trimAddress'
+import { blockedAddressesAtom } from '../atoms/blockedAddressesAtom'
 
 // todo: https://www.youtube.com/watch?v=Bm0JjR4kP8w
 // https://chatgpt.com/c/969d9a40-6af0-4c7e-bbcf-1734d1fbbba9
@@ -38,6 +39,10 @@ type ServerMessage =
       type: 'delete_notification'
       notificationId: string
     }
+  | {
+      type: 'blocklist'
+      list: string[]
+    }
 
 const PresenceInner: FC<{
   details: UserDetails
@@ -51,6 +56,7 @@ const PresenceInner: FC<{
   const setPresence = useSetAtom(presenceRawAtom)
   const setNotifs = useSetAtom(notificationsAtom)
   const setRoom = useSetAtom(myRoomWebsocketAtom)
+  const setBlockList = useSetAtom(blockedAddressesAtom)
 
   // move this to service worker
   const ws = usePartySocket({
@@ -114,6 +120,9 @@ const PresenceInner: FC<{
             setNotifs((prev) =>
               prev.filter((n) => n.id !== partykitMessage.notificationId)
             )
+            break
+          case 'blocklist':
+            setBlockList(partykitMessage.list)
             break
         }
       }

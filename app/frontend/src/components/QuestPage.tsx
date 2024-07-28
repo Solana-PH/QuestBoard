@@ -22,6 +22,7 @@ import { PageScroller } from './PageScroller'
 import { NumberInput } from './NumberInput'
 import { daoBalanceAtom } from '../atoms/daoBalanceAtom'
 import { sendNotification } from '../utils/sendNotification'
+import { NotificationMessageType } from '../atoms/notificationsAtom'
 
 const QuestPageInner: FC = () => {
   const { questId } = useParams()
@@ -112,7 +113,7 @@ const QuestPageInner: FC = () => {
         wallet.publicKey.toBase58(),
         quest.account.owner.toBase58(),
         message,
-        'quest_proposal'
+        NotificationMessageType.QUEST_PROPOSAL
       )
 
       setNotifySuccess(true)

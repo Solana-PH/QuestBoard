@@ -18,6 +18,7 @@ export default class User implements ServerCommon {
   name = 'user'
   connected = false
   notifications = new Map<string, Notification>([])
+  blocklist = new Set<string>()
 
   constructor(readonly room: Party.Room) {}
 
@@ -25,6 +26,7 @@ export default class User implements ServerCommon {
     this.notifications = new Map(
       (await this.room.storage.get('notifications')) ?? []
     )
+    this.blocklist = new Set(await this.room.storage.get('blocklist'))
   }
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
@@ -36,6 +38,12 @@ export default class User implements ServerCommon {
       JSON.stringify({
         type: 'notifications',
         notifications: Array.from(this.notifications.values()),
+      })
+    )
+    this.room.broadcast(
+      JSON.stringify({
+        type: 'blocklist',
+        blocklist: Array.from(this.blocklist),
       })
     )
   }
@@ -84,6 +92,14 @@ export default class User implements ServerCommon {
       const visitorNotifAddress =
         req.headers.get('X-Visitor-Notif-Address') ?? ''
       const messageType = req.headers.get('X-Message-Type') ?? ''
+
+      // reject blocked users
+      if (this.blocklist.has(visitorAddress)) {
+        return new Response('User is blocked', {
+          status: 403,
+          headers: commonHeaders,
+        })
+      }
 
       if (visitorAddress && visitorNotifAddress && messageType) {
         // notification message
@@ -161,6 +177,26 @@ export default class User implements ServerCommon {
           })
         )
         await this.room.storage.put(`notifications`, [])
+        break
+      case 'block_user':
+        this.blocklist.add(message.address)
+        this.room.broadcast(
+          JSON.stringify({
+            type: 'blocklist',
+            blocklist: Array.from(this.blocklist),
+          })
+        )
+        await this.room.storage.put(`blocklist`, Array.from(this.blocklist))
+        break
+      case 'unblock_user':
+        this.blocklist.delete(message.address)
+        this.room.broadcast(
+          JSON.stringify({
+            type: 'blocklist',
+            blocklist: Array.from(this.blocklist),
+          })
+        )
+        await this.room.storage.put(`blocklist`, Array.from(this.blocklist))
         break
     }
 
