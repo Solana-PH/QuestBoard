@@ -12,6 +12,7 @@ export type NotificationMessage = {
   content: string
   minStake: number
   serializedTx?: string
+  cancelId?: string
 }
 
 export interface Notification {

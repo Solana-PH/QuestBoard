@@ -23,6 +23,7 @@ import { programAtom } from '../atoms/programAtom'
 import { BN } from '@coral-xyz/anchor'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import bs58 from 'bs58'
+import CooldownTimer from './CooldownTimer'
 
 dayjs.extend(relativeTime)
 
@@ -87,27 +88,23 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
 }) => {
   const wallet = useUserWallet()
   const program = useAtomValue(programAtom)
-  const [message, setMessage] = useState<string | null>(null)
+  const [messageDetails, setMessage] = useState<NotificationMessage | null>(
+    null
+  )
   const [decryptionError, setDecryptionError] = useState<string | null>(null)
   const isVisitorOnline = useAtomValue(
     userConnectionStatusAtom(notification.visitorAddress)
   )
-  const messageDetails = useMemo(() => {
-    if (!message) return null
-    try {
-      return JSON.parse(message) as NotificationMessage
-    } catch (e) {
-      return null
-    }
-  }, [message, notification.messageType])
   const questDetails = useAtomValue(questAtom(messageDetails?.quest ?? ''))
   const ws = useAtomValue(myRoomWebsocketAtom)
   const [busy, setBusy] = useState(false)
   const since = dayjs(notification.timestamp).fromNow()
+  const [cooldown, setCooldown] = useState<number | null>(null)
 
   useEffect(() => {
     if (!wallet?.publicKey) return
     if (!notification.message) return
+    if (!ws) return
 
     const keypair = getSessionKeypair(wallet.publicKey.toBase58())
 
@@ -121,13 +118,39 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
         return decryptMessage(notification.message, secret)
       })
       .then((decryptedMessage) => {
-        setMessage(decryptedMessage)
+        let message = null
+        try {
+          message = JSON.parse(decryptedMessage)
+        } catch (e) {
+          console.error(e)
+        }
+
+        if (
+          notification.messageType === NotificationMessageType.QUEST_CANCELED &&
+          message.cancelId
+        ) {
+          // cancel the notification
+          ws?.send(
+            JSON.stringify({
+              type: 'delete_notification',
+              id: message.cancelId,
+            })
+          )
+        }
+
+        setMessage(message)
       })
       .catch((e) => {
         console.error(e)
         setDecryptionError('Unable to decrypt message.')
       })
-  }, [wallet, notification.message, notification.visitorNotifAddress])
+  }, [
+    wallet,
+    ws,
+    notification.message,
+    notification.messageType,
+    notification.visitorNotifAddress,
+  ])
 
   const onDelete = () => {
     if (!ws) return
@@ -173,6 +196,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
     if (!wallet?.signTransaction) return
     if (!messageDetails) return
 
+    setBusy(true)
+
     const stakeAmount = new BN(messageDetails.minStake * 10 ** 9)
     const messageString = JSON.stringify(messageDetails)
     const offereeProposalHash = Array.from(
@@ -214,10 +239,14 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       notification.visitorAddress,
       JSON.stringify({
         ...messageDetails,
+        cancelId: notification.id,
         serializedTx,
       } as NotificationMessage),
       NotificationMessageType.QUEST_ACCEPTED
     )
+
+    setBusy(false)
+    setCooldown(Date.now() + 60000)
   }
 
   const onSign = async () => {
@@ -226,6 +255,14 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
     if (!wallet?.publicKey) return
     if (!wallet?.signTransaction) return
     if (!messageDetails?.serializedTx) return
+
+    if (notification.timestamp + 60000 < Date.now()) {
+      alert(
+        'Transaction is already expired. Please wait for the Quest owner to submit a new one.'
+      )
+      onDelete()
+      return
+    }
 
     setBusy(true)
 
@@ -257,6 +294,34 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       )
     } catch (e) {
       console.log(e)
+      setBusy(false)
+    }
+  }
+
+  const onCancel = async () => {
+    if (!wallet?.publicKey) return
+    if (!notification.visitorAddress) return
+    if (!messageDetails?.cancelId) return
+    setBusy(true)
+
+    try {
+      const message = JSON.stringify(messageDetails)
+
+      await sendNotification(
+        wallet.publicKey.toBase58(),
+        notification.visitorAddress,
+        message,
+        NotificationMessageType.QUEST_CANCELED
+      )
+
+      ws?.send(
+        JSON.stringify({
+          type: 'delete_notification',
+          id: notification.id,
+        })
+      )
+    } catch (e) {
+      console.error(e)
       setBusy(false)
     }
   }
@@ -299,12 +364,18 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
             NotificationMessageType.QUEST_REJECTED && (
             <div>Your offer has been declined.</div>
           )}
+          {notification.messageType ===
+            NotificationMessageType.QUEST_CANCELED && (
+            <div>The offer has been canceled.</div>
+          )}
           <div
             className={cn(
               (notification.messageType ===
                 NotificationMessageType.QUEST_ACCEPTED ||
                 notification.messageType ===
-                  NotificationMessageType.QUEST_REJECTED) &&
+                  NotificationMessageType.QUEST_REJECTED ||
+                notification.messageType ===
+                  NotificationMessageType.QUEST_CANCELED) &&
                 'px-3 py-2 bg-black/5',
               'flex flex-col gap-3 '
             )}
@@ -346,15 +417,15 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           <div
             className={cn(
               'flex-1',
-              isVisitorOnline && 'bg-green-800/50 text-white'
+              isVisitorOnline && !cooldown && 'bg-green-800/50 text-white'
             )}
           >
             <button
               type='submit'
               onClick={onApprove}
-              disabled={busy || !isVisitorOnline}
+              disabled={busy || !isVisitorOnline || cooldown !== null}
               className={cn(
-                busy || !isVisitorOnline
+                busy || !isVisitorOnline || cooldown !== null
                   ? 'opacity-50 pointer-events-none cursor-wait'
                   : 'cursor-pointer',
                 'w-full px-3 py-2 flex items-center justify-center gap-3',
@@ -366,6 +437,13 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
                 <span>{busy ? 'Waiting' : 'Approve'}</span>
               ) : (
                 <span>Offline</span>
+              )}
+              {!!cooldown && (
+                <CooldownTimer
+                  dateTo={cooldown}
+                  format='[(]s[)]'
+                  trigger={() => setCooldown(null)}
+                />
               )}
             </button>
           </div>
@@ -410,7 +488,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           <div className='bg-red-800/50 text-white flex-1'>
             <button
               type='submit'
-              onClick={() => {}}
+              onClick={onCancel}
               disabled={busy}
               className={cn(
                 busy
