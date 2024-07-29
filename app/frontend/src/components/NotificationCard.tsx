@@ -10,12 +10,12 @@ import { useUserWallet } from '../atoms/userWalletAtom'
 import { trimAddress } from '../utils/trimAddress'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
 import cn from 'classnames'
 import { Signature, TrashSimple, Warning, X } from '@phosphor-icons/react'
 import { questAtom } from '../atoms/questsAtom'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { formatNumber } from '../utils/formatNumber'
 import { myRoomWebsocketAtom } from '../atoms/myRoomWebsocketAtom'
 import { sendNotification } from '../utils/sendNotification'
@@ -24,6 +24,7 @@ import { BN } from '@coral-xyz/anchor'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import bs58 from 'bs58'
 import CooldownTimer from './CooldownTimer'
+import { questsListTabAtom } from '../atoms/questsListTabAtom'
 
 dayjs.extend(relativeTime)
 
@@ -102,6 +103,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
   const [busy, setBusy] = useState(false)
   const since = dayjs(notification.timestamp).fromNow()
   const [cooldown, setCooldown] = useState<number | null>(null)
+  const setTab = useSetAtom(questsListTabAtom)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!wallet?.publicKey) return
@@ -144,12 +147,16 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
             notification.messageType === NotificationMessageType.QUEST_SETTLED
           ) {
             // todo: forward to Quest chat
+            setTab('ongoing')
+
             ws?.send(
               JSON.stringify({
                 type: 'delete_notification',
                 id: notification.id,
               })
             )
+
+            navigate(`/quest/${message.quest}/chat`)
           }
         }
 
@@ -165,6 +172,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
     notification.message,
     notification.messageType,
     notification.visitorNotifAddress,
+    navigate,
+    setTab,
   ])
 
   const onDelete = () => {
@@ -316,6 +325,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       )
 
       // todo: forward to Quest chat
+      setTab('ongoing')
 
       ws?.send(
         JSON.stringify({
@@ -323,6 +333,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           id: notification.id,
         })
       )
+
+      navigate(`/quest/${messageDetails.quest}/chat`)
     } catch (e) {
       console.log(e)
       setBusy(false)

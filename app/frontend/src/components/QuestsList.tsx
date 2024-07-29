@@ -4,7 +4,7 @@ import { questsAtom } from '../atoms/questsAtom'
 import { QuestCard } from './QuestCard'
 import cn from 'classnames'
 
-export const QuestList: FC = () => {
+export const QuestsList: FC = () => {
   const list = useAtomValue(questsAtom)
 
   return (

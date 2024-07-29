@@ -224,14 +224,22 @@ const QuestPageInner: FC = () => {
               </>
             ) : (
               <>
-                <div className='flex flex-col gap-2 col-span-2 text-red-500'>
-                  <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
-                    Warning
-                  </span>
-                  <span className='font-bold text-sm'>
-                    Owner did not stake any DAO Tokens. Proceed with caution.
-                  </span>
-                </div>
+                {owner ? (
+                  <div className='flex flex-col gap-2 col-span-2 text-red-500'>
+                    <span className='font-bold text-sm'>
+                      You did not staked any DAO tokens for this Quest.
+                    </span>
+                  </div>
+                ) : (
+                  <div className='flex flex-col gap-2 col-span-2 text-red-500'>
+                    <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
+                      Warning
+                    </span>
+                    <span className='font-bold text-sm'>
+                      Owner did not stake any DAO Tokens. Proceed with caution.
+                    </span>
+                  </div>
+                )}
               </>
             )}
             {minStakeValue > 0 && (
@@ -248,133 +256,137 @@ const QuestPageInner: FC = () => {
         </div>
         <div className='border-b border-dashed border-black/25' />
       </div>
-      <div className='flex-none px-5 pb-5 gap-5 flex flex-col'>
-        {owner ? (
-          <div className='bg-black/50 text-white'>
-            <button
-              disabled={busy}
-              onClick={onClose}
-              className={cn(
-                busy
-                  ? 'opacity-50 pointer-events-none cursor-wait'
-                  : 'cursor-pointer',
-                'w-full px-3 py-2 flex items-center justify-center gap-3',
-                'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
-              )}
-            >
-              <Trash size={32} />
-              <span>{busy ? 'Please Wait' : 'Close Quest'}</span>
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className='flex flex-col gap-1'>
-              <label
-                htmlFor='proposal'
-                className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
-              >
-                <span className='opacity-75'>Make an Offer</span>
-                {proposal.length > 210 && (
-                  <span
-                    className={cn(proposal.length === 320 && 'text-red-500')}
-                  >
-                    {proposal.length}/320
-                  </span>
+      {quest.account.status === 1 && (
+        <div className='flex-none px-5 pb-5 gap-5 flex flex-col'>
+          {owner ? (
+            <div className='bg-black/50 text-white'>
+              <button
+                disabled={busy}
+                onClick={onClose}
+                className={cn(
+                  busy
+                    ? 'opacity-50 pointer-events-none cursor-wait'
+                    : 'cursor-pointer',
+                  'w-full px-3 py-2 flex items-center justify-center gap-3',
+                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
                 )}
-              </label>
-              <textarea
-                id='proposal'
-                placeholder='Provide an offer to the owner. Make it concise and convincing.'
-                className='w-full bg-black/5 px-3 py-2'
-                value={proposal}
-                onChange={(e) => setProposal(e.target.value.substring(0, 320))}
-              />
+              >
+                <Trash size={32} />
+                <span>{busy ? 'Please Wait' : 'Close Quest'}</span>
+              </button>
             </div>
-            {(daoBalance ?? 0) > 0 && stakedValue > 0 && (
+          ) : (
+            <>
               <div className='flex flex-col gap-1'>
                 <label
-                  htmlFor='minstake'
+                  htmlFor='proposal'
                   className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
                 >
-                  <span className='opacity-75'>Stake</span>
+                  <span className='opacity-75'>Make an Offer</span>
+                  {proposal.length > 210 && (
+                    <span
+                      className={cn(proposal.length === 320 && 'text-red-500')}
+                    >
+                      {proposal.length}/320
+                    </span>
+                  )}
                 </label>
-                <NumberInput
-                  disabled={stakedValue === minStakeValue}
-                  type='text'
-                  id='minstake'
-                  placeholder='Required stake amount for this Quest.'
+                <textarea
+                  id='proposal'
+                  placeholder='Provide an offer to the owner. Make it concise and convincing.'
                   className='w-full bg-black/5 px-3 py-2'
-                  value={minStake}
-                  min={minStakeValue}
-                  max={maxStakeValue}
-                  onChange={setMinStake}
-                  onBlur={(minStake) => {
-                    const minStakeNum = parseNumber(minStake, 0)
-                    formatNumber(Math.max(minStakeValue, minStakeNum) + '')
-                  }}
+                  value={proposal}
+                  onChange={(e) =>
+                    setProposal(e.target.value.substring(0, 320))
+                  }
                 />
               </div>
-            )}
-            {notifySuccess ? (
-              <div>
-                <button
-                  disabled
-                  className={cn(
-                    'bg-amber-300/10',
-                    'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
+              {(daoBalance ?? 0) > 0 && stakedValue > 0 && (
+                <div className='flex flex-col gap-1'>
+                  <label
+                    htmlFor='minstake'
+                    className='text-xs uppercase tracking-wider font-bold flex items-center justify-between'
+                  >
+                    <span className='opacity-75'>Stake</span>
+                  </label>
+                  <NumberInput
+                    disabled={stakedValue === minStakeValue}
+                    type='text'
+                    id='minstake'
+                    placeholder='Required stake amount for this Quest.'
+                    className='w-full bg-black/5 px-3 py-2'
+                    value={minStake}
+                    min={minStakeValue}
+                    max={maxStakeValue}
+                    onChange={setMinStake}
+                    onBlur={(minStake) => {
+                      const minStakeNum = parseNumber(minStake, 0)
+                      formatNumber(Math.max(minStakeValue, minStakeNum) + '')
+                    }}
+                  />
+                </div>
+              )}
+              {notifySuccess ? (
+                <div>
+                  <button
+                    disabled
+                    className={cn(
+                      'bg-amber-300/10',
+                      'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
+                    )}
+                  >
+                    <ThumbsUp size={32} />
+                    <span>Owner is notified</span>
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {daoDiff >= 0 ? (
+                    <div className={cn('bg-black/50 text-white')}>
+                      <button
+                        disabled={busy}
+                        onClick={onSendNotification}
+                        className={cn(
+                          busy
+                            ? 'opacity-50 pointer-events-none cursor-wait'
+                            : 'cursor-pointer',
+                          'w-full px-3 py-2 flex items-center justify-center gap-3',
+                          'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                        )}
+                      >
+                        {connectionStatus ? (
+                          <>
+                            <Handshake size={32} />
+                            <span>{busy ? 'Please Wait' : 'Accept Quest'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <PaperPlaneTilt size={32} />
+                            <span>Notify Owner</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <button
+                        disabled
+                        className={cn(
+                          'bg-amber-300/10',
+                          'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
+                        )}
+                      >
+                        <HandPalm size={32} />
+                        <span>Insufficient DAO Tokens</span>
+                      </button>
+                    </div>
                   )}
-                >
-                  <ThumbsUp size={32} />
-                  <span>Owner is notified</span>
-                </button>
-              </div>
-            ) : (
-              <>
-                {daoDiff >= 0 ? (
-                  <div className={cn('bg-black/50 text-white')}>
-                    <button
-                      disabled={busy}
-                      onClick={onSendNotification}
-                      className={cn(
-                        busy
-                          ? 'opacity-50 pointer-events-none cursor-wait'
-                          : 'cursor-pointer',
-                        'w-full px-3 py-2 flex items-center justify-center gap-3',
-                        'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
-                      )}
-                    >
-                      {connectionStatus ? (
-                        <>
-                          <Handshake size={32} />
-                          <span>{busy ? 'Please Wait' : 'Accept Quest'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <PaperPlaneTilt size={32} />
-                          <span>Notify Owner</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  <div>
-                    <button
-                      disabled
-                      className={cn(
-                        'bg-amber-300/10',
-                        'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
-                      )}
-                    >
-                      <HandPalm size={32} />
-                      <span>Insufficient DAO Tokens</span>
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        )}
-      </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </>
   )
 }

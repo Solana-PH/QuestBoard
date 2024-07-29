@@ -10,10 +10,12 @@ import { Link } from 'react-router-dom'
 import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
 import { trimAddress } from '../utils/trimAddress'
 import { searchAtom } from '../atoms/searchAtom'
+import { useUserWallet } from '../atoms/userWalletAtom'
 
 export const QuestCard: FC<
   ProgramAccount<IdlAccounts<QuestBoard>['quest']>
 > = ({ account, publicKey }) => {
+  const wallet = useUserWallet()
   const id = account.id.toBase58()
   const hash = bs58.encode(account.detailsHash)
   const details = useAtomValue(questDetailsAtom(id + '_' + hash))
@@ -37,6 +39,8 @@ export const QuestCard: FC<
 
   const staked = account.staked.toNumber() / 10 ** 9
   const minStakeRequired = account.minStakeRequired.toNumber() / 10 ** 9
+
+  const questOwner = wallet?.publicKey && account.owner.equals(wallet.publicKey)
 
   return (
     <Link
@@ -67,8 +71,12 @@ export const QuestCard: FC<
         <div className='flex items-center gap-2'>
           <span>Owner: </span>
           <span className='font-bold flex items-center gap-2'>
-            <span>{trimAddress(account.owner.toBase58())}</span>
-            {connectionStatus && (
+            <span>
+              {questOwner
+                ? 'You own this Quest'
+                : trimAddress(account.owner.toBase58())}
+            </span>
+            {connectionStatus && !questOwner && (
               <span
                 className={cn('rounded-full w-2 h-2 flex-none', 'bg-green-500')}
               />
