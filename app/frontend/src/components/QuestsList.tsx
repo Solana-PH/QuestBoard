@@ -1,11 +1,11 @@
 import { useAtomValue } from 'jotai'
 import { FC, Suspense } from 'react'
-import { questsAtom } from '../atoms/questsAtom'
+import { sortedQuestsAtom } from '../atoms/questsAtom'
 import { QuestCard } from './QuestCard'
 import cn from 'classnames'
 
 export const QuestsList: FC = () => {
-  const list = useAtomValue(questsAtom)
+  const list = useAtomValue(sortedQuestsAtom)
 
   return (
     <>

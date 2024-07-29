@@ -18,8 +18,6 @@ export const questsAtom = atom(async (get) => {
 
   if (counter.postsOpen.toNumber() === 0) return []
 
-  const presence = get(presenceRawAtom)
-
   // fetch all open Quests
   const result = await program.account.quest.all([
     {
@@ -30,33 +28,16 @@ export const questsAtom = atom(async (get) => {
     },
   ])
 
+  return result ?? []
+})
+
+export const sortedQuestsAtom = atom(async (get) => {
+  const presence = get(presenceRawAtom)
+  const result = await get(questsAtom)
   result.sort(sortFn(presence))
 
   return result ?? []
 })
-
-export const questAtom = atomFamily((questPda: string) =>
-  atom(async (get) => {
-    if (questPda === '') return null
-
-    const program = get(programAtom)
-    if (!program) return null
-
-    const result = await program.account.quest.fetch(new PublicKey(questPda))
-    if (!result) return null
-
-    const details = await get(
-      questDetailsAtom(
-        result.id.toBase58() + '_' + bs58.encode(result.detailsHash)
-      )
-    )
-
-    return {
-      account: result,
-      details,
-    }
-  })
-)
 
 export const myOngoingQuestsAtom = atom(async (get) => {
   const program = get(programAtom)
@@ -67,7 +48,6 @@ export const myOngoingQuestsAtom = atom(async (get) => {
 
   if (counter.postsTaken.toNumber() === 0) return []
 
-  const presence = get(presenceRawAtom)
   const myAddress = program.provider.publicKey.toBase58()
 
   const [myTakenQuests, myAcceptedQuests] = await Promise.all([
@@ -102,13 +82,41 @@ export const myOngoingQuestsAtom = atom(async (get) => {
       },
     ]),
   ])
-
   const result = [...myTakenQuests, ...myAcceptedQuests]
 
+  return result ?? []
+})
+
+export const mySortedOnGoingQuestsAtom = atom(async (get) => {
+  const presence = get(presenceRawAtom)
+  const result = await get(myOngoingQuestsAtom)
   result.sort(sortFn(presence))
 
   return result ?? []
 })
+
+export const questAtom = atomFamily((questPda: string) =>
+  atom(async (get) => {
+    if (questPda === '') return null
+
+    const program = get(programAtom)
+    if (!program) return null
+
+    const result = await program.account.quest.fetch(new PublicKey(questPda))
+    if (!result) return null
+
+    const details = await get(
+      questDetailsAtom(
+        result.id.toBase58() + '_' + bs58.encode(result.detailsHash)
+      )
+    )
+
+    return {
+      account: result,
+      details,
+    }
+  })
+)
 
 type QuestAccount = ProgramAccount<IdlAccounts<QuestBoard>['quest']>
 
