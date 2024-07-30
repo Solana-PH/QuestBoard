@@ -1,6 +1,12 @@
 import cn from 'classnames'
-import { FC, Suspense, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { FC, Suspense, useEffect, useMemo, useState } from 'react'
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom'
 import {
   HandPalm,
   Handshake,
@@ -16,9 +22,7 @@ import { useUserWallet } from '../atoms/userWalletAtom'
 import { programAtom } from '../atoms/programAtom'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { userConnectionStatusAtom } from '../atoms/userConnectionStatusAtom'
-import { PageBackdrop } from './PageBackdrop'
 import { PagePanel } from './PagePanel'
-import { PageScroller } from './PageScroller'
 import { NumberInput } from './NumberInput'
 import { daoBalanceAtom } from '../atoms/daoBalanceAtom'
 import { sendNotification } from '../utils/sendNotification'
@@ -45,11 +49,29 @@ const QuestPageInner: FC = () => {
   const [minStake, setMinStake] = useState(formatNumber(minStakeValue + ''))
   const daoBalance = useAtomValue(daoBalanceAtom)
   const [notifySuccess, setNotifySuccess] = useState(false)
+  const location = useLocation()
 
   const daoDiff = useMemo(
     () => (daoBalance ?? 0) / 10 ** 9 - parseNumber(minStake, 0),
     [daoBalance, minStake]
   )
+
+  useEffect(() => {
+    if (!quest) return
+    if (!wallet?.publicKey) return
+
+    if (
+      !window.location.pathname.includes('/chat') &&
+      quest.account.status === 3
+    ) {
+      if (
+        quest.account.owner.equals(wallet.publicKey) ||
+        quest.account.offeree?.equals(wallet.publicKey)
+      ) {
+        navigate('chat')
+      }
+    }
+  }, [quest, navigate])
 
   const onClose = async () => {
     if (!program?.provider.sendAndConfirm) return
@@ -137,9 +159,11 @@ const QuestPageInner: FC = () => {
             <span className='font-bold flex-auto break-words'>
               {quest.details.title}
             </span>
-            <Link to='/'>
-              <X size={24} />
-            </Link>
+            {!location.pathname.includes('chat') && (
+              <Link to='/'>
+                <X size={24} />
+              </Link>
+            )}
           </h2>
           <p className='text-sm font-bold uppercase tracking-wider opacity-80'>
             Reward: {quest.details.reward}
@@ -394,31 +418,30 @@ const QuestPageInner: FC = () => {
 export const QuestPage: FC = () => {
   return (
     <>
-      <PageBackdrop />
-      <PageScroller>
-        <PagePanel>
-          <Suspense
-            fallback={
-              <div className='flex flex-col gap-5 flex-auto p-5'>
-                <div className='flex flex-col gap-2'>
-                  <h2 className='h-10 w-64 bg-amber-950/50 animate-pulse rounded' />
-                  <h2 className='h-5 w-56 bg-amber-950/50 animate-pulse rounded' />
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <div className='h-6 w-72 bg-amber-950/50 animate-pulse rounded' />
-                  <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <div className='h-6 w-36 bg-amber-950/50 animate-pulse rounded' />
-                  <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
-                </div>
+      <PagePanel>
+        <Suspense
+          fallback={
+            <div className='flex flex-col gap-5 flex-auto p-5'>
+              <div className='flex flex-col gap-2'>
+                <h2 className='h-10 w-64 bg-amber-950/50 animate-pulse rounded' />
+                <h2 className='h-5 w-56 bg-amber-950/50 animate-pulse rounded' />
               </div>
-            }
-          >
-            <QuestPageInner />
-          </Suspense>
-        </PagePanel>
-      </PageScroller>
+              <div className='flex flex-col gap-2'>
+                <div className='h-6 w-72 bg-amber-950/50 animate-pulse rounded' />
+                <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+              </div>
+              <div className='flex flex-col gap-2'>
+                <div className='h-6 w-36 bg-amber-950/50 animate-pulse rounded' />
+                <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+              </div>
+            </div>
+          }
+        >
+          <QuestPageInner />
+        </Suspense>
+      </PagePanel>
+
+      <Outlet />
     </>
   )
 }

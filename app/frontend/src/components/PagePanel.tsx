@@ -8,14 +8,14 @@ export const PagePanel: FC<{ children: ReactNode; className?: string }> = ({
   return (
     <div
       className={cn(
-        'animate-slideIn overflow-hidden',
-        'flex justify-end w-full pointer-events-auto',
-        className ?? 'max-w-md'
+        'overflow-hidden flex-none',
+        'flex justify-end pointer-events-auto'
       )}
     >
       <div
         className={cn(
-          'flex flex-col w-full',
+          className ?? 'md:w-[28rem]',
+          'flex flex-col w-screen ',
           'border border-amber-300',
           'h-full bg-stone-200 text-amber-950 overflow-x-hidden overflow-y-auto'
         )}

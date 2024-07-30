@@ -1,18 +1,47 @@
 import cn from 'classnames'
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode, useEffect, useRef } from 'react'
+import { PageBackdrop } from './PageBackdrop'
+import { useLocation } from 'react-router-dom'
 
 export const PageScroller: FC<{ children: ReactNode }> = ({ children }) => {
   // todo: automatically scroll to the right when navigation changes
+  const containerRef = useRef<HTMLDivElement>(null)
+  const location = useLocation()
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    containerRef.current.scrollTo({
+      left: 0,
+      behavior: 'smooth',
+    })
+  }, [location])
+
   return (
-    <div
-      className={cn(
-        'absolute inset-0 pointer-events-none',
-        'flex justify-end',
-        'overflow-x-scroll portrait:overflow-x-hidden md:overflow-x-hidden overflow-y-hidden',
-        'gap-0 p-0 md:gap-3 md:p-3 lg:gap-5 lg:p-5 pl-0'
-      )}
-    >
-      {children}
+    <div className={cn('absolute inset-0 w-full h-full')}>
+      <PageBackdrop />
+      <div
+        ref={containerRef}
+        className={cn(
+          'flex h-full',
+          'flex-row-reverse',
+          'overflow-hidden md:overflow-x-scroll'
+        )}
+      >
+        <div
+          className={cn(
+            'animate-slideIn',
+            'md:px-2 md:pt-2 md:gap-2',
+            'relative flex',
+            'flex-none h-full'
+          )}
+        >
+          {children}
+        </div>
+      </div>
     </div>
   )
+}
+
+{
+  /* <div className='flex justify-end absolute inset-0 pointer-events-none'></div> */
 }

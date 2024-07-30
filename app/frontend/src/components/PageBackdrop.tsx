@@ -7,7 +7,7 @@ export const PageBackdrop: FC = () => {
     <Link to='/'>
       <div
         className={cn(
-          'absolute inset-0 animate-fadeInNoDelay overflow-hidden',
+          'absolute inset-0 animate-fadeInNoDelay overflow-hidden pointer-events-auto',
           'backdrop-grayscale backdrop-opacity-80 bg-black/50'
         )}
       />

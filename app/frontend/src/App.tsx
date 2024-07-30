@@ -70,6 +70,7 @@ function App() {
             )}
           </div>
         </ScrollableContent>
+
         <Outlet />
       </div>
       <ActionBar />

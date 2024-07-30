@@ -15,6 +15,7 @@ import { Presence } from './components/Presence.tsx'
 import { NotificationPage } from './components/NotificationPage.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
 import { ChatPage } from './components/ChatPage.tsx'
+import { PageScroller } from './components/PageScroller.tsx'
 
 const SplashScreen = () => {
   const { connected } = useWallet()
@@ -31,10 +32,24 @@ const SplashScreen = () => {
       <CounterListener />
       <Routes>
         <Route path='/' element={<App />}>
-          <Route path='quest/:questId' element={<QuestPage />}>
+          <Route
+            path='quest/:questId'
+            element={
+              <PageScroller>
+                <QuestPage />
+              </PageScroller>
+            }
+          >
             <Route path='chat' element={<ChatPage />} />
           </Route>
-          <Route path='notifications' element={<NotificationPage />} />
+          <Route
+            path='notifications'
+            element={
+              <PageScroller>
+                <NotificationPage />
+              </PageScroller>
+            }
+          />
         </Route>
       </Routes>
     </Router>

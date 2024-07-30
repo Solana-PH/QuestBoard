@@ -153,7 +153,6 @@ const PresenceInner: FC<{
 
     onMessage(e) {
       const connections = (JSON.parse(e.data) ?? []).sort()
-      console.log(connections)
       setPresence(JSON.stringify(connections))
     },
 
