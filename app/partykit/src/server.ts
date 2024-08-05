@@ -8,6 +8,7 @@ import QuestInfo from './servers/QuestInfo'
 import UserInfo from './servers/UserInfo'
 import User from './servers/User'
 import Presence from './servers/Presence'
+import Quest from './servers/Quest'
 
 export default class Server implements Party.Server {
   readonly server: ServerCommon
@@ -27,6 +28,9 @@ export default class Server implements Party.Server {
         break
       case 'questinfo':
         this.server = new QuestInfo(room)
+        break
+      case 'quest':
+        this.server = new Quest(room)
         break
       case 'userinfo':
         this.server = new UserInfo(room)
@@ -143,6 +147,8 @@ export default class Server implements Party.Server {
         return Chat.onBeforeRequest(req, lobby, ctx)
       case 'questinfo':
         return QuestInfo.onBeforeRequest(req, lobby, ctx)
+      case 'quest':
+        return Quest.onBeforeRequest(req, lobby, ctx)
       case 'userinfo':
         return UserInfo.onBeforeRequest(req, lobby, ctx)
       case 'presence':
@@ -167,6 +173,8 @@ export default class Server implements Party.Server {
         return Chat.onBeforeConnect(req, lobby, ctx)
       case 'questinfo':
         return QuestInfo.onBeforeConnect(req, lobby, ctx)
+      case 'quest':
+        return Quest.onBeforeConnect(req, lobby, ctx)
       case 'userinfo':
         return UserInfo.onBeforeConnect(req, lobby, ctx)
       case 'presence':

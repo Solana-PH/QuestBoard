@@ -11,7 +11,7 @@ export const PageScroller: FC<{ children: ReactNode }> = ({ children }) => {
   useEffect(() => {
     if (!containerRef.current) return
     containerRef.current.scrollTo({
-      left: 0,
+      left: containerRef.current.scrollWidth,
       behavior: 'smooth',
     })
   }, [location])

@@ -35,7 +35,7 @@ const SplashScreen = () => {
           <Route
             path='quest/:questId'
             element={
-              <PageScroller>
+              <PageScroller key={'quest'}>
                 <QuestPage />
               </PageScroller>
             }
@@ -45,7 +45,7 @@ const SplashScreen = () => {
           <Route
             path='notifications'
             element={
-              <PageScroller>
+              <PageScroller key={'notif'}>
                 <NotificationPage />
               </PageScroller>
             }
