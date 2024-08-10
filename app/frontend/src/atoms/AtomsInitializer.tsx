@@ -1,7 +1,53 @@
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useSetAtom } from 'jotai'
-import { FC, ReactNode, useEffect, useRef } from 'react'
-import { userWalletAtom } from './userWalletAtom'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { FC, ReactNode, Suspense, useEffect, useRef } from 'react'
+import { userWalletAtom, useUserWallet } from './userWalletAtom'
+import { idbAtom, QuestBoardIDBSchema } from './idbAtom'
+import { rpcEndpointAtom } from './rpcEndpointAtom'
+import { openDB } from 'idb'
+
+export const IdbInitializer: FC<{ children: ReactNode }> = ({ children }) => {
+  const rpcEndpoint = useAtomValue(rpcEndpointAtom)
+  const wallet = useUserWallet()
+  const setIdb = useSetAtom(idbAtom)
+
+  useEffect(() => {
+    if (indexedDB && rpcEndpoint && wallet?.publicKey) {
+      const initDb = async () => {
+        if (!rpcEndpoint) return
+        if (!wallet?.publicKey) return
+
+        const idb = await openDB<QuestBoardIDBSchema>(
+          `questboard_${rpcEndpoint}_${wallet.publicKey.toBase58()}`,
+          1,
+          {
+            upgrade(db, oldVersion) {
+              switch (oldVersion) {
+                case 0:
+                case 1: {
+                  db.createObjectStore('proposal_hash')
+                  db.createObjectStore('files', {
+                    keyPath: 'id',
+                  })
+                  // createIndex('questId', 'questId', { unique: false })
+                  db.createObjectStore('quest', {
+                    keyPath: 'id',
+                  })
+                }
+              }
+            },
+          }
+        )
+
+        setIdb(idb)
+      }
+
+      void initDb()
+    }
+  }, [setIdb, rpcEndpoint])
+
+  return children
+}
 
 export const AtomsInitializer: FC<{ children: ReactNode }> = ({ children }) => {
   const walletContextStateSerialized = useRef('')
@@ -24,5 +70,9 @@ export const AtomsInitializer: FC<{ children: ReactNode }> = ({ children }) => {
     }
   }, [walletContextState, setUserWalletContextState])
 
-  return children
+  return (
+    <Suspense fallback={null}>
+      <IdbInitializer>{children}</IdbInitializer>
+    </Suspense>
+  )
 }

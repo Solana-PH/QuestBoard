@@ -25,6 +25,7 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import bs58 from 'bs58'
 import CooldownTimer from './CooldownTimer'
 import { questsListTabAtom } from '../atoms/questsListTabAtom'
+import { idbAtom } from '../atoms/idbAtom'
 
 dayjs.extend(relativeTime)
 
@@ -105,6 +106,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
   const [cooldown, setCooldown] = useState<number | null>(null)
   const setTab = useSetAtom(questsListTabAtom)
   const navigate = useNavigate()
+  const idb = useAtomValue(idbAtom)
 
   useEffect(() => {
     if (!wallet?.publicKey) return
@@ -146,7 +148,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           if (
             notification.messageType === NotificationMessageType.QUEST_SETTLED
           ) {
-            // todo: forward to Quest chat
+            // todo: send POST request to quest_${questId}
+
             setTab('ongoing')
 
             ws?.send(
@@ -215,6 +218,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
   }
 
   const onApprove = async () => {
+    if (!idb) return
     if (!program) return
     if (!wallet?.publicKey) return
     if (!wallet?.signTransaction) return
@@ -224,7 +228,12 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
 
     try {
       const stakeAmount = new BN(messageDetails.minStake * 10 ** 9)
-      const messageString = JSON.stringify(messageDetails)
+      // todo: replace messageString with messageDetails.content only
+      const messageString = JSON.stringify({
+        quest: messageDetails.quest,
+        content: messageDetails.content,
+        minStake: messageDetails.minStake,
+      })
       const offereeProposalHash = Array.from(
         new Uint8Array(
           await crypto.subtle.digest(
@@ -232,6 +241,12 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
             Buffer.from(messageString, 'utf-8')
           )
         )
+      )
+
+      await idb.put(
+        'proposal_hash',
+        messageString,
+        bs58.encode(offereeProposalHash)
       )
 
       const ixAcceptQuest = await program.methods
@@ -324,7 +339,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
         NotificationMessageType.QUEST_SETTLED
       )
 
-      // todo: forward to Quest chat
+      // todo: send POST request to quest_${questId}
+
       setTab('ongoing')
 
       ws?.send(

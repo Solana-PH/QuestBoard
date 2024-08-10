@@ -108,7 +108,7 @@ export default class User implements ServerCommon {
         const message = await req.text()
         const id = bs58.encode(crypto.getRandomValues(new Uint8Array(32)))
         const content: Notification = {
-          id, // predefined id in the client, also include it in the message for declineId
+          id, // todo: predefine id in the client, also include it in the message for declineId
           message,
           messageType,
           visitorAddress,

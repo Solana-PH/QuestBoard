@@ -27,6 +27,8 @@ import { NumberInput } from './NumberInput'
 import { daoBalanceAtom } from '../atoms/daoBalanceAtom'
 import { sendNotification } from '../utils/sendNotification'
 import { NotificationMessageType } from '../atoms/notificationsAtom'
+import { idbAtom } from '../atoms/idbAtom'
+import bs58 from 'bs58'
 
 const QuestPageInner: FC = () => {
   const { questId } = useParams()
@@ -50,6 +52,7 @@ const QuestPageInner: FC = () => {
   const daoBalance = useAtomValue(daoBalanceAtom)
   const [notifySuccess, setNotifySuccess] = useState(false)
   const location = useLocation()
+  const idb = useAtomValue(idbAtom)
 
   const daoDiff = useMemo(
     () => (daoBalance ?? 0) / 10 ** 9 - parseNumber(minStake, 0),
@@ -117,6 +120,7 @@ const QuestPageInner: FC = () => {
   }
 
   const onSendNotification = async () => {
+    if (!idb) return
     if (!wallet?.publicKey) return
     if (!quest) return
 
@@ -130,6 +134,14 @@ const QuestPageInner: FC = () => {
       }
 
       const message = JSON.stringify(notification)
+
+      const proposalHash = Array.from(
+        new Uint8Array(
+          await crypto.subtle.digest('SHA-256', Buffer.from(message, 'utf-8'))
+        )
+      )
+
+      await idb.put('proposal_hash', message, bs58.encode(proposalHash))
 
       await sendNotification(
         wallet.publicKey.toBase58(),

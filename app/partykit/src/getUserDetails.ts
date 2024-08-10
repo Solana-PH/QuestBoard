@@ -17,7 +17,7 @@ export const getUserDetails = async (room: Stub): Promise<UserDetails> => {
   })
 
   if (!remote.ok) {
-    throw new Error('Error fetching visitor session')
+    throw new Error('Error fetching user session')
   }
 
   return remote.json()
