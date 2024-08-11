@@ -10,21 +10,16 @@ import { getSessionKeypair } from '../utils/getSessionKeypair'
 import { getAccessToken } from '../utils/getAccessToken'
 import { useUserWallet } from '../atoms/userWalletAtom'
 import { idbAtom } from '../atoms/idbAtom'
-import { useAtomValue } from 'jotai'
-
-interface ChatMessage {
-  data: string // base 58 encoded, encrypted
-  hash: string // sha256(previous message hash + data, encrypted), backend generated
-  timestamp: number // backend generated
-  senderAddress: string // backend generated
-  signature: string // signature of the data (encrypted), using session address
-}
+import { useAtom, useAtomValue } from 'jotai'
+import { ChatMessage, questMessagesAtom } from '../atoms/questMessagesAtom'
+import { PublicKey } from '@solana/web3.js'
 
 interface ServerMessage {
   authorizedAddresses?: AuthorizedAddress[]
   messages?: ChatMessage[]
   proposal_hash?: string
   standby?: boolean
+  message?: ChatMessage
 }
 
 const ChatPageInner: FC = () => {
@@ -33,7 +28,9 @@ const ChatPageInner: FC = () => {
   const wallet = useUserWallet()
   const address = wallet?.publicKey?.toBase58() ?? ''
   const [message, setMessage] = useState('')
-  const [onStandby, setOnStandby] = useState(true)
+  const [initialized, setInitialized] = useState(false)
+  const [messages, messageAction] = useAtom(questMessagesAtom(questId ?? ''))
+  const [keypairNotFound, setKeypairNotFound] = useState(false)
 
   const ws = usePartySocket({
     host: partykitAddress,
@@ -61,7 +58,11 @@ const ChatPageInner: FC = () => {
 
       if (!serverMessage) return
 
-      if (serverMessage.authorizedAddresses && serverMessage.proposal_hash) {
+      if (
+        !initialized &&
+        serverMessage.authorizedAddresses &&
+        serverMessage.proposal_hash
+      ) {
         if (!questId) return
         if (!idb) return
 
@@ -91,11 +92,42 @@ const ChatPageInner: FC = () => {
 
         await idb.put('quest', patchedQuest)
 
-        setOnStandby(false)
+        // store the sessionKeypair used for this quest
+        const sessionKeypair = getSessionKeypair(address)
+
+        const sessionAddressUsed =
+          owner.address === address
+            ? owner.sessionAddress
+            : taker.sessionAddress
+
+        if (
+          !sessionKeypair ||
+          !sessionKeypair.publicKey.equals(new PublicKey(sessionAddressUsed))
+        ) {
+          // todo: session keypair not found
+          setKeypairNotFound(true)
+          return
+        }
+
+        setKeypairNotFound(false)
+
+        await idb.put('session_keys', {
+          id: sessionAddressUsed,
+          active: true,
+          downloaded: false,
+          keypair: sessionKeypair.secretKey,
+        })
+
+        if (serverMessage.messages) {
+          messageAction({ type: 'set', messages: serverMessage.messages })
+        }
+
+        setInitialized(true)
       }
 
-      // messages atom (getter, setter)
-      // decrypt messages
+      if (initialized && serverMessage.message) {
+        messageAction({ type: 'add', message: serverMessage.message })
+      }
     },
     onClose() {
       console.log('quest ws closed')
@@ -114,6 +146,27 @@ const ChatPageInner: FC = () => {
         className='flex-none px-5 pb-5 flex'
         onSubmit={(e) => {
           e.preventDefault()
+          if (!address) return
+          if (!idb) return
+          if (!questId) return
+          if (!message) return
+
+          messageAction({
+            type: 'encrypt',
+            message: {
+              type: 'text',
+              message,
+            },
+            callback: (clientMessage) => {
+              ws.send(
+                JSON.stringify({
+                  ...clientMessage,
+                  type: 'message',
+                })
+              )
+              setMessage('')
+            },
+          })
         }}
       >
         <input
@@ -126,7 +179,7 @@ const ChatPageInner: FC = () => {
         <div className='bg-black/50 text-white'>
           <button
             type='submit'
-            disabled={onStandby}
+            disabled={!initialized}
             className={cn(
               'cursor-pointer',
               'w-full px-3 py-2 flex items-center justify-center gap-3',
@@ -137,9 +190,16 @@ const ChatPageInner: FC = () => {
           </button>
         </div>
       </form>
-      {onStandby && (
+      {!initialized && (
         <div className='absolute inset-0 bg-white/80 flex items-center justify-center p-5 text-center'>
-          Please wait...
+          {keypairNotFound ? (
+            <div className='text-red-500'>
+              The session keypair used for this quest was not found in this
+              device.
+            </div>
+          ) : (
+            <>Please wait...</>
+          )}
         </div>
       )}
     </div>

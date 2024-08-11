@@ -23,7 +23,7 @@ export type Message =
     }
   | {
       type: 'file'
-      key: string
+      id: string
       chunkSize: number
       checksum: string
       senderAddress: string

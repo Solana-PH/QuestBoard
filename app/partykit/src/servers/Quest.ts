@@ -10,7 +10,7 @@ import { getUserDetails } from '../getUserDetails'
 
 interface AuthorizedAddress {
   address: string
-  sessionAdress: string
+  sessionAddress: string
   encryptionAddress: string
   taker?: boolean
   owner?: boolean
@@ -22,6 +22,12 @@ interface Message {
   timestamp: number // backend generated
   senderAddress: string // backend generated
   signature: string // signature of the data (encrypted), using session address
+}
+
+interface ClientMessage {
+  type: string
+  data: string
+  signature: string
 }
 
 interface ServerResponse {
@@ -49,6 +55,9 @@ export default class Quest implements ServerCommon {
   }
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
+    const address = ctx.request.headers.get('X-User-Address')
+    conn.setState({ address })
+
     if (
       this.authorizedAddresses.find((a) => a.owner) &&
       this.authorizedAddresses.find((a) => a.taker)
@@ -56,6 +65,7 @@ export default class Quest implements ServerCommon {
       const output: ServerResponse = {
         authorizedAddresses: this.authorizedAddresses,
         proposal_hash: this.quest!.offereeProposalHash,
+        messages: this.messages,
       }
       this.room.broadcast(JSON.stringify(output))
     } else {
@@ -63,10 +73,61 @@ export default class Quest implements ServerCommon {
     }
   }
 
-  async onMessage(message: string | ArrayBufferLike, sender: Party.Connection) {
+  async onMessage(
+    rawMessage: string | ArrayBufferLike,
+    sender: Party.Connection
+  ) {
+    const clientMessage = JSON.parse(rawMessage.toString()) as ClientMessage
+    const senderAddress = (sender.state as { address: string }).address
+
+    if (clientMessage.type !== 'message') {
+      switch (clientMessage.type) {
+        case 'get_messages': {
+          sender.send(JSON.stringify({ messages: this.messages }))
+          break
+        }
+      }
+      return
+    }
+
+    // verify signature
+    const signature = bs58.decode(clientMessage.signature)
+    const user = this.authorizedAddresses.find(
+      (a) => a.address === senderAddress
+    )!
+    const sessionAddress = bs58.decode(user.sessionAddress)
+    const messageData = new TextEncoder().encode(clientMessage.data)
+
+    if (!sign.detached.verify(messageData, signature, sessionAddress)) {
+      throw new Error('Invalid signature')
+    }
+
     // todo: first message hash should be the proposal hash from the quest
     // and should be sent by the taker
-    this.room.broadcast(message)
+
+    const previousHash = bs58.decode(
+      this.messages[this.messages.length - 1]?.hash ??
+        this.quest!.offereeProposalHash
+    )
+
+    const data = new Uint8Array(previousHash.length + messageData.length)
+    data.set(previousHash)
+    data.set(messageData, previousHash.length)
+
+    const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', data))
+
+    const message: Message = {
+      data: clientMessage.data,
+      hash: bs58.encode(hash),
+      timestamp: Date.now(),
+      senderAddress,
+      signature: clientMessage.signature,
+    }
+
+    this.messages.push(message)
+    await this.room.storage.put('messages', this.messages)
+
+    this.room.broadcast(JSON.stringify({ message }))
   }
 
   async onRequest(req: Party.Request) {
@@ -90,7 +151,7 @@ export default class Quest implements ServerCommon {
         if (userAddress === quest.owner || userAddress === quest.offeree) {
           this.authorizedAddresses.push({
             address: userAddress,
-            sessionAdress: req.headers.get('X-User-Session-Address') ?? '',
+            sessionAddress: req.headers.get('X-User-Session-Address') ?? '',
             encryptionAddress:
               req.headers.get('X-User-Encryption-Address') ?? '',
             taker: userAddress === quest.offeree,
@@ -236,11 +297,13 @@ export default class Quest implements ServerCommon {
         !authorizedAddresses.some(
           (a) =>
             a.address === address &&
-            a.sessionAdress === userDetails.sessionAddress
+            a.sessionAddress === userDetails.sessionAddress
         )
       ) {
         throw new Error('Unauthorized')
       }
+
+      req.headers.set('X-User-Address', address)
 
       return req
     } catch (e) {
