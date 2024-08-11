@@ -26,6 +26,7 @@ import bs58 from 'bs58'
 import CooldownTimer from './CooldownTimer'
 import { questsListTabAtom } from '../atoms/questsListTabAtom'
 import { idbAtom } from '../atoms/idbAtom'
+import { joinQuestRoom } from '../utils/joinQuestRoom'
 
 dayjs.extend(relativeTime)
 
@@ -113,7 +114,8 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
     if (!notification.message) return
     if (!ws) return
 
-    const keypair = getSessionKeypair(wallet.publicKey.toBase58())
+    const myAddress = wallet.publicKey.toBase58()
+    const keypair = getSessionKeypair(myAddress)
 
     if (!keypair) {
       setDecryptionError('Session keypair does not exists.')
@@ -148,18 +150,18 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           if (
             notification.messageType === NotificationMessageType.QUEST_SETTLED
           ) {
-            // todo: send POST request to quest_${questId}
+            joinQuestRoom(myAddress, message.quest).then(() => {
+              setTab('ongoing')
 
-            setTab('ongoing')
+              ws?.send(
+                JSON.stringify({
+                  type: 'delete_notification',
+                  id: notification.id,
+                })
+              )
 
-            ws?.send(
-              JSON.stringify({
-                type: 'delete_notification',
-                id: notification.id,
-              })
-            )
-
-            navigate(`/quest/${message.quest}/chat`)
+              navigate(`/quest/${message.quest}/chat`)
+            })
           }
         }
 
@@ -326,20 +328,18 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
         }
       )
       // todo: replace with confirmation strategy
-      const result = await program.provider.connection.confirmTransaction(
-        signature
-      )
+      await program.provider.connection.confirmTransaction(signature)
 
-      console.log(result)
+      const myAddress = wallet.publicKey.toBase58()
+
+      await joinQuestRoom(myAddress, messageDetails.quest)
 
       await sendNotification(
-        wallet.publicKey.toBase58(),
+        myAddress,
         notification.visitorAddress,
         JSON.stringify(messageDetails),
         NotificationMessageType.QUEST_SETTLED
       )
-
-      // todo: send POST request to quest_${questId}
 
       setTab('ongoing')
 
