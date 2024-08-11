@@ -6,7 +6,6 @@ import { atom } from 'jotai'
 export interface QuestMember {
   address: string
   sessionAddress: string // solana pubkey used to auth
-  sessionKeypair?: Uint8Array // the keypair of the address above
   encryptionAddress: string // solana pubkey used to encrypt messages
 
   // todo: Signal Protocol
@@ -34,6 +33,15 @@ export type Message =
     }
 
 export interface QuestBoardIDBSchema extends DBSchema {
+  session_keys: {
+    key: string
+    value: {
+      id: string
+      keypair: Uint8Array
+      downloaded: boolean
+      active: boolean
+    }
+  }
   proposal_hash: {
     key: string
     value: string

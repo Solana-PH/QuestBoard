@@ -26,6 +26,9 @@ export const IdbInitializer: FC<{ children: ReactNode }> = ({ children }) => {
                 case 0:
                 case 1: {
                   db.createObjectStore('proposal_hash')
+                  db.createObjectStore('session_keys', {
+                    keyPath: 'id',
+                  })
                   db.createObjectStore('files', {
                     keyPath: 'id',
                   })
@@ -44,7 +47,7 @@ export const IdbInitializer: FC<{ children: ReactNode }> = ({ children }) => {
 
       void initDb()
     }
-  }, [setIdb, rpcEndpoint])
+  }, [setIdb, wallet, rpcEndpoint])
 
   return children
 }

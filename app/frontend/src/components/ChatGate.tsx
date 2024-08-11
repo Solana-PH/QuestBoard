@@ -5,16 +5,19 @@ import { partykitAddress } from '../constants/partykitAddress'
 import { joinQuestRoom } from '../utils/joinQuestRoom'
 import cn from 'classnames'
 import { SignIn } from '@phosphor-icons/react'
+import { useAtomValue } from 'jotai'
+import { idbAtom } from '../atoms/idbAtom'
 
-interface AuthorizedAddress {
+export interface AuthorizedAddress {
   address: string
-  sessionAdress: string
+  sessionAddress: string
   encryptionAddress: string
   taker?: boolean
   owner?: boolean
 }
 
 export const ChatGate: FC<{ children: ReactNode }> = ({ children }) => {
+  const idb = useAtomValue(idbAtom)
   const { questId } = useParams()
   const wallet = useUserWallet()
   const address = wallet?.publicKey?.toBase58() ?? ''
@@ -57,7 +60,7 @@ export const ChatGate: FC<{ children: ReactNode }> = ({ children }) => {
     }
   }
 
-  if (authorizedAddresses === null) {
+  if (authorizedAddresses === null || idb === null) {
     return (
       <>
         <div className='flex flex-col gap-5 flex-auto p-5'>

@@ -24,6 +24,12 @@ interface Message {
   signature: string // signature of the data (encrypted), using session address
 }
 
+interface ServerResponse {
+  authorizedAddresses?: AuthorizedAddress[]
+  messages?: Message[]
+  proposal_hash?: string
+}
+
 export default class Quest implements ServerCommon {
   name = 'quest'
   authorizedAddresses: AuthorizedAddress[] = []
@@ -43,13 +49,18 @@ export default class Quest implements ServerCommon {
   }
 
   async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-    conn.send(
-      JSON.stringify({
+    if (
+      this.authorizedAddresses.find((a) => a.owner) &&
+      this.authorizedAddresses.find((a) => a.taker)
+    ) {
+      const output: ServerResponse = {
         authorizedAddresses: this.authorizedAddresses,
-        quest: this.quest,
-        messages: this.messages,
-      })
-    )
+        proposal_hash: this.quest!.offereeProposalHash,
+      }
+      this.room.broadcast(JSON.stringify(output))
+    } else {
+      conn.send(JSON.stringify({ standby: true }))
+    }
   }
 
   async onMessage(message: string | ArrayBufferLike, sender: Party.Connection) {
