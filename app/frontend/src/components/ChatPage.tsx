@@ -1,15 +1,19 @@
 import { FC, Suspense } from 'react'
 import { PagePanel } from './PagePanel'
+import { ChatGate } from './ChatGate'
 
 const ChatPageInner: FC = () => {
   return (
-    <div className='flex flex-col gap-5 flex-auto px-5 pb-5 pt-4'>
-      <div className='flex flex-col gap-2'>
-        <h2 className='font-cursive text-2xl flex justify-between py-1 sticky top-0 bg-stone-200 z-10 gap-5'>
-          <span className='font-bold flex-auto break-words'></span>
-        </h2>
+    <ChatGate>
+      <div className='flex flex-col gap-5 flex-auto px-5 pb-5 pt-4'>
+        <div className='flex flex-col gap-2'>
+          <h2 className='font-cursive text-2xl flex justify-between py-1 sticky top-0 bg-stone-200 z-10 gap-5'>
+            <span className='font-bold flex-auto break-words'></span>
+          </h2>
+          Joined
+        </div>
       </div>
-    </div>
+    </ChatGate>
   )
 }
 
