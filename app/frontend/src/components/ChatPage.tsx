@@ -12,6 +12,7 @@ import { useUserWallet } from '../atoms/userWalletAtom'
 import { EncryptedMessage, idbAtom } from '../atoms/idbAtom'
 import { useAtom, useAtomValue } from 'jotai'
 import { questMessagesAtom } from '../atoms/questMessagesAtom'
+import { ChatBubble } from './ChatBubble'
 
 interface ServerMessage {
   authorizedAddresses?: AuthorizedAddress[]
@@ -28,7 +29,9 @@ const ChatPageInner: FC = () => {
   const address = wallet?.publicKey?.toBase58() ?? ''
   const [message, setMessage] = useState('')
   const [initialized, setInitialized] = useState(false)
-  const [messages, messageAction] = useAtom(questMessagesAtom(questId ?? ''))
+  const [messageHashes, messageAction] = useAtom(
+    questMessagesAtom(questId ?? '')
+  )
   const [keypairNotFound, setKeypairNotFound] = useState(false)
 
   const ws = usePartySocket({
@@ -125,7 +128,11 @@ const ChatPageInner: FC = () => {
   return (
     <div className='flex flex-col h-full overflow-hidden relative'>
       <div className='flex-auto overflow-y-auto overflow-x-hidden p-5'>
-        <div className='flex flex-col gap-5'>{JSON.stringify(messages)}</div>
+        <div className='flex flex-col gap-5'>
+          {messageHashes.map((hash) => (
+            <ChatBubble key={hash} hash={hash} />
+          ))}
+        </div>
       </div>
       <form
         className='flex-none px-5 pb-5 flex'
@@ -184,7 +191,7 @@ const ChatPageInner: FC = () => {
               continue.
             </div>
           ) : (
-            <>Please wait...</>
+            <>Waiting for the other person to join</>
           )}
         </div>
       )}

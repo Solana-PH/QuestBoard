@@ -139,7 +139,7 @@ export const questMessagesAtom = atomFamily((questId: string) =>
 )
 
 export const questMessageAtom = atomFamily((hash: string) =>
-  atom(async (get) => {
+  atom<Promise<Message | null>>(async (get) => {
     const idb = get(idbAtom)
     if (!idb) return null
 
