@@ -2,7 +2,7 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { FC, ReactNode, Suspense, useEffect, useRef } from 'react'
 import { userWalletAtom, useUserWallet } from './userWalletAtom'
-import { idbAtom, Message, QuestBoardIDBSchema } from './idbAtom'
+import { idbAtom, QuestBoardIDBSchema } from './idbAtom'
 import { rpcEndpointAtom } from './rpcEndpointAtom'
 import { openDB } from 'idb'
 

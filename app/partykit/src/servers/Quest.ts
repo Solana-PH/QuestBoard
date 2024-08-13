@@ -17,8 +17,10 @@ interface AuthorizedAddress {
 }
 
 interface Message {
+  questId: string
   data: string // base 58 encoded, encrypted
   hash: string // sha256(previous message hash + data, encrypted), backend generated
+  prevHash: string
   timestamp: number // backend generated
   senderAddress: string // backend generated
   signature: string // signature of the data (encrypted), using session address
@@ -106,20 +108,22 @@ export default class Quest implements ServerCommon {
     // todo: first message hash should be the proposal hash from the quest
     // and should be sent by the taker
 
-    const previousHash = bs58.decode(
+    const prevHash =
       this.messages[this.messages.length - 1]?.hash ??
-        this.quest!.offereeProposalHash
-    )
+      this.quest!.offereeProposalHash
+    const prevHashBytes = bs58.decode(prevHash)
 
-    const data = new Uint8Array(previousHash.length + messageData.length)
-    data.set(previousHash)
-    data.set(messageData, previousHash.length)
+    const data = new Uint8Array(prevHashBytes.length + messageData.length)
+    data.set(prevHashBytes)
+    data.set(messageData, prevHashBytes.length)
 
     const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', data))
-
+    const [, questId] = this.room.id.split('_')
     const message: Message = {
+      questId,
       data: clientMessage.data,
       hash: bs58.encode(hash),
+      prevHash,
       timestamp: Date.now(),
       senderAddress,
       signature: clientMessage.signature,

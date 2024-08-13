@@ -1,6 +1,6 @@
 import { atom } from 'jotai'
 import { atomFamily } from 'jotai/utils'
-import { idbAtom, Message } from './idbAtom'
+import { EncryptedMessage, idbAtom } from './idbAtom'
 import { userWalletAtom } from './userWalletAtom'
 import {
   decryptMessage,
@@ -11,29 +11,47 @@ import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 
-export interface ChatMessage {
-  data: string // base 58 encoded, encrypted
-  hash: string // sha256(previous message hash + data, encrypted), backend generated
-  timestamp: number // backend generated
-  senderAddress: string // backend generated
-  signature: string // signature of the data (encrypted), using session address
-}
+export type Message =
+  | {
+      questId: string
+      type: 'text'
+      data: string // encrypted data
+      content: string
+      senderAddress: string
+      timestamp: number
+      signature: string
+      hash: string // sha256(data (bytes) + key)
+      prevHash: string
+    }
+  | {
+      questId: string
+      type: 'file'
+      data: string // encrypted data
+      id: string // file id
+      chunkSize: number
+      checksum: string
+      senderAddress: string
+      timestamp: number
+      signature: string
+      hash: string // sha256(prev hash (bytes) + key)
+      prevHash: string
+    }
 
 export type MessagePayload =
   | {
       type: 'text'
-      message: string
+      content: string
     }
   | { type: 'file'; id: string; chunkSize: number; checksum: string }
 
 export type MessageAction =
   | {
       type: 'add'
-      message: ChatMessage
+      message: EncryptedMessage
     }
   | {
       type: 'set'
-      messages: ChatMessage[]
+      messages: EncryptedMessage[]
     }
   | {
       type: 'encrypt'
@@ -42,87 +60,63 @@ export type MessageAction =
     }
 
 export const questMessagesBaseAtom = atomFamily((_questId: string) =>
-  atom<Message[]>([])
+  atom<EncryptedMessage[]>([])
 )
 
 export const questMessagesAtom = atomFamily((questId: string) =>
   atom(
     (get) => {
-      return get(questMessagesBaseAtom(questId))
+      const encryptedMessages = get(questMessagesBaseAtom(questId))
+      if (encryptedMessages.length === 0) return []
+      return encryptedMessages.map((m) => m.hash)
     },
     async (get, set, action: MessageAction) => {
-      const wallet = get(userWalletAtom)
-      if (!wallet?.publicKey) return
-
-      const address = wallet.publicKey.toBase58()
-
       const idb = get(idbAtom)
       if (!idb) return
 
-      const quest = await idb.get('quest', questId)
-      if (!quest) return
-
-      // get the session address used for this quest
-      const [me, other] =
-        quest.owner.address === address
-          ? [quest.owner, quest.taker]
-          : [quest.taker, quest.owner]
-
-      const key = await idb.get('session_keys', me.sessionAddress)
-      if (!key) return
-
-      const keypair = Keypair.fromSecretKey(key.keypair)
-      const secret = await deriveSharedSecret(keypair, other.encryptionAddress)
-
-      const parseMessage = async (message: ChatMessage): Promise<Message> => {
-        const data = JSON.parse(
-          await decryptMessage(message.data, secret)
-        ) as MessagePayload
-
-        switch (data.type) {
-          case 'file': {
-            return {
-              questId,
-              type: 'file',
-              data: message.data,
-              id: data.id,
-              chunkSize: data.chunkSize,
-              checksum: data.checksum,
-              senderAddress: message.senderAddress,
-              timestamp: message.timestamp,
-              signature: message.signature,
-              hash: message.hash,
-            }
-          }
-          case 'text':
-          default: {
-            return {
-              questId,
-              type: 'text',
-              data: message.data,
-              content: data.message,
-              senderAddress: message.senderAddress,
-              timestamp: message.timestamp,
-              signature: message.signature,
-              hash: message.hash,
-            }
-          }
-        }
-      }
-
       switch (action.type) {
         case 'add': {
-          const message = await parseMessage(action.message)
-          set(questMessagesBaseAtom(questId), (prev) => [...prev, message])
+          await idb.put('messages', action.message)
+          set(questMessagesBaseAtom(questId), (prev) => [
+            ...prev,
+            action.message,
+          ])
           break
         }
         case 'set': {
-          const messages = await Promise.all(action.messages.map(parseMessage))
-          // idb.put('messages', messages)
-          set(questMessagesBaseAtom(questId), messages)
+          const tx = idb.transaction('messages', 'readwrite')
+          const store = tx.objectStore('messages')
+          for (const message of action.messages) {
+            await store.put(message)
+          }
+          await tx.done
+          set(questMessagesBaseAtom(questId), action.messages)
           break
         }
         case 'encrypt': {
+          const wallet = get(userWalletAtom)
+          if (!wallet?.publicKey) return
+
+          const address = wallet.publicKey.toBase58()
+
+          const quest = await idb.get('quest', questId)
+          if (!quest) return
+
+          // get the session address used for this quest
+          const [me, other] =
+            quest.owner.address === address
+              ? [quest.owner, quest.taker]
+              : [quest.taker, quest.owner]
+
+          const key = await idb.get('session_keys', me.sessionAddress)
+          if (!key) return
+
+          const keypair = Keypair.fromSecretKey(key.keypair)
+          const secret = await deriveSharedSecret(
+            keypair,
+            other.encryptionAddress
+          )
+
           const encrypted = await encryptMessage(
             JSON.stringify(action.message),
             secret
@@ -142,4 +136,59 @@ export const questMessagesAtom = atomFamily((questId: string) =>
       }
     }
   )
+)
+
+export const questMessageAtom = atomFamily((hash: string) =>
+  atom(async (get) => {
+    const idb = get(idbAtom)
+    if (!idb) return null
+
+    const wallet = get(userWalletAtom)
+    if (!wallet?.publicKey) return null
+
+    const address = wallet.publicKey.toBase58()
+
+    const encryptedMessage = await idb.get('messages', hash)
+    if (!encryptedMessage) return null
+
+    const quest = await idb.get('quest', encryptedMessage.questId)
+    if (!quest) return null
+
+    const [me, other] =
+      quest.owner.address === address
+        ? [quest.owner, quest.taker]
+        : [quest.taker, quest.owner]
+
+    const key = await idb.get('session_keys', me.sessionAddress)
+    if (!key) return null
+
+    const keypair = Keypair.fromSecretKey(key.keypair)
+    const secret = await deriveSharedSecret(keypair, other.encryptionAddress)
+
+    const decrypted = JSON.parse(
+      await decryptMessage(encryptedMessage.data, secret)
+    ) as MessagePayload
+
+    switch (decrypted.type) {
+      case 'file': {
+        return {
+          ...encryptedMessage,
+          questId: encryptedMessage.questId,
+          type: 'file',
+          id: decrypted.id,
+          chunkSize: decrypted.chunkSize,
+          checksum: decrypted.checksum,
+        }
+      }
+      case 'text':
+      default: {
+        return {
+          ...encryptedMessage,
+          questId: encryptedMessage.questId,
+          type: 'text',
+          content: decrypted.content,
+        }
+      }
+    }
+  })
 )

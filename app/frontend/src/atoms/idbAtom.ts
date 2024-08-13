@@ -11,30 +11,15 @@ export interface QuestMember {
   // todo: Signal Protocol
 }
 
-// genesis Message hash should be the proposal_hash
-export type Message =
-  | {
-      questId: string
-      type: 'text'
-      data: string // encrypted data
-      content: string
-      senderAddress: string
-      timestamp: number
-      signature: string
-      hash: string // sha256(data (bytes) + key)
-    }
-  | {
-      questId: string
-      type: 'file'
-      data: string // encrypted data
-      id: string // file id
-      chunkSize: number
-      checksum: string
-      senderAddress: string
-      timestamp: number
-      signature: string
-      hash: string // sha256(prev hash (bytes) + key)
-    }
+export interface EncryptedMessage {
+  questId: string
+  data: string // base 58 encoded, encrypted
+  hash: string // sha256(previous message hash + data, encrypted), backend generated
+  prevHash: string
+  timestamp: number // backend generated
+  senderAddress: string // backend generated
+  signature: string // signature of the data (encrypted), using session address
+}
 
 export interface QuestBoardIDBSchema extends DBSchema {
   session_keys: {
@@ -87,7 +72,7 @@ export interface QuestBoardIDBSchema extends DBSchema {
   }
   messages: {
     key: string
-    value: Message
+    value: EncryptedMessage
     indexes: { questId: string; senderAddress: string }
   }
 }

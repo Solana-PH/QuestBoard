@@ -9,16 +9,16 @@ import { useParams } from 'react-router-dom'
 import { getSessionKeypair } from '../utils/getSessionKeypair'
 import { getAccessToken } from '../utils/getAccessToken'
 import { useUserWallet } from '../atoms/userWalletAtom'
-import { idbAtom } from '../atoms/idbAtom'
+import { EncryptedMessage, idbAtom } from '../atoms/idbAtom'
 import { useAtom, useAtomValue } from 'jotai'
-import { ChatMessage, questMessagesAtom } from '../atoms/questMessagesAtom'
+import { questMessagesAtom } from '../atoms/questMessagesAtom'
 
 interface ServerMessage {
   authorizedAddresses?: AuthorizedAddress[]
-  messages?: ChatMessage[]
+  messages?: EncryptedMessage[]
   proposal_hash?: string
   standby?: boolean
-  message?: ChatMessage
+  message?: EncryptedMessage
 }
 
 const ChatPageInner: FC = () => {
@@ -140,7 +140,7 @@ const ChatPageInner: FC = () => {
             type: 'encrypt',
             message: {
               type: 'text',
-              message,
+              content: message,
             },
             callback: (clientMessage) => {
               ws.send(
@@ -179,8 +179,9 @@ const ChatPageInner: FC = () => {
         <div className='absolute inset-0 bg-white/80 flex items-center justify-center p-5 text-center'>
           {keypairNotFound ? (
             <div className='text-red-500'>
-              The session keypair used for this quest was not found in this
-              device.
+              The session keypair used for this Quest was not found in this
+              device. You need to upload the correct session keypair to
+              continue.
             </div>
           ) : (
             <>Please wait...</>
