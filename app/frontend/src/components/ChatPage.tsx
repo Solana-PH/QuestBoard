@@ -92,19 +92,13 @@ const ChatPageInner: FC = () => {
 
         await idb.put('quest', patchedQuest)
 
-        // store the sessionKeypair used for this quest
-        const sessionKeypair = getSessionKeypair(address)
-
         const sessionAddressUsed =
           owner.address === address
             ? owner.sessionAddress
             : taker.sessionAddress
 
-        if (
-          !sessionKeypair ||
-          !sessionKeypair.publicKey.equals(new PublicKey(sessionAddressUsed))
-        ) {
-          // todo: session keypair not found
+        const session = await idb.get('session_keys', sessionAddressUsed)
+        if (!session) {
           setKeypairNotFound(true)
           return
         }

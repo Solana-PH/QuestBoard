@@ -237,7 +237,7 @@ export default class Quest implements ServerCommon {
         if (
           !sign.detached.verify(
             new TextEncoder().encode(
-              `${questSessionAddress}.${encryptionAddress}`
+              `${questSessionAddress}_${encryptionAddress}`
             ),
             bs58.decode(questSessionSignature),
             bs58.decode(questSessionAddress)
