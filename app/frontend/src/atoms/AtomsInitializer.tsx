@@ -2,7 +2,7 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { FC, ReactNode, Suspense, useEffect, useRef } from 'react'
 import { userWalletAtom, useUserWallet } from './userWalletAtom'
-import { idbAtom, QuestBoardIDBSchema } from './idbAtom'
+import { idbAtom, Message, QuestBoardIDBSchema } from './idbAtom'
 import { rpcEndpointAtom } from './rpcEndpointAtom'
 import { openDB } from 'idb'
 
@@ -31,10 +31,18 @@ export const IdbInitializer: FC<{ children: ReactNode }> = ({ children }) => {
                   })
                   db.createObjectStore('files', {
                     keyPath: 'id',
-                  })
-                  // createIndex('questId', 'questId', { unique: false })
+                  }).createIndex('questId', 'questId', { unique: false })
                   db.createObjectStore('quest', {
                     keyPath: 'id',
+                  })
+                  const messageStore = db.createObjectStore('messages', {
+                    keyPath: 'hash',
+                  })
+                  messageStore.createIndex('questId', 'questId', {
+                    unique: false,
+                  })
+                  messageStore.createIndex('senderAddress', 'senderAddress', {
+                    unique: false,
                   })
                 }
               }

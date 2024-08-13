@@ -12,7 +12,6 @@ import { useUserWallet } from '../atoms/userWalletAtom'
 import { idbAtom } from '../atoms/idbAtom'
 import { useAtom, useAtomValue } from 'jotai'
 import { ChatMessage, questMessagesAtom } from '../atoms/questMessagesAtom'
-import { PublicKey } from '@solana/web3.js'
 
 interface ServerMessage {
   authorizedAddresses?: AuthorizedAddress[]
@@ -86,7 +85,6 @@ const ChatPageInner: FC = () => {
             ...quest?.taker,
             ...taker,
           },
-          messages: [...(quest?.messages || [])],
           proposal,
         }
 

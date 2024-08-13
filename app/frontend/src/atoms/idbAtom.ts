@@ -14,16 +14,20 @@ export interface QuestMember {
 // genesis Message hash should be the proposal_hash
 export type Message =
   | {
+      questId: string
       type: 'text'
-      data: string
+      data: string // encrypted data
+      content: string
       senderAddress: string
       timestamp: number
       signature: string
       hash: string // sha256(data (bytes) + key)
     }
   | {
+      questId: string
       type: 'file'
-      id: string
+      data: string // encrypted data
+      id: string // file id
       chunkSize: number
       checksum: string
       senderAddress: string
@@ -70,6 +74,7 @@ export interface QuestBoardIDBSchema extends DBSchema {
       }[]
       checksum: string
     }
+    indexes: { questId: string }
   }
   quest: {
     key: string
@@ -78,8 +83,12 @@ export interface QuestBoardIDBSchema extends DBSchema {
       proposal: string // JSON of the proposal details and staked amount
       owner: QuestMember
       taker: QuestMember
-      messages: Message[]
     }
+  }
+  messages: {
+    key: string
+    value: Message
+    indexes: { questId: string; senderAddress: string }
   }
 }
 

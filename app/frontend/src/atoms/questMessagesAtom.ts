@@ -82,7 +82,9 @@ export const questMessagesAtom = atomFamily((questId: string) =>
         switch (data.type) {
           case 'file': {
             return {
+              questId,
               type: 'file',
+              data: message.data,
               id: data.id,
               chunkSize: data.chunkSize,
               checksum: data.checksum,
@@ -95,8 +97,10 @@ export const questMessagesAtom = atomFamily((questId: string) =>
           case 'text':
           default: {
             return {
+              questId,
               type: 'text',
-              data: data.message,
+              data: message.data,
+              content: data.message,
               senderAddress: message.senderAddress,
               timestamp: message.timestamp,
               signature: message.signature,
