@@ -48,6 +48,7 @@ export default class Quest implements ServerCommon {
   constructor(readonly room: Party.Room) {}
 
   async onStart() {
+    // await this.room.storage.deleteAll()
     this.authorizedAddresses =
       (await this.room.storage.get('authorizedAddresses')) ?? []
     this.quest = (await this.room.storage.get('quest')) || null
@@ -164,7 +165,11 @@ export default class Quest implements ServerCommon {
         }
       }
 
-      if (!this.authorizedAddresses.some((a) => a.address === userAddress)) {
+      const user = this.authorizedAddresses.find(
+        (a) => a.address === userAddress
+      )
+
+      if (!user) {
         return new Response('Access denied', {
           status: 403,
           headers: commonHeaders,
@@ -178,7 +183,7 @@ export default class Quest implements ServerCommon {
 
       // todo: store signal pre-keys
 
-      return new Response('OK', {
+      return new Response(JSON.stringify(user), {
         status: 200,
         headers: commonHeaders,
       })
@@ -226,9 +231,24 @@ export default class Quest implements ServerCommon {
           throw new Error('Invalid signature')
         }
 
+        const [questSessionAddress, encryptionAddress, questSessionSignature] =
+          message.split('_')
+
+        if (
+          !sign.detached.verify(
+            new TextEncoder().encode(
+              `${questSessionAddress}.${encryptionAddress}`
+            ),
+            bs58.decode(questSessionSignature),
+            bs58.decode(questSessionAddress)
+          )
+        ) {
+          throw new Error('Invalid quest session signature')
+        }
+
         req.headers.set('X-User-Address', address)
-        req.headers.set('X-User-Session-Address', userDetails.sessionAddress)
-        req.headers.set('X-User-Encryption-Address', userDetails.notifAddress)
+        req.headers.set('X-User-Session-Address', questSessionAddress)
+        req.headers.set('X-User-Encryption-Address', encryptionAddress)
 
         return req
       } catch (e) {
@@ -293,13 +313,7 @@ export default class Quest implements ServerCommon {
 
       const authorizedAddresses = (await remote.json()) as AuthorizedAddress[]
 
-      if (
-        !authorizedAddresses.some(
-          (a) =>
-            a.address === address &&
-            a.sessionAddress === userDetails.sessionAddress
-        )
-      ) {
+      if (!authorizedAddresses.some((a) => a.address === address)) {
         throw new Error('Unauthorized')
       }
 

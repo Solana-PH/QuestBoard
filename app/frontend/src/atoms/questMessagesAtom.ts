@@ -114,6 +114,7 @@ export const questMessagesAtom = atomFamily((questId: string) =>
         }
         case 'set': {
           const messages = await Promise.all(action.messages.map(parseMessage))
+          // idb.put('messages', messages)
           set(questMessagesBaseAtom(questId), messages)
           break
         }

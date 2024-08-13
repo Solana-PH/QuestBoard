@@ -39,7 +39,6 @@ export interface QuestBoardIDBSchema extends DBSchema {
       id: string
       keypair: Uint8Array
       downloaded: boolean
-      active: boolean
     }
   }
   proposal_hash: {

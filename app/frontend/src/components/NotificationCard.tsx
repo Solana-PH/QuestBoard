@@ -110,6 +110,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
   const idb = useAtomValue(idbAtom)
 
   useEffect(() => {
+    if (!idb) return
     if (!wallet?.publicKey) return
     if (!notification.message) return
     if (!ws) return
@@ -150,18 +151,28 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           if (
             notification.messageType === NotificationMessageType.QUEST_SETTLED
           ) {
-            joinQuestRoom(myAddress, message.quest).then(() => {
-              setTab('ongoing')
+            joinQuestRoom(myAddress, message.quest)
+              .then((sessionKeypair) => {
+                if (sessionKeypair) {
+                  return idb.put('session_keys', {
+                    id: sessionKeypair.publicKey.toBase58(),
+                    downloaded: false,
+                    keypair: sessionKeypair.secretKey,
+                  })
+                }
+              })
+              .then(() => {
+                setTab('ongoing')
 
-              ws?.send(
-                JSON.stringify({
-                  type: 'delete_notification',
-                  id: notification.id,
-                })
-              )
+                ws?.send(
+                  JSON.stringify({
+                    type: 'delete_notification',
+                    id: notification.id,
+                  })
+                )
 
-              navigate(`/quest/${message.quest}/chat`)
-            })
+                navigate(`/quest/${message.quest}/chat`)
+              })
           }
         }
 
@@ -298,6 +309,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
 
   const onSign = async () => {
     // todo: validate transaction
+    if (!idb) return
     if (!program) return
     if (!wallet?.publicKey) return
     if (!wallet?.signTransaction) return
@@ -332,7 +344,18 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
 
       const myAddress = wallet.publicKey.toBase58()
 
-      await joinQuestRoom(myAddress, messageDetails.quest)
+      const sessionKeypair = await joinQuestRoom(
+        myAddress,
+        messageDetails.quest
+      )
+
+      if (sessionKeypair) {
+        await idb.put('session_keys', {
+          id: sessionKeypair.publicKey.toBase58(),
+          downloaded: false,
+          keypair: sessionKeypair.secretKey,
+        })
+      }
 
       await sendNotification(
         myAddress,

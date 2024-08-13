@@ -111,13 +111,6 @@ const ChatPageInner: FC = () => {
 
         setKeypairNotFound(false)
 
-        await idb.put('session_keys', {
-          id: sessionAddressUsed,
-          active: true,
-          downloaded: false,
-          keypair: sessionKeypair.secretKey,
-        })
-
         if (serverMessage.messages) {
           messageAction({ type: 'set', messages: serverMessage.messages })
         }
@@ -140,7 +133,7 @@ const ChatPageInner: FC = () => {
   return (
     <div className='flex flex-col h-full overflow-hidden relative'>
       <div className='flex-auto overflow-y-auto overflow-x-hidden p-5'>
-        <div className='flex flex-col gap-5'></div>
+        <div className='flex flex-col gap-5'>{JSON.stringify(messages)}</div>
       </div>
       <form
         className='flex-none px-5 pb-5 flex'

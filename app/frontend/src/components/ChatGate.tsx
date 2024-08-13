@@ -45,13 +45,20 @@ export const ChatGate: FC<{ children: ReactNode }> = ({ children }) => {
   }, [address, authorizedAddresses])
 
   const join = async () => {
+    if (!idb) return
     if (!questId) return
     if (!address) return
     if (joined) return
     setBusy(true)
     try {
-      const result = await joinQuestRoom(address, questId)
-      if (!result.ok) throw Error('Failed to join')
+      const sessionKeypair = await joinQuestRoom(address, questId)
+      if (sessionKeypair) {
+        await idb.put('session_keys', {
+          id: sessionKeypair.publicKey.toBase58(),
+          downloaded: false,
+          keypair: sessionKeypair.secretKey,
+        })
+      }
       fetchAuthorizedAddresses()
     } catch (e) {
       console.error(e)
