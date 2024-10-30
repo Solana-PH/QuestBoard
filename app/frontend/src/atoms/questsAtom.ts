@@ -102,7 +102,7 @@ export const questAtom = atomFamily((questPda: string) =>
     const program = get(programAtom)
     if (!program) return null
 
-    const result = await program.account.quest.fetch(new PublicKey(questPda))
+    const result = await program.account.quest.fetchNullable(new PublicKey(questPda))
     if (!result) return null
 
     const details = await get(

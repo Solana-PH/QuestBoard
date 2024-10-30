@@ -9,8 +9,8 @@ import { searchAtom } from './atoms/searchAtom'
 import { useAtom } from 'jotai'
 import { Suspense } from 'react'
 import { OngoingQuestsList } from './components/OngoingQuestsList'
-import cn from 'classnames'
 import { questsListTabAtom } from './atoms/questsListTabAtom'
+import cn from 'classnames'
 
 function App() {
   const [search, setSearch] = useAtom(searchAtom)
@@ -40,7 +40,12 @@ function App() {
               Ongoing
             </button>
           </div>
-          <div className='show-next-when-empty grid grid-cols-12 gap-3 p-3 lg:gap-5 lg:p-5'>
+          <div
+            className={cn(
+              'columns-1 sm:columns-2 lg:columns-3 xl:columns-4',
+              'show-next-when-empty gap-3 p-3 space-y-3 lg:gap-5 lg:p-5 lg:space-y-4'
+            )}
+          >
             <Suspense
               fallback={
                 <div className='absolute inset-0 flex flex-col gap-5 items-center justify-center animate-fadeIn'>
