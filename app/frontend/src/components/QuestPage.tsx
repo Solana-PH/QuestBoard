@@ -166,8 +166,8 @@ const QuestPageInner: FC = () => {
   return (
     <>
       <div className='flex flex-col gap-5 flex-auto px-5 pb-5 pt-4'>
-        <div className='flex flex-col gap-2'>
-          <h2 className='font-cursive text-2xl flex justify-between py-1 sticky top-0 bg-stone-200 z-10 gap-5'>
+        <div className='flex flex-col gap-3'>
+          <h2 className='font-cursive text-2xl flex justify-between py-1 sticky top-0 bg-gray-800 z-10 gap-5'>
             <span className='font-bold flex-auto break-words'>
               {quest.details.title}
             </span>
@@ -177,14 +177,12 @@ const QuestPageInner: FC = () => {
               </Link>
             )}
           </h2>
-          <p className='text-sm font-bold uppercase tracking-wider opacity-80'>
+          <p className='text-sm font-bold uppercase tracking-wider opacity-80 text-yellow-100'>
             Reward: {quest.details.reward}
           </p>
         </div>
-        <div className='break-words text-black'>
-          {quest.details.description}
-        </div>
-        <div className='border-b border-dashed border-black/25 mt-auto' />
+        <div className='break-words '>{quest.details.description}</div>
+        <div className='border-b border-dashed border-white/25 mt-auto' />
         <div className='flex flex-col gap-2'>
           <span className='flex items-center gap-2'>
             <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
@@ -231,7 +229,7 @@ const QuestPageInner: FC = () => {
             </a>
           )}
         </div>
-        <div className='border-b border-dashed border-black/25' />
+        <div className='border-b border-dashed border-white/25' />
         <div className='flex flex-col gap-5'>
           <div className='flex flex-col gap-2'>
             <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
@@ -290,12 +288,12 @@ const QuestPageInner: FC = () => {
             )}
           </div>
         </div>
-        <div className='border-b border-dashed border-black/25' />
+        <div className='border-b border-dashed border-white/25' />
       </div>
       {quest.account.status === 1 && (
         <div className='flex-none px-5 pb-5 gap-5 flex flex-col'>
           {owner ? (
-            <div className='bg-black/50 text-white'>
+            <div className=''>
               <button
                 disabled={busy}
                 onClick={onClose}
@@ -304,7 +302,7 @@ const QuestPageInner: FC = () => {
                     ? 'opacity-50 pointer-events-none cursor-wait'
                     : 'cursor-pointer',
                   'w-full px-3 py-2 flex items-center justify-center gap-3',
-                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                  'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
                 )}
               >
                 <Trash size={32} />
@@ -367,7 +365,7 @@ const QuestPageInner: FC = () => {
                   <button
                     disabled
                     className={cn(
-                      'bg-amber-300/10',
+                      'bg-gray-300/10',
                       'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
                     )}
                   >
@@ -378,7 +376,7 @@ const QuestPageInner: FC = () => {
               ) : (
                 <>
                   {daoDiff >= 0 ? (
-                    <div className={cn('bg-black/50 text-white')}>
+                    <div className={cn('')}>
                       <button
                         disabled={busy}
                         onClick={onSendNotification}
@@ -387,7 +385,7 @@ const QuestPageInner: FC = () => {
                             ? 'opacity-50 pointer-events-none cursor-wait'
                             : 'cursor-pointer',
                           'w-full px-3 py-2 flex items-center justify-center gap-3',
-                          'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                          'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
                         )}
                       >
                         {connectionStatus ? (
@@ -408,7 +406,7 @@ const QuestPageInner: FC = () => {
                       <button
                         disabled
                         className={cn(
-                          'bg-amber-300/10',
+                          'bg-gray-300/10',
                           'w-full px-3 py-2 flex items-center justify-center gap-3 cursor-not-allowed'
                         )}
                       >
@@ -435,16 +433,16 @@ export const QuestPage: FC = () => {
           fallback={
             <div className='flex flex-col gap-5 flex-auto p-5'>
               <div className='flex flex-col gap-2'>
-                <h2 className='h-10 w-64 bg-amber-950/50 animate-pulse rounded' />
-                <h2 className='h-5 w-56 bg-amber-950/50 animate-pulse rounded' />
+                <h2 className='h-10 w-64 bg-gray-600/50 animate-pulse rounded' />
+                <h2 className='h-5 w-56 bg-gray-600/50 animate-pulse rounded' />
               </div>
               <div className='flex flex-col gap-2'>
-                <div className='h-6 w-72 bg-amber-950/50 animate-pulse rounded' />
-                <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+                <div className='h-6 w-72 bg-gray-600/50 animate-pulse rounded' />
+                <div className='h-6 w-64 bg-gray-600/50 animate-pulse rounded' />
               </div>
               <div className='flex flex-col gap-2'>
-                <div className='h-6 w-36 bg-amber-950/50 animate-pulse rounded' />
-                <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+                <div className='h-6 w-36 bg-gray-600/50 animate-pulse rounded' />
+                <div className='h-6 w-64 bg-gray-600/50 animate-pulse rounded' />
               </div>
             </div>
           }

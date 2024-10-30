@@ -46,26 +46,25 @@ export const QuestCard: FC<
     <Link
       to={`/quest/${publicKey.toBase58()}`}
       className={cn(
-        !connectionStatus && 'brightness-50 grayscale',
-        'border border-amber-300',
+        !connectionStatus
+          ? 'text-slate-300 bg-gray-800 brightness-90'
+          : 'bg-gradient-to-tr from-gray-700 via-gray-800 to-slate-700',
+        'rounded',
         'break-inside-avoid',
-        'bg-stone-200 text-amber-950 p-5 flex flex-col gap-5',
+        'p-5 flex flex-col gap-5',
         'animate-fadeIn transition-all'
       )}
     >
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col gap-3'>
         <h2 className='text-2xl font-cursive font-bold break-words'>
           {details.title}
         </h2>
-
-        <h2 className='text-xs font-bold uppercase tracking-wider opacity-80'>
+        <h2 className='text-xs font-bold uppercase tracking-wider opacity-80 text-yellow-100'>
           Reward: {details.reward}
         </h2>
       </div>
-      <div className='text-black break-words text-sm'>
-        {details.description}
-      </div>
-      <div className='border-b border-dashed border-black/25 mt-auto' />
+      <div className=' break-words text-sm'>{details.description}</div>
+      <div className='border-b border-dashed border-white/25 mt-auto' />
       <div className='flex flex-col gap-2 text-xs'>
         <div className='flex items-center gap-2'>
           <span>Owner: </span>

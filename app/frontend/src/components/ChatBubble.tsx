@@ -36,7 +36,7 @@ const ChatBubbleInner: FC<ChatBubbleProps> = ({ hash }) => {
         <div
           className={cn(
             'px-3 py-2 rounded-lg',
-            isMe ? 'bg-white text-black' : 'bg-stone-800 text-white',
+            isMe ? 'bg-white ' : 'bg-gray-800 ',
             isMe ? 'rounded-br-none' : 'rounded-bl-none'
           )}
         >

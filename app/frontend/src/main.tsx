@@ -61,7 +61,7 @@ const Reload = () => {
     <div className='flex items-center justify-center flex-col absolute inset-0 gap-2'>
       <span>An error occurred. Please refresh the page.</span>
       <button
-        className='px-3 py-2 bg-amber-300/10'
+        className='px-3 py-2 bg-gray-300/10'
         onClick={() => window.location.reload()}
       >
         Refresh

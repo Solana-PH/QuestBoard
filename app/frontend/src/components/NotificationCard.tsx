@@ -47,7 +47,7 @@ const Card: FC<{
       case NotificationMessageType.QUEST_REJECTED:
         return { label: `Declined by `, color: 'border-red-500' }
       case NotificationMessageType.QUEST_CANCELED:
-        return { label: `Canceled by `, color: 'border-amber-500' }
+        return { label: `Canceled by `, color: 'border-slate-500' }
       case NotificationMessageType.QUEST_SETTLED:
         return { label: `Settled by `, color: 'border-blue-500' }
     }
@@ -83,7 +83,7 @@ const Card: FC<{
       </div>
 
       {children}
-      <div className='border-b border-dashed border-black/25 mb-5' />
+      <div className='border-b border-dashed border-white/25 mb-5' />
     </div>
   )
 }
@@ -466,7 +466,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
               'flex flex-col gap-3 '
             )}
           >
-            <p className='text-black'>{messageDetails.content}</p>
+            <p className=''>{messageDetails.content}</p>
             {questDetails?.details && (
               <div className='flex flex-col gap-2 text-xs'>
                 <div className='flex items-center gap-2'>
@@ -503,7 +503,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
           <div
             className={cn(
               'flex-1',
-              isVisitorOnline && !cooldown && 'bg-green-800/50 text-white'
+              isVisitorOnline && !cooldown && 'bg-green-800/50 '
             )}
           >
             <button
@@ -515,7 +515,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
                   ? 'opacity-50 pointer-events-none cursor-wait'
                   : 'cursor-pointer',
                 'w-full px-3 py-2 flex items-center justify-center gap-3',
-                'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
               )}
             >
               <Signature size={32} />
@@ -534,7 +534,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
             </button>
           </div>
           {cooldown === null && (
-            <div className='bg-red-800/50 text-white flex-1'>
+            <div className='bg-red-800/50  flex-1'>
               <button
                 type='submit'
                 onClick={onDecline}
@@ -544,7 +544,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
                     ? 'opacity-50 pointer-events-none cursor-wait'
                     : 'cursor-pointer',
                   'w-full px-3 py-2 flex items-center justify-center gap-3',
-                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                  'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
                 )}
               >
                 <X size={32} />
@@ -556,7 +556,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
       )}
       {notification.messageType === NotificationMessageType.QUEST_ACCEPTED && (
         <div className='flex gap-5'>
-          <div className={cn('flex-1', 'bg-green-800/50 text-white')}>
+          <div className={cn('flex-1', 'bg-green-800/50 ')}>
             <button
               type='submit'
               onClick={onSign}
@@ -566,14 +566,14 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
                   ? 'opacity-50 pointer-events-none cursor-wait'
                   : 'cursor-pointer',
                 'w-full px-3 py-2 flex items-center justify-center gap-3',
-                'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
               )}
             >
               <Signature size={32} />
               <span>Sign</span>
             </button>
           </div>
-          <div className='bg-red-800/50 text-white flex-1'>
+          <div className='bg-red-800/50  flex-1'>
             <button
               type='submit'
               onClick={onCancel}
@@ -583,7 +583,7 @@ export const NotificationCard: FC<{ notification: Notification }> = ({
                   ? 'opacity-50 pointer-events-none cursor-wait'
                   : 'cursor-pointer',
                 'w-full px-3 py-2 flex items-center justify-center gap-3',
-                'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
               )}
             >
               <X size={32} />

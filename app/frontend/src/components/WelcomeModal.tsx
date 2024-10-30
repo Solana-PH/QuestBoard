@@ -139,17 +139,17 @@ export const WelcomeModal: FC = () => {
             }}
             className={cn(
               'flex flex-col gap-5',
-              'border border-amber-300',
-              'mx-auto max-w-md w-full bg-stone-200 text-amber-950 px-5 pb-5 pt-4'
+              'rounded',
+              'mx-auto max-w-md w-full bg-gray-800  px-5 pb-5 pt-4'
             )}
           >
-            <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-stone-200 z-10'>
+            <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-gray-800 z-10'>
               <span className='font-bold'>Welcome to QuestBoard!</span>
               <button type='button' onClick={() => wallet?.disconnect()}>
                 <X size={24} />
               </button>
             </h2>
-            <p className='text-black'>
+            <p className=''>
               Please provide your availability so that other users know when
               they can reach you.
             </p>
@@ -166,23 +166,20 @@ export const WelcomeModal: FC = () => {
               </span>
               <TimeInput value={end} onChange={setEnd} />
             </div>
-            <div className='border-b border-dashed border-black/25' />
+            <div className='border-b border-dashed border-white/25' />
             <div className='flex flex-col gap-1'>
               <span className='text-xs uppercase tracking-wider font-bold opacity-75'>
                 Disclosure
               </span>
-              <p className='text-sm text-black'>
+              <p className='text-sm '>
                 By submitting, you agree to our{' '}
-                <span className='font-bold text-amber-950'>
-                  terms and conditions
-                </span>{' '}
-                and{' '}
-                <span className='font-bold text-amber-950'>privacy policy</span>
-                . The team behind this dApp is not responsible for any loss of
-                funds or damages caused by the use of this application.
+                <span className='font-bold '>terms and conditions</span> and{' '}
+                <span className='font-bold '>privacy policy</span>. The team
+                behind this dApp is not responsible for any loss of funds or
+                damages caused by the use of this application.
               </p>
             </div>
-            <div className='bg-black/50 text-white'>
+            <div className=''>
               <button
                 type='submit'
                 disabled={busy}
@@ -191,7 +188,7 @@ export const WelcomeModal: FC = () => {
                     ? 'opacity-50 pointer-events-none cursor-wait'
                     : 'cursor-pointer',
                   'w-full px-3 py-2 flex items-center justify-center gap-3',
-                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                  'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
                 )}
               >
                 <Pen size={32} />
@@ -211,11 +208,11 @@ export const WelcomeModal: FC = () => {
           <div
             className={cn(
               'flex flex-col gap-5',
-              'border border-amber-300',
-              'mx-auto max-w-md w-full bg-stone-200 text-amber-950 px-5 pb-5 pt-4'
+              'rounded',
+              'mx-auto max-w-md w-full bg-gray-800  px-5 pb-5 pt-4'
             )}
           >
-            <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-stone-200 z-10'>
+            <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-gray-800 z-10'>
               <span className='font-bold'>Welcome back!</span>
               <button type='button' onClick={() => wallet?.disconnect()}>
                 <X size={24} />
@@ -227,11 +224,11 @@ export const WelcomeModal: FC = () => {
               </span>
               {info === 'missing' ? (
                 <>
-                  <p className='text-black'>
+                  <p className=''>
                     It seems like you have lost your old session for this wallet
                     or might be using a different device.
                   </p>
-                  <p className='text-black'>
+                  <p className=''>
                     To retain your session and be able to decrypt your old
                     messages, it is recommended to recover your previous
                     keypair.
@@ -239,11 +236,11 @@ export const WelcomeModal: FC = () => {
                 </>
               ) : (
                 <>
-                  <p className='text-black'>
+                  <p className=''>
                     It seems like you are using a different session for this
                     wallet and might be on a different device.
                   </p>
-                  <p className='text-black'>
+                  <p className=''>
                     Would you like to recover your keypair from the other
                     device?
                   </p>
@@ -271,7 +268,7 @@ export const WelcomeModal: FC = () => {
                 onChange={(e) => setOldKeypairStr(e.target.value)}
               />
             </div>
-            <div className='bg-black/50 text-white'>
+            <div className=''>
               <button
                 onClick={onImport}
                 type='button'
@@ -281,7 +278,7 @@ export const WelcomeModal: FC = () => {
                     ? 'opacity-50 pointer-events-none cursor-wait'
                     : 'cursor-pointer',
                   'w-full px-3 py-2 flex items-center justify-center gap-3',
-                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                  'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
                 )}
               >
                 <DownloadSimple size={32} />

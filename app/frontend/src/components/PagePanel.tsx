@@ -16,8 +16,8 @@ export const PagePanel: FC<{ children: ReactNode; className?: string }> = ({
         className={cn(
           className ?? 'md:w-[28rem]',
           'flex flex-col w-screen ',
-          'border border-amber-300',
-          'h-full bg-stone-200 text-amber-950 overflow-x-hidden overflow-y-auto'
+          'landscape:rounded',
+          'h-full bg-gray-800 overflow-x-hidden overflow-y-auto'
         )}
       >
         {children}

@@ -72,16 +72,16 @@ export const ChatGate: FC<{ children: ReactNode }> = ({ children }) => {
       <>
         <div className='flex flex-col gap-5 flex-auto p-5'>
           <div className='flex flex-col gap-2'>
-            <h2 className='h-10 w-64 bg-amber-950/50 animate-pulse rounded' />
-            <h2 className='h-5 w-56 bg-amber-950/50 animate-pulse rounded' />
+            <h2 className='h-10 w-64 bg-gray-600/50 animate-pulse rounded' />
+            <h2 className='h-5 w-56 bg-gray-600/50 animate-pulse rounded' />
           </div>
           <div className='flex flex-col gap-2'>
-            <div className='h-6 w-72 bg-amber-950/50 animate-pulse rounded' />
-            <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+            <div className='h-6 w-72 bg-gray-600/50 animate-pulse rounded' />
+            <div className='h-6 w-64 bg-gray-600/50 animate-pulse rounded' />
           </div>
           <div className='flex flex-col gap-2'>
-            <div className='h-6 w-36 bg-amber-950/50 animate-pulse rounded' />
-            <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+            <div className='h-6 w-36 bg-gray-600/50 animate-pulse rounded' />
+            <div className='h-6 w-64 bg-gray-600/50 animate-pulse rounded' />
           </div>
         </div>
       </>
@@ -91,7 +91,7 @@ export const ChatGate: FC<{ children: ReactNode }> = ({ children }) => {
   if (!joined) {
     return (
       <div className='flex flex-col gap-5 flex-auto p-5 items-center justify-center'>
-        <div className='bg-black/50 text-white'>
+        <div className=''>
           <button
             onClick={join}
             disabled={busy}
@@ -100,7 +100,7 @@ export const ChatGate: FC<{ children: ReactNode }> = ({ children }) => {
                 ? 'opacity-50 pointer-events-none cursor-wait'
                 : 'cursor-pointer',
               'w-full px-3 py-2 flex items-center justify-center gap-3',
-              'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+              'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
             )}
           >
             <SignIn size={32} />

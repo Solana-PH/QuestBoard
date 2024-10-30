@@ -20,7 +20,7 @@ function App() {
     <div className='h-dvh w-full flex flex-col'>
       <div className='w-full h-full overflow-hidden flex flex-col relative'>
         <ScrollableContent className='flex flex-col'>
-          <div className='gap-3 px-3 pt-3 lg:gap-10 lg:px-5 lg:pt-10 lg:pb-5 flex-none flex text-xl lg:text-4xl text-stone-400 font-cursive'>
+          <div className='gap-3 px-3 pt-3 lg:gap-10 lg:px-5 lg:pt-10 lg:pb-5 flex-none flex text-xl lg:text-4xl text-slate-400 font-cursive'>
             <button
               onClick={() => setTab('open')}
               className={cn(

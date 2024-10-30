@@ -8,7 +8,7 @@ export const PageBackdrop: FC = () => {
       <div
         className={cn(
           'absolute inset-0 animate-fadeInNoDelay overflow-hidden pointer-events-auto',
-          'backdrop-grayscale backdrop-opacity-80 bg-black/50'
+          'bg-black/30'
         )}
       />
     </Link>

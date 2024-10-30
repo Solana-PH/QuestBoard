@@ -28,11 +28,7 @@ export default function Dialog({ show, children, onClose }: DialogProps) {
             className={'fixed h-dvh inset-x-0 top-0 overflow-hidden'}
             aria-hidden='true'
           >
-            <div
-              className={
-                'backdrop-grayscale backdrop-opacity-80 bg-black/50 w-full h-full'
-              }
-            />
+            <div className={'bg-black/30 w-full h-full'} />
           </div>
         </TransitionChild>
         <TransitionChild

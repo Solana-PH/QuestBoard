@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        cursive: ['IM Fell English', 'cursive'],
-        serif: ['IM Fell English', 'serif'],
-        sans: ['Open Sans', 'sans-serif'],
+        cursive: ['Quicksand', 'cursive'],
+        serif: ['Quicksand', 'serif'],
+        sans: ['Roboto', 'sans-serif'],
       },
       keyframes: {
         fadeIn: {

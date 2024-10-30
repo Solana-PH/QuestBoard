@@ -35,7 +35,7 @@ export const ActionBar: FC = () => {
   const notif = useAtomValue(notificationsAtom)
 
   return (
-    <div className='animate-fadeIn flex flex-none px-2 h-16 bg-black/50 items-center justify-between gap-5'>
+    <div className='animate-fadeIn flex flex-none px-2 h-16 items-center justify-between gap-5'>
       <div className='flex flex-auto items-center px-3 gap-5 max-w-3xl'>
         <img
           onClick={() => playAlertSound()}
@@ -49,7 +49,7 @@ export const ActionBar: FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             type='text'
             placeholder='Search Quests'
-            className='bg-transparent px-3 py-2 w-full placeholder-stone-500 text-white'
+            className='bg-transparent px-3 py-2 w-full placeholder-slate-500 '
           />
         </div>
       </div>
@@ -63,7 +63,7 @@ export const ActionBar: FC = () => {
               <div className='animate-shake'>
                 <BellRinging size={32} />
               </div>
-              <span className='text-white font-bold bg-red-600 px-2 py-1 rounded'>
+              <span className=' font-bold bg-red-600 px-2 py-1 rounded'>
                 {notif.length}
               </span>
             </>
@@ -87,7 +87,7 @@ export const ActionBar: FC = () => {
                     ConnectionStatus.CONNECTED === connectionStatus &&
                       'bg-green-500',
                     ConnectionStatus.CONNECTING === connectionStatus &&
-                      'bg-amber-500 animate-pulse'
+                      'bg-gray-500 animate-pulse'
                   )}
                 />
               </span>
@@ -95,7 +95,7 @@ export const ActionBar: FC = () => {
           </MenuButton>
           <MenuItems
             anchor='bottom'
-            className='w-52 flex flex-col p-1 bg-black/80 backdrop-blur'
+            className='w-52 flex flex-col p-1 bg-gray-900/80 backdrop-blur'
           >
             <div className='flex flex-col gap-2 py-2'>
               <p className='px-3 text-xs flex items-center justify-between'>
@@ -120,7 +120,7 @@ export const ActionBar: FC = () => {
             <MenuItem>
               <button
                 onClick={() => {}}
-                className='bg-amber-300/5 px-3 py-2 text-left data-[focus]:bg-amber-300/10 transition-colors'
+                className='bg-gray-300/5 px-3 py-2 text-left data-[focus]:bg-gray-300/10 transition-colors'
               >
                 Go Offline
               </button>
@@ -136,7 +136,7 @@ export const ActionBar: FC = () => {
                   // copy to clipboard
                   navigator.clipboard.writeText(sessionKey || '')
                 }}
-                className='bg-amber-300/5 px-3 py-2 text-left data-[focus]:bg-amber-300/10 transition-colors'
+                className='bg-gray-300/5 px-3 py-2 text-left data-[focus]:bg-gray-300/10 transition-colors'
               >
                 Copy Session Keypair
               </button>
@@ -144,7 +144,7 @@ export const ActionBar: FC = () => {
             <MenuItem>
               <button
                 onClick={() => setVisible(true)}
-                className='bg-amber-300/5 px-3 py-2 text-left data-[focus]:bg-amber-300/10 transition-colors'
+                className='bg-gray-300/5 px-3 py-2 text-left data-[focus]:bg-gray-300/10 transition-colors'
               >
                 Change Wallet
               </button>
@@ -152,7 +152,7 @@ export const ActionBar: FC = () => {
             <MenuItem>
               <button
                 onClick={disconnect}
-                className='bg-amber-300/5 px-3 py-2 text-left data-[focus]:bg-amber-300/10 transition-colors'
+                className='bg-gray-300/5 px-3 py-2 text-left data-[focus]:bg-gray-300/10 transition-colors'
               >
                 Disconnect
               </button>
@@ -161,7 +161,7 @@ export const ActionBar: FC = () => {
         </Menu>
         <button
           onClick={() => setShowDialog(Dialogs.CREATE_QUEST)}
-          className='px-3 py-2 flex items-center gap-3 bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+          className='px-3 py-2 flex items-center gap-3 bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
         >
           <Note size={32} />
           <span className='hidden xl:inline'>Post a Quest</span>

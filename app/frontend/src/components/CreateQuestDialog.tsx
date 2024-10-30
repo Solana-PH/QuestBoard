@@ -171,11 +171,11 @@ export const CreateQuestDialog: FC = () => {
           }}
           className={cn(
             'flex flex-col gap-5',
-            'border border-amber-300',
-            'mx-auto max-w-md w-full bg-stone-200 text-amber-950 px-5 pb-5 pt-4'
+            'rounded',
+            'mx-auto max-w-md w-full bg-gray-800  px-5 pb-5 pt-4'
           )}
         >
-          <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-stone-200 z-10'>
+          <h2 className='font-cursive text-2xl flex items-center justify-between py-1 sticky top-0 bg-gray-800 z-10'>
             <span className='font-bold'>Create a Quest</span>
             <button type='button' onClick={() => setShowDialog(Dialogs.NONE)}>
               <X size={24} />
@@ -337,7 +337,7 @@ export const CreateQuestDialog: FC = () => {
             />
           </div>
           {cost > 0 ? (
-            <div className='bg-black/50 text-white'>
+            <div className=''>
               <button
                 type='submit'
                 disabled={busy}
@@ -346,7 +346,7 @@ export const CreateQuestDialog: FC = () => {
                     ? 'opacity-50 pointer-events-none cursor-wait'
                     : 'cursor-pointer',
                   'w-full px-3 py-2 flex items-center justify-center gap-3',
-                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                  'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
                 )}
               >
                 <Note size={32} />
@@ -361,7 +361,7 @@ export const CreateQuestDialog: FC = () => {
                 className={cn(
                   'pointer-events-none',
                   'w-full px-3 py-2 flex items-center justify-center gap-3',
-                  'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+                  'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
                 )}
               >
                 <span className='opacity-50'>

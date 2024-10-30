@@ -168,14 +168,14 @@ const ChatPageInner: FC = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value.substring(0, 120))}
         />
-        <div className='bg-black/50 text-white'>
+        <div className=''>
           <button
             type='submit'
             disabled={!initialized}
             className={cn(
               'cursor-pointer',
               'w-full px-3 py-2 flex items-center justify-center gap-3',
-              'bg-amber-300/10 hover:bg-amber-300/30 transition-colors'
+              'bg-gray-300/10 hover:bg-gray-300/30 transition-colors'
             )}
           >
             <PaperPlaneRight size={32} />
@@ -206,16 +206,16 @@ export const ChatPage: FC = () => {
         fallback={
           <div className='flex flex-col gap-5 flex-auto p-5'>
             <div className='flex flex-col gap-2'>
-              <h2 className='h-10 w-64 bg-amber-950/50 animate-pulse rounded' />
-              <h2 className='h-5 w-56 bg-amber-950/50 animate-pulse rounded' />
+              <h2 className='h-10 w-64 bg-gray-600/50 animate-pulse rounded' />
+              <h2 className='h-5 w-56 bg-gray-600/50 animate-pulse rounded' />
             </div>
             <div className='flex flex-col gap-2'>
-              <div className='h-6 w-72 bg-amber-950/50 animate-pulse rounded' />
-              <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+              <div className='h-6 w-72 bg-gray-600/50 animate-pulse rounded' />
+              <div className='h-6 w-64 bg-gray-600/50 animate-pulse rounded' />
             </div>
             <div className='flex flex-col gap-2'>
-              <div className='h-6 w-36 bg-amber-950/50 animate-pulse rounded' />
-              <div className='h-6 w-64 bg-amber-950/50 animate-pulse rounded' />
+              <div className='h-6 w-36 bg-gray-600/50 animate-pulse rounded' />
+              <div className='h-6 w-64 bg-gray-600/50 animate-pulse rounded' />
             </div>
           </div>
         }
